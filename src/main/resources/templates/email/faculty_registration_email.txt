@@ -1,0 +1,11 @@
+Hello {{Name}},
+
+Your faculty account has been created in ChronoFlex.
+
+Login Email: {{Name}}
+Password: {{Password}}
+
+Please change your password after first login.
+
+Regards,
+ChronoFlex Team

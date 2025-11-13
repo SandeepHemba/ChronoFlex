@@ -1,0 +1,6 @@
+Hello {{Name}},
+
+Your OTP for Chrono Flex College Registration is: {{OTP}}.
+
+Thank you,
+Chrono Flex Team

@@ -1,0 +1,7 @@
+Hello {{Name}},
+
+Your college has approved your Chrono Flex admin registration.
+Please verify your email with this OTP: {{OTP}}.
+
+Thank you,
+Chrono Flex Team

@@ -1,0 +1,7 @@
+Hello {{Name}},
+
+A new admin registration request has been initiated for your college in Chrono Flex.
+Your OTP for verification is: {{OTP}}.
+
+Thank you,
+Chrono Flex Team
