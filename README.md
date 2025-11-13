@@ -55,7 +55,6 @@ ChronoFlex/
 │ └── data.sql
 │── pom.xml
 └── README.md
-
 yaml
 Copy code
 
@@ -95,6 +94,7 @@ Copy code
 ```bash
 git clone https://github.com/your-username/ChronoFlex.git
 cd ChronoFlex
+
 2️⃣ Configure Database
 Create a MySQL database:
 
