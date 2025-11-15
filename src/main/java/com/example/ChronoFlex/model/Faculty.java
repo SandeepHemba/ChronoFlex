@@ -166,4 +166,5 @@ public class Faculty {
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
     }
+
 }

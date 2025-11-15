@@ -11,6 +11,10 @@ public class TimeTableGenerationRequest {
     private Integer templateId;
     private Long adminId;
 
+    // ❗ Replacing adminId with admin email + password
+    private String adminEmail;
+    private String adminPassword;
+
     private TimeTableGenerationFilters filters;
 
     // Getters & Setters
@@ -31,4 +35,12 @@ public class TimeTableGenerationRequest {
 
     public TimeTableGenerationFilters getFilters() { return filters; }
     public void setFilters(TimeTableGenerationFilters filters) { this.filters = filters; }
+
+    public String getAdminEmail() { return adminEmail; }
+    public void setAdminEmail(String adminEmail) { this.adminEmail = adminEmail; }
+
+    public String getAdminPassword() { return adminPassword; }
+    public void setAdminPassword(String adminPassword) { this.adminPassword = adminPassword; }
+
+
 }

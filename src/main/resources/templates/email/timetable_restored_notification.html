@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ChronoFlex – Timetable Restored</title>
+
+  <style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background: #eef3ff;
+        padding: 25px;
+        margin: 0;
+    }
+    .container {
+        max-width: 780px;
+        background: #ffffff;
+        margin: auto;
+        padding: 28px;
+        border-radius: 18px;
+        box-shadow: 0 8px 28px rgba(0,0,0,0.10);
+    }
+    .header {
+        background: linear-gradient(135deg, #4263eb, #5c7cfa);
+        padding: 22px;
+        color: white;
+        text-align: center;
+        border-radius: 14px;
+        font-size: 26px;
+        font-weight: 600;
+        letter-spacing: .6px;
+    }
+    .sub {
+        margin-top: 18px;
+        font-size: 15px;
+        color: #444;
+        text-align: center;
+    }
+    .highlight {
+        color: #4263eb;
+        font-weight: 600;
+    }
+
+    /* Summary Box */
+    .summary-box {
+        background: #f3f6ff;
+        border-left: 5px solid #4263eb;
+        padding: 15px;
+        margin-top: 25px;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #444;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 30px;
+        font-size: 14px;
+    }
+    th {
+        background: #4263eb;
+        color: white;
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+    }
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #e3e8ff;
+        text-align: center;
+    }
+    tr:nth-child(even) td {
+        background: #f7faff;
+    }
+
+    /* Notice Box */
+    .notice {
+        margin-top: 25px;
+        background: #fff4e6;
+        border-left: 5px solid #f08c00;
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 13px;
+        color: #7c5a00;
+    }
+
+    /* Footer */
+    .footer {
+        margin-top: 28px;
+        font-size: 13px;
+        text-align: center;
+        color: #777;
+    }
+  </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">✔ Timetable Restored Successfully</div>
+
+  <p class="sub">
+    Hello <span class="highlight">{{ADMIN_NAME}}</span>,<br>
+    The timetable has been successfully restored for:<br>
+    <b>Semester {{SEMESTER}} – Section {{SECTION}} ({{COLLEGE}})</b><br>
+    Restored at <b>{{TIMESTAMP}}</b>.
+  </p>
+
+  <!-- Summary Section -->
+  <div class="summary-box">
+    <b>📌 Restoration Summary</b><br><br>
+    • Total slots restored: <b>{{SLOTS_COUNT}}</b><br>
+    • Restore type: <b>Strict Restore</b> (no conflicting slot allowed)<br>
+    • Triggered by: <b>{{ADMIN_NAME}}</b> (Admin)<br>
+    • Operation: <b>Complete timetable rewrite</b> for this class<br>
+    • Previous active timetable was fully cleared before applying restore<br>
+  </div>
+
+  <h3 style="text-align:center; margin-top:35px; color:#4263eb;">
+    Restored Timetable Overview
+  </h3>
+
+  <table>
+    {{TIMETABLE_ROWS}}
+  </table>
+
+  <!-- Important Notice -->
+  <div class="notice">
+    ⚠️ <b>Please Review Carefully:</b><br>
+    Although this restore was successful, we recommend verifying:<br>
+    • No new subjects have been added to the department after the backup<br>
+    • Class template timings haven’t changed since the backup<br>
+    • Faculty availability has not been updated or blocked recently<br>
+    • Existing timetable for other classes is unaffected<br><br>
+    If any inconsistency is observed, kindly regenerate or adjust the timetable accordingly.
+  </div>
+
+  <div class="footer">
+    — ChronoFlex Automated Scheduling System —<br>
+    <small>Smart • Reliable • Error-Free Timetabling</small>
+  </div>
+
+</div>
+
+</body>
+</html>

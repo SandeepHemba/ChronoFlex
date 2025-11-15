@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Timetable Deletion Notification</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            background: #ffffff;
+            max-width: 650px;
+            margin: auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        h2 {
+            color: #d9534f;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .details-box {
+            background: #f9fcff;
+            border-left: 4px solid #007bff;
+            padding: 12px 18px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+
+        .details-box p {
+            margin: 6px 0;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .highlight {
+            font-weight: bold;
+            color: #007bff;
+        }
+
+        .deleted-count {
+            font-size: 17px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <h2>Timetable Deleted Successfully</h2>
+
+    <p>Dear <strong>{{ADMIN_NAME}}</strong>,</p>
+
+    <p>
+        This is to inform you that the timetable for the specified class has been
+        <strong style="color:#d9534f;">successfully deleted</strong> and a complete backup has been created for safety.
+    </p>
+
+    <div class="details-box">
+        <p><strong>College:</strong> {{COLLEGE}}</p>
+        <p><strong>Semester:</strong> {{SEMESTER}}</p>
+        <p><strong>Section:</strong> {{SECTION}}</p>
+        <p><strong>Slots Deleted & Backed Up:</strong>
+            <span class="deleted-count">{{SLOTS_COUNT}}</span>
+        </p>
+        <p><strong>Timestamp:</strong> {{TIMESTAMP}}</p>
+    </div>
+
+    <p>
+        You may restore or review the deleted timetable anytime using the
+        <strong>Delete History</strong> feature in ChronoFlex.
+    </p>
+
+    <p>
+        If any of the above details seem incorrect, please regenerate the timetable or contact support.
+    </p>
+
+    <div class="footer">
+        Regards,<br>
+        <strong>ChronoFlex Team</strong>
+    </div>
+
+</div>
+</body>
+</html>

@@ -3,9 +3,11 @@ package com.example.ChronoFlex.service;
 import com.example.ChronoFlex.dto.TimeTableGenerationFilters;
 import com.example.ChronoFlex.model.*;
 import com.example.ChronoFlex.repository.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.chronoflex.repository.FacultyAvailabilityRepository;
 
 import java.time.LocalTime;
 import java.util.*;
@@ -21,13 +23,26 @@ public class TimeTableGeneratorService {
     private final TemplateRepository templateRepo;
     private final TimeTableAuditLogRepository auditLogRepo; // ✅ Added
 
+    private final AdminRepository adminRepo;
+    private final CollegeRepository collegeRepo;
+    private final FacultyAvailabilityRepository availabilityRepo;
+    private final EmailService emailService;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
+
+
     public TimeTableGeneratorService(
             FacultySubjectMapRepository facultySubjectMapRepo,
             FacultyAvailabilityService availabilityService,
             CollegeClassRepository classRepo,
             SubjectRepository subjectRepo,
             TemplateRepository templateRepo,
-            TimeTableAuditLogRepository auditLogRepo // ✅ Added
+            TimeTableAuditLogRepository auditLogRepo, // ✅ Added
+
+            AdminRepository adminRepo,
+            CollegeRepository collegeRepo,
+            FacultyAvailabilityRepository availabilityRepo,
+            EmailService emailService
     ) {
         this.facultySubjectMapRepo = facultySubjectMapRepo;
         this.availabilityService = availabilityService;
@@ -35,6 +50,12 @@ public class TimeTableGeneratorService {
         this.subjectRepo = subjectRepo;
         this.templateRepo = templateRepo;
         this.auditLogRepo = auditLogRepo; // ✅ Added
+
+        // ⭐ Assign new dependencies
+        this.adminRepo = adminRepo;
+        this.collegeRepo = collegeRepo;
+        this.availabilityRepo = availabilityRepo;
+        this.emailService = emailService;
     }
 
     private String toRoman(String semesterNumber) {
@@ -364,4 +385,73 @@ public class TimeTableGeneratorService {
     public FacultyAvailabilityService getAvailabilityService() {
         return this.availabilityService;
     }
+
+
+
+
+    public String deleteTimetableForClass(String adminEmail,
+                                          String adminPassword,
+                                          String semesterNumber,
+                                          String section) throws Exception {
+
+        // 🔐 Step 1: Authenticate admin
+        Admin admin = adminRepo.findByEmail(adminEmail)
+                .orElseThrow(() -> new IllegalAccessException("Invalid admin email or password"));
+
+        if (!passwordEncoder.matches(adminPassword, admin.getPassword()))
+            throw new IllegalAccessException("Invalid admin credentials");
+
+        if (!admin.isVerified())
+            throw new IllegalAccessException("Admin account not verified.");
+
+        // 🏫 Step 2: Fetch admin's college
+        College college = collegeRepo.findByCollegeCode(admin.getCollegeCode())
+                .orElseThrow(() -> new IllegalStateException("College not found for admin"));
+
+        Long collegeId = college.getCollegeId();
+
+        // Convert semester → Roman
+        String semester = toRoman(semesterNumber);
+
+        // 🧩 Step 3: Fetch class row
+        CollegeClass collegeClass = classRepo
+                .findByCollege_CollegeIdAndSemesterAndSection(collegeId, semester, section)
+                .orElseThrow(() -> new IllegalStateException("Class not found for semester & section"));
+
+        Integer classId = collegeClass.getClassId();
+
+        // ❌ Step 4: Delete timetable
+        int freed = availabilityRepo.deleteByClassAndSemesterAndSection(classId, semester, section);
+
+        String message = "Deleted " + freed + " timetable slots for " + semester + "-" + section;
+
+        // 🧾 Step 5: Log audit entry
+        logAudit(
+                admin.getAdminId(),
+                collegeId,
+                null,
+                "DELETE_TIMETABLE",
+                semester,
+                section,
+                "success",
+                message
+        );
+
+        // ✉️ Step 6: Send email notification
+        Map<String, String> values = Map.of(
+                "ADMIN_NAME", admin.getName(),
+                "SEMESTER", semester,
+                "SECTION", section,
+                "COLLEGE", college.getCollegeName()
+        );
+
+        emailService.sendEmailFromTemplate(
+                "timetable_deleted_notification.html",
+                admin.getEmail(),
+                values
+        );
+
+        return "✅ " + message;
+    }
+
 }

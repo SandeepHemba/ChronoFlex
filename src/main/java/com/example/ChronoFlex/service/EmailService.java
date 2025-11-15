@@ -9,6 +9,10 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -23,29 +27,58 @@ public class EmailService {
     @Autowired
     private EmailLogRepository emailLogRepository;
 
+
     @Async
     public void sendEmailFromTemplate(String templateFileName, String toEmail, Map<String, String> values) throws IOException {
 
         ClassPathResource resource = new ClassPathResource("templates/email/" + templateFileName);
         String body = new String(resource.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
 
+        // Replace placeholders {{KEY}}
         for (Map.Entry<String, String> entry : values.entrySet()) {
             body = body.replace("{{" + entry.getKey() + "}}", entry.getValue());
         }
 
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(toEmail);
-        message.setSubject("Chrono Flex Notification");
-        message.setText(body);
+        boolean isHtml = templateFileName.endsWith(".html") || templateFileName.endsWith(".htm");
 
         EmailLog log = new EmailLog();
         log.setRecipientEmail(toEmail);
-        log.setSubject(message.getSubject());
+        log.setSubject("Chrono Flex Notification");
         log.setBody(body);
+        log.setTimestamp(LocalDateTime.now());
 
         try {
-            mailSender.send(message);
-            log.setStatus("SENT");
+            if (isHtml) {
+                // ===========================
+                //      SEND HTML EMAIL
+                // ===========================
+                MimeMessage mimeMessage = mailSender.createMimeMessage();
+                MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+
+                helper.setTo(toEmail);
+                helper.setSubject("Chrono Flex Notification");
+                helper.setText(body, true); // <-- true = HTML
+
+                mailSender.send(mimeMessage);
+                log.setStatus("SENT_HTML");
+
+            } else {
+                // ===========================
+                //   SEND PLAIN TEXT EMAIL
+                // ===========================
+                SimpleMailMessage message = new SimpleMailMessage();
+                message.setTo(toEmail);
+                message.setSubject("Chrono Flex Notification");
+                message.setText(body);
+
+                mailSender.send(message);
+                log.setStatus("SENT_TEXT");
+            }
+
+        } catch (MessagingException e) {
+            log.setStatus("FAILED");
+            log.setErrorMessage(e.getMessage());
+
         } catch (Exception e) {
             log.setStatus("FAILED");
             log.setErrorMessage(e.getMessage());
@@ -53,6 +86,8 @@ public class EmailService {
 
         emailLogRepository.save(log);
     }
+
+
 
     // ============================================================
     // ✅ New Methods for Admin Registration Email Logs

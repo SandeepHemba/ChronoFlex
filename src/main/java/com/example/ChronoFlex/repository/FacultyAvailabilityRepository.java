@@ -1,10 +1,20 @@
 package com.example.chronoflex.repository;
 
+
 import com.example.ChronoFlex.model.FacultyAvailability;
 import com.example.ChronoFlex.model.FacultyAvailability.DayOfWeekEnum;
+import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import com.example.ChronoFlex.model.FacultyAvailability;
+import com.example.ChronoFlex.model.FacultyAvailability.DayOfWeekEnum;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import java.time.LocalTime;
+import java.util.List;
 
 import java.time.LocalTime;
 import java.util.List;
@@ -54,4 +64,37 @@ public interface FacultyAvailabilityRepository extends JpaRepository<FacultyAvai
     // ✅ Fetch all slots for a specific college
     List<FacultyAvailability> findByCollegeId(Long collegeId);
 
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM FacultyAvailability f WHERE f.classId = :classId AND f.semester = :semester AND f.section = :section")
+    int deleteByClassAndSemesterAndSection(@Param("classId") Integer classId,
+                                           @Param("semester") String semester,
+                                           @Param("section") String section);
+
+
+
+    @Query("SELECT fa FROM FacultyAvailability fa " +
+            "WHERE fa.facultyId = :facultyId AND fa.dayOfWeek = :day " +
+            "AND fa.startTime < :slotEnd AND fa.endTime > :slotStart")
+    List<FacultyAvailability> findFacultyConflicts(
+            @Param("facultyId") Long facultyId,
+            @Param("day") DayOfWeekEnum day,
+            @Param("slotStart") LocalTime slotStart,
+            @Param("slotEnd") LocalTime slotEnd
+    );
+
+    @Query("SELECT fa FROM FacultyAvailability fa " +
+            "WHERE fa.classId = :classId AND fa.dayOfWeek = :day " +
+            "AND fa.startTime < :slotEnd AND fa.endTime > :slotStart")
+    List<FacultyAvailability> findClassConflicts(
+            @Param("classId") Integer classId,
+            @Param("day") DayOfWeekEnum day,
+            @Param("slotStart") LocalTime slotStart,
+            @Param("slotEnd") LocalTime slotEnd
+    );
+
+    void deleteByClassIdAndSemesterAndSection(Integer classId, String semester, String section);
+
+    List<FacultyAvailability> findByDayOfWeekAndStartTimeBetween(DayOfWeekEnum day, LocalTime from, LocalTime to);
 }
