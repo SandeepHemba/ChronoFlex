@@ -21,6 +21,10 @@ public class TemplateRequest {
     private Integer maxHoursPerFacultyPerDay;
     private Integer maxHoursPerFacultyPerWeek;
 
+    private LocalTime lunchBreakFrom;
+    private LocalTime lunchBreakTo;
+
+
     // Getters & Setters
     public String getAdminEmail() { return adminEmail; }
     public void setAdminEmail(String adminEmail) { this.adminEmail = adminEmail; }
@@ -66,4 +70,20 @@ public class TemplateRequest {
 
     public Integer getMaxHoursPerFacultyPerWeek() { return maxHoursPerFacultyPerWeek; }
     public void setMaxHoursPerFacultyPerWeek(Integer maxHoursPerFacultyPerWeek) { this.maxHoursPerFacultyPerWeek = maxHoursPerFacultyPerWeek; }
+
+    public LocalTime getLunchBreakFrom() {
+        return lunchBreakFrom;
+    }
+
+    public void setLunchBreakFrom(LocalTime lunchBreakFrom) {
+        this.lunchBreakFrom = lunchBreakFrom;
+    }
+
+    public LocalTime getLunchBreakTo() {
+        return lunchBreakTo;
+    }
+
+    public void setLunchBreakTo(LocalTime lunchBreakTo) {
+        this.lunchBreakTo = lunchBreakTo;
+    }
 }

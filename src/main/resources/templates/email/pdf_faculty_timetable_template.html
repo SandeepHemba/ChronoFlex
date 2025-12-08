@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8" />
+
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: #eef2f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Outer PDF Container */
+        .pdf-container {
+            max-width: 750px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 14px;
+            padding: 30px;
+            border: 1px solid #dce3eb;
+        }
+
+        /* Header Style (similar to email) */
+        .header {
+            background: linear-gradient(135deg, #1c7ed6, #228be6);
+            color: #ffffff;
+            padding: 18px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        /* Sub Header for College */
+        .college-bar {
+            margin-top: 18px;
+            background: #f0f6ff;
+            border-left: 5px solid #1c7ed6;
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #1c7ed6;
+        }
+
+        /* Faculty Banner */
+        .faculty-banner {
+            margin-top: 18px;
+            padding: 12px 14px;
+            background: #f8fbff;
+            border-radius: 10px;
+            border-left: 5px solid #4dabf7;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1c7ed6;
+        }
+
+        /* Table Title */
+        .title {
+            margin-top: 22px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #1c7ed6;
+        }
+
+        /* Table Style */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            font-size: 14px;
+        }
+
+        th {
+            background: #1c7ed6;
+            color: white;
+            padding: 10px;
+            border: 1px solid #d0d7df;
+            text-align: center;
+        }
+
+        td {
+            background: #f8fbff;
+            padding: 10px;
+            border: 1px solid #d0d7df;
+            text-align: center;
+        }
+
+        tr:nth-child(even) td {
+            background: #eef4fa;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 13px;
+            color: #555;
+        }
+
+        .footer b {
+            color: #1c7ed6;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="pdf-container">
+
+    <div class="header">
+        ChronoFlex – Faculty Timetable
+    </div>
+
+    <div class="college-bar">
+        {{COLLEGE_NAME}}
+    </div>
+
+    <div class="faculty-banner">
+        Faculty: {{FACULTY_NAME}}
+    </div>
+
+    <div class="title">Teaching Schedule</div>
+
+    {{TIMETABLE_ROWS}}
+
+    <div class="footer">
+        Powered by <b>ChronoFlex</b> • Automated Timetable System
+    </div>
+
+</div>
+
+</body>
+</html>

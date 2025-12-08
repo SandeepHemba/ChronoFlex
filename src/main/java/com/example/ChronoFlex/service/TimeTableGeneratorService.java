@@ -21,7 +21,7 @@ public class TimeTableGeneratorService {
     private final CollegeClassRepository classRepo;
     private final SubjectRepository subjectRepo;
     private final TemplateRepository templateRepo;
-    private final TimeTableAuditLogRepository auditLogRepo; // ✅ Added
+    private final TimeTableAuditLogRepository auditLogRepo;
 
     private final AdminRepository adminRepo;
     private final CollegeRepository collegeRepo;
@@ -29,15 +29,13 @@ public class TimeTableGeneratorService {
     private final EmailService emailService;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-
-
     public TimeTableGeneratorService(
             FacultySubjectMapRepository facultySubjectMapRepo,
             FacultyAvailabilityService availabilityService,
             CollegeClassRepository classRepo,
             SubjectRepository subjectRepo,
             TemplateRepository templateRepo,
-            TimeTableAuditLogRepository auditLogRepo, // ✅ Added
+            TimeTableAuditLogRepository auditLogRepo,
 
             AdminRepository adminRepo,
             CollegeRepository collegeRepo,
@@ -49,9 +47,8 @@ public class TimeTableGeneratorService {
         this.classRepo = classRepo;
         this.subjectRepo = subjectRepo;
         this.templateRepo = templateRepo;
-        this.auditLogRepo = auditLogRepo; // ✅ Added
+        this.auditLogRepo = auditLogRepo;
 
-        // ⭐ Assign new dependencies
         this.adminRepo = adminRepo;
         this.collegeRepo = collegeRepo;
         this.availabilityRepo = availabilityRepo;
@@ -110,7 +107,6 @@ public class TimeTableGeneratorService {
 
             Map<String, String> canonMap = buildCanonicalMap(subjects);
 
-            // Template setup
             List<String> workingDaysList = Arrays.stream(template.getWorkingDays().split(","))
                     .map(s -> s.trim().toUpperCase()).collect(Collectors.toList());
             int slotDuration = template.getDurationPerClass();
@@ -121,7 +117,10 @@ public class TimeTableGeneratorService {
             LocalTime breakFrom = template.getBreakTimeFrom();
             LocalTime breakTo = template.getBreakTimeTo();
 
-            // Subject ordering: priority first
+            // ⭐ NEW Lunch break references
+            LocalTime lunchFrom = template.getLunchBreakFrom();
+            LocalTime lunchTo = template.getLunchBreakTo();
+
             List<String> priorityEarlyLower = filters.getPrioritySubjectsEarly() == null
                     ? Collections.emptyList()
                     : filters.getPrioritySubjectsEarly().stream().map(String::toLowerCase).collect(Collectors.toList());
@@ -137,7 +136,6 @@ public class TimeTableGeneratorService {
                 Collections.shuffle(orderedSubjects);
             }
 
-            // Break configuration
             long totalDayMinutes = java.time.Duration.between(startTime, endTime).toMinutes();
             List<LocalTime[]> breaks = new ArrayList<>();
             if (breakFrom != null && breakTo != null) {
@@ -151,7 +149,6 @@ public class TimeTableGeneratorService {
                 }
             }
 
-            // Tracking maps
             Map<String, Integer> perWeekCounts = new HashMap<>();
             Map<String, Map<String, Integer>> perDayCounts = new HashMap<>();
             Map<String, String> lastSubjectPerDay = new HashMap<>();
@@ -184,18 +181,37 @@ public class TimeTableGeneratorService {
                     final LocalTime currentSlotStart = slotStart;
                     final LocalTime currentSlotEnd = slotEnd;
 
+                    // -------------------------
+                    // ⭐ UPDATED BREAK LOGIC
+                    // -------------------------
                     boolean isBreak = breaks.stream().anyMatch(b ->
                             currentSlotStart.isBefore(b[1]) && currentSlotEnd.isAfter(b[0])
                     );
-                    if (isBreak) {
-                        LocalTime breakEndTime = breaks.stream()
-                                .filter(b -> currentSlotStart.isBefore(b[1]) && currentSlotEnd.isAfter(b[0]))
-                                .map(b -> b[1])
-                                .findFirst()
-                                .orElse(currentSlotEnd);
-                        slotStart = breakEndTime;
+
+                    // ⭐ NEW: Lunch break logic
+                    boolean isLunchBreak = false;
+                    if (lunchFrom != null && lunchTo != null) {
+                        isLunchBreak = currentSlotStart.isBefore(lunchTo) && currentSlotEnd.isAfter(lunchFrom);
+                    }
+
+                    if (isBreak || isLunchBreak) {
+
+                        if (isLunchBreak) {
+                            slotStart = lunchTo; // skip lunch
+                        } else {
+                            LocalTime breakEndTime = breaks.stream()
+                                    .filter(b -> currentSlotStart.isBefore(b[1]) && currentSlotEnd.isAfter(b[0]))
+                                    .map(b -> b[1])
+                                    .findFirst()
+                                    .orElse(currentSlotEnd);
+                            slotStart = breakEndTime;
+                        }
+
                         continue;
                     }
+                    // -------------------------
+                    // END UPDATED BREAK SECTION
+                    // -------------------------
 
                     if (remainingFreePerDay.get(dayKey) > 0 || remainingFreeWeek > 0) {
                         if (remainingFreePerDay.get(dayKey) > 0) {
@@ -209,10 +225,8 @@ public class TimeTableGeneratorService {
                         }
                     }
 
-                    // --- Candidate subject list for the day ---
                     List<Subject> dayCandidates = new ArrayList<>(orderedSubjects);
 
-                    // Labs on preferred days first
                     if (filters.getPreferredDaysForLabs() != null && !filters.getPreferredDaysForLabs().isEmpty()) {
                         List<Subject> prefLabs = new ArrayList<>();
                         List<Subject> others = new ArrayList<>();
@@ -232,7 +246,6 @@ public class TimeTableGeneratorService {
                         dayCandidates.addAll(others);
                     }
 
-                    // Fairness: under-used subjects first
                     dayCandidates.sort(Comparator.comparingInt(s -> perWeekCounts.getOrDefault(s.getSubjectName(), 0)));
 
                     Subject chosen = null;
@@ -275,7 +288,6 @@ public class TimeTableGeneratorService {
                 }
             }
 
-            // Validation + API response
             Set<String> subjectsUsed = perWeekCounts.keySet();
             Set<String> subjectsExpected = subjects.stream().map(Subject::getSubjectName).collect(Collectors.toSet());
             Set<String> missing = new HashSet<>(subjectsExpected);
@@ -309,7 +321,6 @@ public class TimeTableGeneratorService {
         }
     }
 
-    // ✅ Audit logger method
     private void logAudit(Long adminId, Long collegeId, Integer templateId,
                           String templateName, String semester, String section,
                           String status, String message) {
@@ -317,15 +328,11 @@ public class TimeTableGeneratorService {
             TimeTableAuditLog log = new TimeTableAuditLog(adminId, collegeId, templateId,
                     templateName, semester, section, status, message);
             auditLogRepo.save(log);
-            System.out.println("🧾 [AUDIT] " + message + " (Admin: " + adminId + ")");
         } catch (Exception e) {
             System.out.println("⚠️ Failed to log audit entry: " + e.getMessage());
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Helper utilities (unchanged)
-    // -----------------------------------------------------------------------
     private static boolean isLab(String subjectName) {
         if (subjectName == null) return false;
         String s = subjectName.toLowerCase();
@@ -386,15 +393,11 @@ public class TimeTableGeneratorService {
         return this.availabilityService;
     }
 
-
-
-
     public String deleteTimetableForClass(String adminEmail,
                                           String adminPassword,
                                           String semesterNumber,
                                           String section) throws Exception {
 
-        // 🔐 Step 1: Authenticate admin
         Admin admin = adminRepo.findByEmail(adminEmail)
                 .orElseThrow(() -> new IllegalAccessException("Invalid admin email or password"));
 
@@ -404,28 +407,23 @@ public class TimeTableGeneratorService {
         if (!admin.isVerified())
             throw new IllegalAccessException("Admin account not verified.");
 
-        // 🏫 Step 2: Fetch admin's college
         College college = collegeRepo.findByCollegeCode(admin.getCollegeCode())
                 .orElseThrow(() -> new IllegalStateException("College not found for admin"));
 
         Long collegeId = college.getCollegeId();
 
-        // Convert semester → Roman
         String semester = toRoman(semesterNumber);
 
-        // 🧩 Step 3: Fetch class row
         CollegeClass collegeClass = classRepo
                 .findByCollege_CollegeIdAndSemesterAndSection(collegeId, semester, section)
                 .orElseThrow(() -> new IllegalStateException("Class not found for semester & section"));
 
         Integer classId = collegeClass.getClassId();
 
-        // ❌ Step 4: Delete timetable
         int freed = availabilityRepo.deleteByClassAndSemesterAndSection(classId, semester, section);
 
         String message = "Deleted " + freed + " timetable slots for " + semester + "-" + section;
 
-        // 🧾 Step 5: Log audit entry
         logAudit(
                 admin.getAdminId(),
                 collegeId,
@@ -437,7 +435,6 @@ public class TimeTableGeneratorService {
                 message
         );
 
-        // ✉️ Step 6: Send email notification
         Map<String, String> values = Map.of(
                 "ADMIN_NAME", admin.getName(),
                 "SEMESTER", semester,
@@ -446,12 +443,11 @@ public class TimeTableGeneratorService {
         );
 
         emailService.sendEmailFromTemplate(
-                "timetable_deleted_notification.html",
+                "timetable_deleted_notification_NoBackup.html",
                 admin.getEmail(),
                 values
         );
 
         return "✅ " + message;
     }
-
 }

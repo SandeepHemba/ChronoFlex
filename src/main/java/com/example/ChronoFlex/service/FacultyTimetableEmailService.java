@@ -8,14 +8,17 @@ import com.example.ChronoFlex.model.Faculty;
 import com.example.ChronoFlex.repository.AdminRepository;
 import com.example.ChronoFlex.repository.CollegeRepository;
 import com.example.ChronoFlex.repository.FacultyRepository;
+import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.time.LocalDateTime;
@@ -98,10 +101,27 @@ public class FacultyTimetableEmailService {
                     .replace("{{TIMETABLE_ROWS}}", tableHTML);
 
 
+            // Generate PDF using timetable only (tableHTML) or full HTML
+            // Load stylish PDF template
+            String pdfTemplate = loadTemplate("templates/email/pdf_faculty_timetable_template.html");
+
+            // Replace placeholders
+            String pdfHtml = pdfTemplate
+                    .replace("{{FACULTY_NAME}}", escapeXml(facultyDTO.getFacultyName()))
+                    .replace("{{COLLEGE_NAME}}", escapeXml(collegeName))
+                    .replace("{{TIMETABLE_ROWS}}", (tableHTML));
+
+
+            // Generate PDF
+            byte[] pdfBytes = generateTimetablePdf(pdfHtml);
+
+
+
             try {
                 sendEmail(faculty.getEmail(),
                         "Your Faculty Timetable - ChronoFlex",
-                        personalizedHtml);
+                        personalizedHtml,
+                        pdfBytes);
 
                 // ✅ Log successful email
                 emailLogService.logEmailActivity(
@@ -147,13 +167,16 @@ public class FacultyTimetableEmailService {
     }
 
     // 🧩 Send email with HTML body
-    private void sendEmail(String to, String subject, String htmlContent) throws MessagingException {
+    private void sendEmail(String to, String subject, String htmlContent,byte[] pdfBytes) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(htmlContent, true);
+
+        // Attach PDF
+        helper.addAttachment("Timetable.pdf", new ByteArrayResource(pdfBytes));
 
         mailSender.send(message);
     }
@@ -209,5 +232,27 @@ public class FacultyTimetableEmailService {
         sb.append("</tbody></table>");
         return sb.toString();
     }
+
+
+    private byte[] generateTimetablePdf(String htmlContent) {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            PdfRendererBuilder builder = new PdfRendererBuilder();
+            builder.withHtmlContent(htmlContent, null);
+            builder.toStream(outputStream);
+            builder.run();
+            return outputStream.toByteArray();
+        } catch (Exception e) {
+            throw new RuntimeException("PDF generation failed: " + e.getMessage());
+        }
+    }
+
+    private String escapeXml(String text) {
+        if (text == null) return "";
+        return text
+                .replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;");
+    }
+
 
 }

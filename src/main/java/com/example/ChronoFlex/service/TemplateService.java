@@ -57,6 +57,9 @@ public class TemplateService {
         template.setMaxHoursPerFacultyPerWeek(request.getMaxHoursPerFacultyPerWeek());
         template.setCreatedBy(admin);
         template.setCreatedAt(LocalDateTime.now());
+        template.setLunchBreakFrom(request.getLunchBreakFrom());
+        template.setLunchBreakTo(request.getLunchBreakTo());
+
 
         return templateRepository.save(template);
     }
@@ -110,6 +113,11 @@ public class TemplateService {
             template.setMaxHoursPerFacultyPerDay(request.getMaxHoursPerFacultyPerDay());
         if (request.getMaxHoursPerFacultyPerWeek() != null)
             template.setMaxHoursPerFacultyPerWeek(request.getMaxHoursPerFacultyPerWeek());
+        if (request.getLunchBreakFrom() != null)
+            template.setLunchBreakFrom(request.getLunchBreakFrom());
+        if (request.getLunchBreakTo() != null)
+            template.setLunchBreakTo(request.getLunchBreakTo());
+
 
         template.setUpdatedAt(LocalDateTime.now());
         return templateRepository.save(template);

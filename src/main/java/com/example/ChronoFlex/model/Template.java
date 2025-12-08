@@ -66,6 +66,13 @@ public class Template {
     @Column(length = 10)
     private Status status = Status.ACTIVE;
 
+    @Column(nullable = true)
+    private LocalTime lunchBreakFrom;
+
+    @Column(nullable = true)
+    private LocalTime lunchBreakTo;
+
+
     public enum Status {
         ACTIVE, INACTIVE
     }
@@ -127,5 +134,11 @@ public class Template {
     public Status getStatus() { return status; }
     public void setStatus(Status status) { this.status = status; }
 
+
+    public LocalTime getLunchBreakFrom() { return lunchBreakFrom; }
+    public void setLunchBreakFrom(LocalTime lunchBreakFrom) { this.lunchBreakFrom = lunchBreakFrom; }
+
+    public LocalTime getLunchBreakTo() { return lunchBreakTo; }
+    public void setLunchBreakTo(LocalTime lunchBreakTo) { this.lunchBreakTo = lunchBreakTo; }
 
 }
