@@ -11,12 +11,12 @@ import java.util.*;
 public class TimeTableViewService {
 
     private final CollegeClassRepository classRepo;
-    private final com.example.chronoflex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo;
+    private final com.example.ChronoFlex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo;
     private final SubjectRepository subjectRepo;
     private final FacultyRepository facultyRepo;
 
     public TimeTableViewService(CollegeClassRepository classRepo,
-                                com.example.chronoflex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo,
+                                com.example.ChronoFlex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo,
                                 SubjectRepository subjectRepo,
                                 FacultyRepository facultyRepo) {
         this.classRepo = classRepo;
