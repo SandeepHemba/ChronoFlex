@@ -27,7 +27,7 @@ public class TimeTableRestoreService {
     private final TimeTableBackupRepository backupRepo;
 
     // repository in different package (your project)
-    private final com.example.chronoflex.repository.FacultyAvailabilityRepository availabilityRepo;
+    private final com.example.ChronoFlex.repository.FacultyAvailabilityRepository availabilityRepo;
 
     private final TimeTableAuditLogRepository auditLogRepo;
     private final EmailService emailService;
@@ -40,7 +40,7 @@ public class TimeTableRestoreService {
             FacultyRepository facultyRepo,
             SubjectRepository subjectRepo,
             TimeTableBackupRepository backupRepo,
-            com.example.chronoflex.repository.FacultyAvailabilityRepository availabilityRepo,
+            com.example.ChronoFlex.repository.FacultyAvailabilityRepository availabilityRepo,
             TimeTableAuditLogRepository auditLogRepo,
             EmailService emailService
     ) {
