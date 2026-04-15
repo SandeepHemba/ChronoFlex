@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class FacultyNotificationService {
 
     private final FacultyNotificationSettingRepository settingRepo;
-    private final com.example.chronoflex.repository.FacultyAvailabilityRepository availabilityRepo;
+    private final com.example.ChronoFlex.repository.FacultyAvailabilityRepository availabilityRepo;
     private final FacultyRepository facultyRepo;
     private final AdminRepository adminRepo;
     private final SubjectRepository subjectRepo;
@@ -31,7 +31,7 @@ public class FacultyNotificationService {
 
     public FacultyNotificationService(
             FacultyNotificationSettingRepository settingRepo,
-            com.example.chronoflex.repository.FacultyAvailabilityRepository availabilityRepo,
+            com.example.ChronoFlex.repository.FacultyAvailabilityRepository availabilityRepo,
             FacultyRepository facultyRepo,
             AdminRepository adminRepo,
             SubjectRepository subjectRepo,
