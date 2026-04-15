@@ -1,4 +1,4 @@
-package com.example.chronoflex.repository;
+package com.example.ChronoFlex.repository;
 
 
 import com.example.ChronoFlex.model.FacultyAvailability;
