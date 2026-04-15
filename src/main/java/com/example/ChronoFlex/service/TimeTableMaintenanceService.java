@@ -15,7 +15,7 @@ public class TimeTableMaintenanceService {
     private final AdminRepository adminRepo;
     private final CollegeRepository collegeRepo;
     private final CollegeClassRepository classRepo;
-    private final com.example.chronoflex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo;
+    private final com.example.ChronoFlex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo;
     private final TimeTableBackupRepository backupRepo;
     private final TimeTableAuditLogRepository auditLogRepo;
     private final EmailService emailService; // existing email logger + sender
@@ -24,7 +24,7 @@ public class TimeTableMaintenanceService {
     public TimeTableMaintenanceService(AdminRepository adminRepo,
                                        CollegeRepository collegeRepo,
                                        CollegeClassRepository classRepo,
-                                       com.example.chronoflex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo,
+                                       com.example.ChronoFlex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo,
                                        TimeTableBackupRepository backupRepo,
                                        TimeTableAuditLogRepository auditLogRepo,
                                        EmailService emailService) {
