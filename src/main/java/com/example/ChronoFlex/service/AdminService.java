@@ -12,6 +12,9 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpSession;
+
 
 @Service
 public class AdminService {
@@ -58,7 +61,7 @@ public class AdminService {
         );
 
         emailService.sendEmailFromTemplate(
-                "college_admin_verification_otp.txt",
+                "college_admin_verification_otp.html",
                 college.getContactEmail(),
                 values
         );
@@ -89,7 +92,7 @@ public class AdminService {
             );
 
             emailService.sendEmailFromTemplate(
-                    "admin_final_verification_otp.txt",
+                    "admin_final_verification_otp.html",
                     admin.getEmail(),
                     values
             );
@@ -185,7 +188,7 @@ public class AdminService {
 
         // Send using your existing EmailService
         emailService.sendEmailFromTemplate(
-                "admin_password_reset_otp.txt",
+                "admin_password_reset_otp.html",
                 email,
                 Map.of("Name", admin.getName(), "OTP", otp)
         );

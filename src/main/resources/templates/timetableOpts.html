@@ -1,0 +1,2659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoFlex | Templates</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --cream: #FAF7F2; --cream-2: #F2EDE4; --cream-3: #E8DDD0;
+            --warm-white: #FFFEFB; --text: #1C1C1E; --text-2: #3A3A3C;
+            --text-muted: #6B6B70; --text-faint: #AEAEB2;
+            --accent: #4A3728; --accent-warm: #8B6F47; --gold: #C9A96E; --gold-light: #E8C98A;
+            --accent-glow: rgba(139,111,71,0.12); --border: rgba(139,111,71,0.15); --border-2: rgba(139,111,71,0.08);
+            --panel: rgba(250,247,242,0.92); --sidebar-bg: rgba(255,254,251,0.96);
+            --shadow-sm: 0 1px 4px rgba(74,55,40,0.07); --shadow-md: 0 4px 20px rgba(74,55,40,0.1); --shadow-lg: 0 12px 48px rgba(74,55,40,0.14);
+            --card-bg: rgba(255,254,251,0.9); --hover-bg: rgba(139,111,71,0.06); --active-bg: rgba(139,111,71,0.1);
+            --sidebar-w: 260px; --header-h: 70px;
+            --radius-sm: 10px; --radius-md: 16px; --radius-lg: 22px;
+            --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+        }
+        html.dark {
+            --cream: #111113; --cream-2: #181819; --cream-3: #222224;
+            --warm-white: #1A1A1C; --text: #F5F4F0; --text-2: #E0DDD8;
+            --text-muted: #8A8A8F; --text-faint: #5A5A5F;
+            --accent: #C9A96E; --accent-warm: #E8C98A; --gold: #C9A96E; --gold-light: #E8C98A;
+            --accent-glow: rgba(201,169,110,0.1); --border: rgba(201,169,110,0.12); --border-2: rgba(255,255,255,0.05);
+            --panel: rgba(24,24,25,0.94); --sidebar-bg: rgba(18,18,20,0.98);
+            --shadow-sm: 0 1px 4px rgba(0,0,0,0.25); --shadow-md: 0 4px 20px rgba(0,0,0,0.35); --shadow-lg: 0 12px 48px rgba(0,0,0,0.5);
+            --card-bg: rgba(24,24,26,0.92); --hover-bg: rgba(201,169,110,0.07); --active-bg: rgba(201,169,110,0.12);
+        }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; transition: background var(--transition), color var(--transition); }
+        body::before { content: ''; position: fixed; inset: 0; background-image: radial-gradient(circle, var(--border) 1px, transparent 1px); background-size: 32px 32px; pointer-events: none; z-index: 0; opacity: 0.45; }
+
+        .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; backdrop-filter: blur(20px); transition: transform var(--transition), width var(--transition), background var(--transition); }
+        .sidebar.collapsed { width: 68px; }
+        .sidebar-header { display: flex; align-items: center; padding: 0 16px; height: var(--header-h); border-bottom: 1px solid var(--border); gap: 10px; overflow: hidden; }
+        .logo-icon { flex-shrink: 0; width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--gold)); border-radius: 9px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 3px 12px var(--accent-glow); }
+        .logo-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; white-space: nowrap; overflow: hidden; transition: opacity var(--transition), width var(--transition); }
+        .sidebar.collapsed .logo-title, .sidebar.collapsed .nav-label, .sidebar.collapsed .section-label { opacity: 0; width: 0; pointer-events: none; }
+        .sidebar-toggle { margin-left: auto; flex-shrink: 0; width: 30px; height: 30px; border-radius: 8px; background: none; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--transition); }
+        .sidebar-toggle:hover { background: var(--hover-bg); color: var(--accent); }
+        .sidebar-nav { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 12px 10px; }
+        .section-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); padding: 14px 10px 6px; white-space: nowrap; overflow: hidden; }
+        .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); color: var(--text-muted); text-decoration: none; cursor: pointer; transition: all var(--transition); white-space: nowrap; overflow: hidden; font-size: 0.88rem; font-weight: 500; position: relative; user-select: none; }
+        .nav-item:hover { background: var(--hover-bg); color: var(--text); }
+        .nav-item.active { background: var(--active-bg); color: var(--accent); font-weight: 600; }
+        .nav-item.active::before { content: ''; position: absolute; left: 0; top: 20%; bottom: 20%; width: 3px; border-radius: 0 3px 3px 0; background: var(--gold); }
+        .nav-icon { flex-shrink: 0; width: 20px; height: 20px; }
+        .nav-label { overflow: hidden; }
+        .sidebar-divider { height: 1px; background: var(--border); margin: 8px 10px; }
+        .sidebar-footer { padding: 10px; border-top: 1px solid var(--border); }
+        .user-card { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-md); cursor: pointer; transition: background var(--transition); }
+        .user-card:hover { background: var(--hover-bg); }
+        .user-avatar { flex-shrink: 0; width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--gold)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 0.85rem; overflow: hidden; }
+        .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .sidebar.collapsed .sidebar-footer-text { opacity: 0; width: 0; pointer-events: none; overflow: hidden; }
+        .sidebar-footer-text { transition: opacity var(--transition); }
+        .user-name { font-size: 0.85rem; font-weight: 600; white-space: nowrap; }
+        .user-role { font-size: 0.72rem; color: var(--text-muted); }
+
+        .main { margin-left: var(--sidebar-w); min-height: 100vh; display: flex; flex-direction: column; transition: margin-left var(--transition); position: relative; z-index: 1; }
+        .main.sidebar-collapsed { margin-left: 68px; }
+        .topbar { position: sticky; top: 0; z-index: 90; height: var(--header-h); background: var(--panel); border-bottom: 1px solid var(--border); backdrop-filter: blur(16px); display: flex; align-items: center; padding: 0 28px; gap: 16px; }
+        .topbar-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; }
+        .topbar-spacer { flex: 1; }
+        .icon-btn { width: 38px; height: 38px; border-radius: 10px; background: none; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--transition); }
+        .icon-btn:hover { background: var(--hover-bg); color: var(--accent); border-color: var(--gold); }
+        .content { flex: 1; padding: 28px; }
+
+        .faculty-tabs { display: flex; gap: 4px; background: var(--cream-2); border: 1px solid var(--border); border-radius: 12px; padding: 4px; width: fit-content; margin-bottom: 20px; flex-wrap: wrap; }
+        .ftab { display: flex; align-items: center; gap: 7px; padding: 8px 18px; border-radius: 9px; background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; font-weight: 600; color: var(--text-muted); transition: all var(--transition); }
+        .ftab:hover { color: var(--text); }
+        .ftab.active { background: var(--card-bg); color: var(--accent); box-shadow: var(--shadow-sm); }
+        .ftab-content { display: none; }
+        .ftab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+        .faculty-filter-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; }
+        .filter-search { display: flex; align-items: center; gap: 8px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; flex: 1; min-width: 200px; transition: all var(--transition); }
+        .filter-search:focus-within { border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .filter-search input { background: none; border: none; outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--text); width: 100%; }
+        .filter-search input::placeholder { color: var(--text-faint); }
+        .filter-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .filter-input { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--card-bg); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.82rem; outline: none; transition: all var(--transition); }
+        .filter-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .btn-filter { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--gold)); color: white; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600; transition: all var(--transition); }
+        .btn-filter:hover { box-shadow: 0 4px 14px var(--accent-glow); transform: translateY(-1px); }
+        .btn-filter-clear { padding: 8px 14px; border-radius: 10px; background: none; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 600; transition: all var(--transition); }
+        .btn-filter-clear:hover { border-color: var(--gold); color: var(--accent); }
+        .faculty-stat-strip { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+        .fstat { background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px; padding: 10px 20px; display: flex; flex-direction: column; align-items: center; gap: 2px; min-width: 80px; }
+        .fstat span { font-size: 1.3rem; font-weight: 700; }
+        .fstat small { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
+        .faculty-table-wrap { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); overflow: hidden; }
+        .faculty-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; color: var(--text-muted); font-size: 0.85rem; text-align: center; }
+        .status-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+        .status-badge.active { background: rgba(34,197,94,0.1); color: #16a34a; }
+        .status-badge.inactive { background: rgba(239,68,68,0.1); color: #dc2626; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .spinner { width: 32px; height: 32px; border-radius: 50%; border: 3px solid var(--border); border-top-color: var(--gold); animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .register-layout { display: grid; grid-template-columns: 1fr 300px; gap: 20px; align-items: start; }
+        @media (max-width: 900px) { .register-layout { grid-template-columns: 1fr; } }
+        .reg-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); }
+        .reg-card-header { margin-bottom: 22px; }
+        .reg-card-header h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 4px; }
+        .reg-card-header p { font-size: 0.82rem; color: var(--text-muted); }
+        .reg-section-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 10px; }
+        .reg-row { display: flex; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+        .reg-field { flex: 1; min-width: 160px; }
+        .reg-field label { display: block; font-size: 0.78rem; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+        .req { color: #ef4444; }
+        .reg-field input, .reg-field select { width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--cream-2); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; outline: none; transition: all var(--transition); }
+        .reg-field input:focus, .reg-field select:focus { border-color: var(--gold); background: var(--warm-white); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .reg-field input::placeholder { color: var(--text-faint); }
+        .reg-field input[readonly] { opacity: 0.65; cursor: not-allowed; }
+        .input-wrap { position: relative; display: flex; align-items: center; }
+        .input-wrap input { padding-right: 36px; width: 100%; }
+        .pwd-toggle { position: absolute; right: 10px; background: none; border: none; cursor: pointer; color: var(--text-muted); display: flex; padding: 4px; transition: color var(--transition); }
+        .pwd-toggle:hover { color: var(--accent); }
+        .reg-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+        .btn-reg-clear { padding: 10px 20px; border-radius: 10px; background: none; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; transition: all var(--transition); }
+        .btn-reg-clear:hover { border-color: var(--gold); color: var(--accent); }
+        .btn-reg-submit { display: flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--gold)); color: white; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; transition: all var(--transition); box-shadow: 0 4px 12px var(--accent-glow); }
+        .btn-reg-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px var(--accent-glow); }
+        .btn-reg-submit:disabled { opacity: 0.6; pointer-events: none; }
+        .btn-danger { display: flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 10px; background: none; border: 1px solid rgba(239,68,68,0.4); color: #ef4444; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 600; transition: all var(--transition); }
+        .btn-danger:hover { background: rgba(239,68,68,0.07); border-color: #ef4444; }
+        .btn-danger:disabled { opacity: 0.5; pointer-events: none; }
+        .reg-info-panel { display: flex; flex-direction: column; gap: 12px; }
+        .reg-info-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; display: flex; gap: 12px; align-items: flex-start; }
+        .reg-info-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+        .days-picker { display: flex; gap: 6px; flex-wrap: wrap; }
+        .day-btn { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--border); background: var(--cream-2); color: var(--text-muted); font-family: 'DM Sans', sans-serif; font-size: 0.72rem; font-weight: 700; cursor: pointer; transition: all var(--transition); user-select: none; }
+        .day-btn:hover { border-color: var(--gold); color: var(--accent); }
+        .day-btn.selected { background: linear-gradient(135deg, var(--accent), var(--gold)); color: white; border-color: transparent; box-shadow: 0 2px 8px var(--accent-glow); }
+
+        .template-cards-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+        .template-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; transition: all var(--transition); cursor: default; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+        .template-card:hover { box-shadow: var(--shadow-md); border-color: var(--gold); transform: translateY(-3px); }
+        .template-card-accent { position: absolute; top: 0; right: 0; width: 100px; height: 100px; border-radius: 0 0 0 100px; background: var(--gold); opacity: 0.06; }
+        .tc-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
+        .tc-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; margin-bottom: 3px; }
+        .tc-created { font-size: 0.72rem; color: var(--text-faint); }
+        .tc-actions { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
+        .tc-btn { padding: 5px 12px; border-radius: 7px; font-size: 0.72rem; font-weight: 700; border: 1px solid var(--border); background: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all var(--transition); }
+        .tc-btn.edit { color: var(--accent-warm); }
+        .tc-btn.edit:hover { border-color: var(--gold); background: var(--active-bg); }
+        .tc-btn.generate { color: #10b981; border-color: rgba(16,185,129,0.3); }
+        .tc-btn.generate:hover { border-color: #10b981; background: rgba(16,185,129,0.07); }
+        .tc-btn.delete { color: #ef4444; }
+        .tc-btn.delete:hover { border-color: #ef4444; background: rgba(239,68,68,0.07); }
+        .tc-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+        .tc-field { background: var(--cream-2); border-radius: 8px; padding: 8px 10px; }
+        .tc-field-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 2px; }
+        .tc-field-val { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+        .tc-days { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 10px; }
+        .tc-day-chip { padding: 2px 8px; border-radius: 6px; font-size: 0.68rem; font-weight: 700; background: var(--active-bg); color: var(--accent); }
+
+        .gen-layout { display: grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: start; }
+        @media (max-width: 1000px) { .gen-layout { grid-template-columns: 1fr; } }
+
+        .tpl-picker-wrap { margin-top: 6px; }
+        .tpl-picker-loadbar { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .tpl-picker-state { background: var(--cream-2); border: 1px solid var(--border); border-radius: 12px; padding: 18px; text-align: center; font-size: 0.82rem; color: var(--text-muted); }
+        .tpl-picker-cards { display: none; grid-template-columns: repeat(auto-fill, minmax(230px,1fr)); gap: 10px; }
+        .tpl-pick-card { background: var(--card-bg); border: 2px solid var(--border); border-radius: var(--radius-md); padding: 14px 16px; cursor: pointer; transition: all var(--transition); position: relative; overflow: hidden; }
+        .tpl-pick-card:hover { border-color: var(--gold); box-shadow: var(--shadow-sm); transform: translateY(-2px); }
+        .tpl-pick-card.selected { border-color: var(--gold); background: var(--active-bg); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .tpl-pick-card.selected::after { content: '✓'; position: absolute; top: 8px; right: 10px; font-size: 0.78rem; font-weight: 800; color: var(--gold); }
+        .tpl-pick-name { font-weight: 700; font-size: 0.85rem; margin-bottom: 3px; }
+        .tpl-pick-meta { font-size: 0.7rem; color: var(--text-muted); line-height: 1.6; }
+        .tpl-pick-id { font-size: 0.62rem; font-weight: 700; color: var(--text-faint); margin-top: 4px; }
+
+        .gen-result-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; }
+        .gen-result-box h4 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; margin-bottom: 12px; }
+        .gen-report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+        .gen-report-item { background: var(--cream-2); border-radius: 8px; padding: 10px 12px; }
+        .gen-report-item .label { font-size: 0.65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-faint); margin-bottom: 4px; }
+        .gen-report-item .val { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+        .tag-list { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+        .tag { padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; }
+        .tag.ok { background: rgba(34,197,94,0.1); color: #16a34a; }
+        .tag.warn { background: rgba(245,158,11,0.1); color: #d97706; }
+        .tag.err { background: rgba(239,68,68,0.1); color: #dc2626; }
+        .section-divider { height: 1px; background: var(--border); margin: 14px 0; }
+
+        .tt-grid-wrap { overflow-x: auto; border-radius: var(--radius-md); border: 1px solid var(--border); background: var(--card-bg); }
+        .tt-grid { min-width: 680px; border-collapse: collapse; width: 100%; font-size: 0.78rem; }
+        .tt-grid th { background: var(--cream-2); padding: 10px 14px; text-align: left; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap; }
+        .tt-grid td { padding: 0; border-bottom: 1px solid var(--border-2); border-right: 1px solid var(--border-2); vertical-align: top; min-width: 120px; }
+        .tt-grid tr:last-child td { border-bottom: none; }
+        .tt-grid td:last-child { border-right: none; }
+        .tt-time-col { width: 80px; min-width: 80px; background: var(--cream-2); }
+        .tt-time-cell { padding: 10px 8px; font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-align: center; }
+        .tt-slot { padding: 6px 8px; min-height: 56px; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+        .tt-slot.break-slot { background: repeating-linear-gradient(45deg, transparent, transparent 4px, var(--border-2) 4px, var(--border-2) 8px); }
+        .tt-subject { font-size: 0.76rem; font-weight: 700; color: var(--text); }
+        .tt-faculty { font-size: 0.66rem; color: var(--text-muted); }
+        .tt-chip { display: inline-flex; align-items: center; padding: 1px 6px; border-radius: 4px; font-size: 0.62rem; font-weight: 700; background: var(--border-2); color: var(--text-faint); }
+        .day-chip { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 20px; font-size: 0.7rem; font-weight: 700; background: var(--active-bg); color: var(--accent); }
+
+        .modal-overlay { display: none; position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,0.45); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal-box { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; width: min(640px, 95vw); box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+        .modal-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+        .close-btn { width: 32px; height: 32px; border-radius: 8px; background: none; border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--transition); }
+        .close-btn:hover { background: var(--hover-bg); color: var(--text); }
+
+        .delete-split-group {
+            position: relative;
+            display: inline-flex;
+            align-items: stretch;
+        }
+        .delete-split-main {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 14px;
+            border-radius: 10px 0 0 10px;
+            background: none;
+            border: 1px solid rgba(239,68,68,0.4);
+            border-right: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all var(--transition);
+            white-space: nowrap;
+        }
+        .delete-split-main:hover {
+            background: rgba(239,68,68,0.07);
+            border-color: #ef4444;
+        }
+        .delete-split-main:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+        .delete-split-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            border-radius: 0 10px 10px 0;
+            background: none;
+            border: 1px solid rgba(239,68,68,0.4);
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 0.75rem;
+            transition: all var(--transition);
+            flex-shrink: 0;
+        }
+        .delete-split-arrow:hover {
+            background: rgba(239,68,68,0.07);
+            border-color: #ef4444;
+        }
+        .delete-split-arrow.open {
+            background: rgba(239,68,68,0.1);
+            border-color: #ef4444;
+        }
+        .delete-split-dropdown {
+            display: none;
+            position: absolute;
+            bottom: calc(100% + 8px);
+            left: 0;
+            min-width: 260px;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            z-index: 200;
+            animation: dropUp 0.18s cubic-bezier(0.4,0,0.2,1);
+        }
+        .delete-split-dropdown.show { display: block; }
+        @keyframes dropUp {
+            from { opacity: 0; transform: translateY(6px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .delete-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            cursor: pointer;
+            transition: background var(--transition);
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .delete-option:hover { background: var(--hover-bg); }
+        .delete-option + .delete-option { border-top: 1px solid var(--border); }
+        .delete-option-icon {
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1px;
+        }
+        .delete-option-icon.safe { background: rgba(34,197,94,0.1); color: #16a34a; }
+        .delete-option-icon.hard { background: rgba(239,68,68,0.1); color: #ef4444; }
+        .delete-option-title {
+            font-size: 0.83rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 2px;
+            line-height: 1.3;
+        }
+        .delete-option-desc {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            line-height: 1.45;
+        }
+        .delete-option-badge {
+            display: inline-block;
+            padding: 1px 7px;
+            border-radius: 20px;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            margin-top: 4px;
+        }
+        .delete-option-badge.safe { background: rgba(34,197,94,0.12); color: #16a34a; }
+        .delete-option-badge.hard { background: rgba(239,68,68,0.12); color: #dc2626; }
+
+        .del-modal-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            width: min(460px, 95vw);
+            box-shadow: var(--shadow-lg);
+        }
+        .del-modal-icon-wrap {
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+        .del-modal-icon-wrap.safe { background: rgba(34,197,94,0.1); color: #16a34a; }
+        .del-modal-icon-wrap.hard { background: rgba(239,68,68,0.1); color: #ef4444; }
+        .del-modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .del-modal-desc {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+            margin-bottom: 18px;
+        }
+        .del-modal-info {
+            background: var(--cream-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            margin-bottom: 18px;
+            font-size: 0.8rem;
+            color: var(--text);
+        }
+        .del-modal-info strong { font-weight: 700; color: var(--accent); }
+        .del-modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+        .btn-del-cancel {
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all var(--transition);
+        }
+        .btn-del-cancel:hover { border-color: var(--gold); color: var(--accent); }
+        .btn-del-confirm-safe {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all var(--transition);
+            box-shadow: 0 4px 12px rgba(34,197,94,0.2);
+        }
+        .btn-del-confirm-safe:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(34,197,94,0.3); }
+        .btn-del-confirm-safe:disabled { opacity: 0.6; pointer-events: none; }
+        .btn-del-confirm-hard {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #dc2626, #ef4444);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: all var(--transition);
+            box-shadow: 0 4px 12px rgba(239,68,68,0.2);
+        }
+        .btn-del-confirm-hard:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(239,68,68,0.3); }
+        .btn-del-confirm-hard:disabled { opacity: 0.6; pointer-events: none; }
+
+        .ask-ai-btn {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid rgba(59,130,246,0.25);
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: all var(--transition);
+            box-shadow: 0 4px 14px rgba(59,130,246,0.18);
+        }
+        .ask-ai-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(59,130,246,0.24);
+        }
+
+        .ai-modal-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: min(760px, 96vw);
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+        }
+        .ai-chat-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        .ai-chat-head h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.08rem;
+            font-weight: 700;
+        }
+        .ai-chat-sub {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+        .ai-chat-body {
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 280px;
+            max-height: 52vh;
+            background:
+                radial-gradient(circle at top right, rgba(59,130,246,0.06), transparent 28%),
+                linear-gradient(180deg, var(--warm-white), var(--card-bg));
+        }
+        .ai-msg {
+            max-width: 82%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            font-size: 0.84rem;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .ai-msg.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--accent), var(--gold));
+            color: white;
+            border-bottom-right-radius: 6px;
+        }
+        .ai-msg.bot {
+            align-self: flex-start;
+            background: var(--cream-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-bottom-left-radius: 6px;
+        }
+        .ai-chat-foot {
+            border-top: 1px solid var(--border);
+            padding: 14px 16px 16px;
+            background: var(--card-bg);
+        }
+        .ai-chat-form {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+        .ai-chat-form textarea {
+            flex: 1;
+            resize: none;
+            min-height: 52px;
+            max-height: 140px;
+            padding: 12px 14px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background: var(--cream-2);
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.84rem;
+            outline: none;
+        }
+        .ai-chat-form textarea:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+        }
+        .ai-send-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: none;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            transition: all var(--transition);
+        }
+        .ai-send-btn:disabled {
+            opacity: 0.65;
+            pointer-events: none;
+        }
+        .ai-empty {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 28px 16px;
+        }
+
+        .backup-layout {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 20px;
+            align-items: start;
+        }
+        @media (max-width: 1000px) {
+            .backup-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+        .backup-list-grid {
+            display: grid;
+            gap: 12px;
+        }
+        .backup-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
+        }
+        .backup-card:hover {
+            border-color: var(--gold);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+        .backup-card.selected {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+            background: var(--active-bg);
+        }
+        .backup-card-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        .backup-card-title {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+        .backup-card-meta {
+            font-size: 0.74rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+        .backup-pill {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 9px;
+            border-radius: 999px;
+            font-size: 0.68rem;
+            font-weight: 700;
+            background: var(--cream-2);
+            color: var(--accent);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+        .backup-card-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 12px;
+        }
+        .btn-preview {
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            background: none;
+            color: var(--text);
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            transition: all var(--transition);
+        }
+        .btn-preview:hover {
+            border-color: var(--gold);
+            color: var(--accent);
+            background: var(--hover-bg);
+        }
+        .btn-restore {
+            padding: 8px 14px;
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: white;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 700;
+            transition: all var(--transition);
+            box-shadow: 0 4px 12px rgba(34,197,94,0.18);
+        }
+        .btn-restore:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(34,197,94,0.22);
+        }
+        .btn-restore:disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .backup-preview-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .backup-preview-box h4 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .backup-preview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+        .backup-preview-item {
+            background: var(--cream-2);
+            border-radius: 10px;
+            padding: 10px 12px;
+        }
+        .backup-preview-item .label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--text-faint);
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        .backup-preview-item .val {
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text);
+        }
+        .backup-conflicts {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 12px;
+        }
+        .backup-conflict {
+            border: 1px solid rgba(239,68,68,0.18);
+            background: rgba(239,68,68,0.05);
+            border-radius: 12px;
+            padding: 12px 14px;
+        }
+        .backup-conflict-head {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #dc2626;
+            margin-bottom: 4px;
+        }
+        .backup-conflict-body {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            line-height: 1.55;
+        }
+        .backup-preview-empty {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.84rem;
+            padding: 28px 10px;
+        }
+
+        #toast { position: fixed; bottom: 24px; right: 24px; min-width: 260px; max-width: 380px; padding: 14px 18px; border-radius: 12px; font-size: 0.875rem; font-weight: 500; z-index: 9999; pointer-events: none; opacity: 0; transform: translateY(12px); transition: all 0.35s cubic-bezier(0.68,-0.55,0.265,1.55); box-shadow: var(--shadow-lg); }
+        #toast.show { opacity: 1; transform: translateY(0); }
+        #toast.success { background: #1a3a2a; color: #4ade80; border: 1px solid rgba(74,222,128,0.2); }
+        #toast.error { background: #3a1a1a; color: #f87171; border: 1px solid rgba(248,113,113,0.2); }
+        #toast.info { background: var(--card-bg); color: var(--text); border: 1px solid var(--border); }
+
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+        @media (max-width: 768px) { .sidebar { transform: translateX(-110%); width: var(--sidebar-w) !important; } .main { margin-left: 0 !important; } .content { padding: 16px; } }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <div class="logo-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" width="20" height="20"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <span class="logo-title">ChronoFlex</span>
+        <button class="sidebar-toggle" id="sidebarToggle"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg></button>
+    </div>
+    <nav class="sidebar-nav">
+        <span class="section-label">Overview</span>
+        <a class="nav-item" href="/admin-dashboard"><svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg><span class="nav-label">Dashboard</span></a>
+    </nav>
+    <div class="sidebar-footer">
+        <div class="user-card">
+            <div class="user-avatar" id="sidebarAvatar">—</div>
+            <div class="sidebar-footer-text">
+                <div class="user-name" id="sidebarName">Loading…</div>
+                <div class="user-role" id="sidebarRole">Admin</div>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<div class="main" id="main">
+    <header class="topbar">
+        <div><div class="topbar-title">Templates</div></div>
+        <div class="topbar-spacer"></div>
+        <button class="icon-btn" onclick="toggleTheme()" id="themeToggle" title="Toggle theme">
+            <svg id="iconSun" width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            <svg id="iconMoon" width="17" height="17" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.8" style="display:none"><path stroke-linecap="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+        <div style="display:flex;align-items:center;gap:10px;padding-left:12px;border-left:1px solid var(--border)">
+            <div style="text-align:right">
+                <div style="font-size:0.83rem;font-weight:600;line-height:1.2" id="topbarName">Loading…</div>
+                <div style="font-size:0.72rem;color:var(--text-muted)" id="topbarRole">—</div>
+            </div>
+            <div class="user-avatar" id="topbarAvatar" style="width:38px;height:38px;font-size:0.8rem">—</div>
+        </div>
+    </header>
+
+    <div class="content">
+        <div class="faculty-tabs">
+            <button class="ftab active" onclick="switchTab('list',this)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/></svg>
+                Template List
+            </button>
+            <button class="ftab" onclick="switchTab('add',this)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Add Template
+            </button>
+            <button class="ftab" onclick="switchTab('generate',this)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                Generate Timetable
+            </button>
+            <button class="ftab" onclick="switchTab('view',this)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                View Timetable
+            </button>
+            <button class="ftab" onclick="switchTab('backup',this)">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h10"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 14l3 3 5-5"/>
+                </svg>
+                Backup Restore
+            </button>
+        </div>
+
+        <div class="ftab-content active" id="ftab-list">
+            <div class="faculty-filter-bar">
+                <div class="filter-search">
+                    <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="color:var(--text-faint);flex-shrink:0"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+                    <input type="text" id="tSearchInput" placeholder="Search templates…" oninput="filterTemplateCards()">
+                </div>
+                <div class="filter-group">
+                    <div style="position:relative;display:flex;align-items:center">
+                        <input type="password" class="filter-input" id="tAdminPwd" placeholder="Admin password" style="padding-right:34px;min-width:160px">
+                        <button type="button" style="position:absolute;right:8px;background:none;border:none;cursor:pointer;color:var(--text-faint);display:flex" onclick="togglePwd('tAdminPwd',this)">
+                            <svg class="eye" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg class="eye-off" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
+                    <button class="btn-filter" onclick="fetchTemplates()">
+                        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                        Load Templates
+                    </button>
+                    <button class="btn-filter-clear" onclick="clearListFilters()">Clear</button>
+                </div>
+            </div>
+            <div class="faculty-stat-strip" id="templateStatStrip" style="display:none">
+                <div class="fstat"><span id="tTotal">0</span><small>Total</small></div>
+                <div class="fstat"><span id="tActive">0</span><small>Active</small></div>
+                <div class="fstat"><span id="tInactive">0</span><small>Inactive</small></div>
+            </div>
+            <div id="templateEmptyState" class="faculty-table-wrap">
+                <div class="faculty-empty-state">
+                    <svg width="44" height="44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3" style="opacity:0.3;margin-bottom:12px"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    <p>Click <strong>Load Templates</strong> to fetch your scheduling templates.</p>
+                </div>
+            </div>
+            <div id="templateLoadingState" class="faculty-table-wrap" style="display:none">
+                <div class="faculty-empty-state"><div class="spinner"></div><p style="margin-top:12px">Fetching templates…</p></div>
+            </div>
+            <div id="templateCardsContainer" class="template-cards-grid" style="display:none"></div>
+        </div>
+
+        <div class="ftab-content" id="ftab-add">
+            <div class="register-layout">
+                <div class="reg-card">
+                    <div class="reg-card-header">
+                        <h3>Create New Template</h3>
+                        <p>Define a scheduling configuration. Admin credentials are auto-filled from your session.</p>
+                    </div>
+                    <form id="templateAddForm" onsubmit="submitAddTemplate(event)">
+                        <div class="reg-section-label">Admin Credentials</div>
+                        <div class="reg-row">
+                            <div class="reg-field"><label>Admin Email</label><input type="email" id="addAdminEmail" readonly></div>
+                            <div class="reg-field">
+                                <label>Admin Password <span class="req">*</span></label>
+                                <div class="input-wrap">
+                                    <input type="password" id="addAdminPassword" placeholder="Enter your password to confirm" required>
+                                    <button type="button" class="pwd-toggle" onclick="togglePwd('addAdminPassword',this)">
+                                        <svg class="eye" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <svg class="eye-off" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="reg-section-label" style="margin-top:20px">Template Information</div>
+                        <div class="reg-row"><div class="reg-field" style="flex:2"><label>Template Name <span class="req">*</span></label><input type="text" id="addTemplateName" placeholder="e.g. Semester Morning Template" required></div></div>
+                        <div class="reg-section-label" style="margin-top:20px">Working Days <span class="req">*</span></div>
+                        <div class="days-picker" id="daysPicker">
+                            <button type="button" class="day-btn" data-day="Mon" onclick="toggleDay(this)">Mon</button>
+                            <button type="button" class="day-btn" data-day="Tue" onclick="toggleDay(this)">Tue</button>
+                            <button type="button" class="day-btn" data-day="Wed" onclick="toggleDay(this)">Wed</button>
+                            <button type="button" class="day-btn" data-day="Thu" onclick="toggleDay(this)">Thu</button>
+                            <button type="button" class="day-btn" data-day="Fri" onclick="toggleDay(this)">Fri</button>
+                            <button type="button" class="day-btn" data-day="Sat" onclick="toggleDay(this)">Sat</button>
+                            <button type="button" class="day-btn" data-day="Sun" onclick="toggleDay(this)">Sun</button>
+                        </div>
+                        <input type="hidden" id="addWorkingDays">
+                        <div class="reg-section-label" style="margin-top:20px">Daily Timing</div>
+                        <div class="reg-row">
+                            <div class="reg-field"><label>Start Time <span class="req">*</span></label><input type="time" id="addStartTime" required></div>
+                            <div class="reg-field"><label>End Time <span class="req">*</span></label><input type="time" id="addEndTime" required></div>
+                            <div class="reg-field"><label>Classes Per Day <span class="req">*</span></label><input type="number" id="addClassesPerDay" placeholder="6" min="1" max="20" required></div>
+                            <div class="reg-field"><label>Duration Per Class (min) <span class="req">*</span></label><input type="number" id="addDurationPerClass" placeholder="60" min="15" max="180" required></div>
+                        </div>
+                        <div class="reg-section-label" style="margin-top:20px">Break Configuration</div>
+                        <div class="reg-row">
+                            <div class="reg-field"><label>Number of Breaks <span class="req">*</span></label><input type="number" id="addNumBreaks" placeholder="1" min="0" max="5" required></div>
+                            <div class="reg-field"><label>Duration Per Break (min) <span class="req">*</span></label><input type="number" id="addDurationOfBreak" placeholder="15" min="0" max="120" required></div>
+                            <div class="reg-field"><label>Break From</label><input type="time" id="addBreakTimeFrom"></div>
+                            <div class="reg-field"><label>Break To</label><input type="time" id="addBreakTimeTo"></div>
+                        </div>
+                        <div class="reg-section-label" style="margin-top:20px">Lunch Break</div>
+                        <div class="reg-row">
+                            <div class="reg-field"><label>Lunch Break From</label><input type="time" id="addLunchBreakFrom"></div>
+                            <div class="reg-field"><label>Lunch Break To</label><input type="time" id="addLunchBreakTo"></div>
+                        </div>
+                        <div class="reg-section-label" style="margin-top:20px">Faculty Hour Limits</div>
+                        <div class="reg-row">
+                            <div class="reg-field"><label>Max Hours / Faculty / Day <span class="req">*</span></label><input type="number" id="addMaxHoursDay" placeholder="6" min="1" max="12" required></div>
+                            <div class="reg-field"><label>Max Hours / Faculty / Week <span class="req">*</span></label><input type="number" id="addMaxHoursWeek" placeholder="24" min="1" max="60" required></div>
+                        </div>
+                        <div class="reg-actions">
+                            <button type="button" class="btn-reg-clear" onclick="clearAddForm()">Clear Form</button>
+                            <button type="submit" class="btn-reg-submit" id="addSubmitBtn">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                                Save Template
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="reg-info-panel">
+                    <div class="reg-info-card"><div class="reg-info-icon" style="color:#f59e0b;background:rgba(245,158,11,0.1)"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div><div><div style="font-size:0.82rem;font-weight:700;margin-bottom:4px">Working Days</div><div style="font-size:0.77rem;color:var(--text-muted);line-height:1.5">Click day buttons to toggle. Sent as comma-separated values (e.g. Mon,Tue,Wed).</div></div></div>
+                    <div class="reg-info-card"><div class="reg-info-icon" style="color:#3b82f6;background:rgba(59,130,246,0.1)"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div style="font-size:0.82rem;font-weight:700;margin-bottom:4px">Break Configuration</div><div style="font-size:0.77rem;color:var(--text-muted);line-height:1.5">Set short breaks separately from the lunch break. Both are optional.</div></div></div>
+                    <div class="reg-info-card"><div class="reg-info-icon" style="color:#22c55e;background:rgba(34,197,94,0.1)"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><div style="font-size:0.82rem;font-weight:700;margin-bottom:4px">Faculty Limits</div><div style="font-size:0.77rem;color:var(--text-muted);line-height:1.5">Enforced during timetable generation to prevent overload.</div></div></div>
+                    <div class="reg-info-card"><div class="reg-info-icon" style="color:#a855f7;background:rgba(168,85,247,0.1)"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div><div><div style="font-size:0.82rem;font-weight:700;margin-bottom:4px">Used in Generator</div><div style="font-size:0.77rem;color:var(--text-muted);line-height:1.5">Select a template when generating timetables. Create multiple for different departments or semesters.</div></div></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ftab-content" id="ftab-generate">
+            <div class="gen-layout">
+                <div class="reg-card">
+                    <div class="reg-card-header">
+                        <h3>Generate Timetable</h3>
+                        <p>Select a template, choose a class, add optional rules — then generate.</p>
+                    </div>
+                    <form id="genForm" onsubmit="submitGenerate(event)">
+                        <div class="reg-section-label">Admin Credentials</div>
+                        <div class="reg-row">
+                            <div class="reg-field"><label>Admin Email</label><input type="email" id="genAdminEmail" readonly></div>
+                            <div class="reg-field">
+                                <label>Admin Password <span class="req">*</span></label>
+                                <div class="input-wrap">
+                                    <input type="password" id="genAdminPassword" placeholder="Required to generate" required>
+                                    <button type="button" class="pwd-toggle" onclick="togglePwd('genAdminPassword',this)">
+                                        <svg class="eye" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <svg class="eye-off" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="background:var(--active-bg);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:0.8rem;color:var(--text-muted)">
+                            <strong style="color:var(--accent)">ℹ College</strong> — resolved automatically from your admin account on the backend.
+                        </div>
+
+                        <div class="reg-section-label">Target Class</div>
+                        <div class="reg-row">
+                            <div class="reg-field">
+                                <label>Semester <span class="req">*</span></label>
+                                <select id="genSemester" required>
+                                    <option value="">Select…</option>
+                                    <option value="1">Semester 1</option><option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option><option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option><option value="6">Semester 6</option>
+                                </select>
+                            </div>
+                            <div class="reg-field">
+                                <label>Section <span class="req">*</span></label>
+                                <input type="text" id="genSection" placeholder="e.g. A" maxlength="4" required>
+                            </div>
+                        </div>
+
+                        <div class="reg-section-label" style="margin-top:4px">
+                            Select Template <span class="req">*</span>
+                            <input type="hidden" id="genTemplateId">
+                        </div>
+                        <div class="tpl-picker-wrap" id="genTplWrap">
+                            <div class="tpl-picker-loadbar">
+                                <div style="position:relative;display:flex;align-items:center;flex:1">
+                                    <input type="password" id="genTplPwd" class="filter-input" placeholder="Password to load templates" style="width:100%;padding-right:34px">
+                                    <button type="button" style="position:absolute;right:8px;background:none;border:none;cursor:pointer;color:var(--text-faint);display:flex" onclick="togglePwd('genTplPwd',this)">
+                                        <svg class="eye" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                        <svg class="eye-off" width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                                    </button>
+                                </div>
+                                <button type="button" class="btn-filter" onclick="loadPickerTemplates()" style="white-space:nowrap">
+                                    <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+                                    Load
+                                </button>
+                            </div>
+                            <div class="tpl-picker-state" id="genTplState">Enter your password and click Load to choose a template.</div>
+                            <div class="tpl-picker-cards" id="genTplCards" style="display:none"></div>
+                        </div>
+
+                        <div class="reg-section-label" style="margin-top:18px">Generation Rules <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:0.72rem;color:var(--text-faint)">(all optional)</span></div>
+                        <div class="reg-row">
+                            <div class="reg-field"><label>Free Slots / Day</label><input type="number" id="genFreeDay" value="0" min="0" max="10"></div>
+                            <div class="reg-field"><label>Free Slots / Week</label><input type="number" id="genFreeWeek" value="0" min="0" max="20"></div>
+                        </div>
+                        <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;font-weight:500"><input type="checkbox" id="genAvoidConsec" style="width:16px;height:16px;accent-color:var(--gold)"> Avoid consecutive same subject</label>
+                            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:0.85rem;font-weight:500"><input type="checkbox" id="genEnforceFac" style="width:16px;height:16px;accent-color:var(--gold)"> Enforce faculty hour limits</label>
+                        </div>
+                        <div class="reg-row">
+                            <div class="reg-field" style="flex:2"><label>Priority Subjects (Early Slots)</label><input type="text" id="genPrioritySubj" placeholder="e.g. Mathematics, DBMS Lab (comma-separated)"></div>
+                        </div>
+                        <div class="reg-row">
+                            <div class="reg-field"><label>Max Repeats/Day (JSON)</label><input type="text" id="genMaxDay" placeholder='{"DBMS":2}'></div>
+                            <div class="reg-field"><label>Max Repeats/Week (JSON)</label><input type="text" id="genMaxWeek" placeholder='{"DBMS":4}'></div>
+                        </div>
+                        <div class="reg-row">
+                            <div class="reg-field" style="flex:2"><label>Preferred Days for Labs (JSON)</label><input type="text" id="genLabDays" placeholder='{"DBMS Lab":["TUE","THU"]}'></div>
+                        </div>
+
+                        <div class="reg-actions">
+                            <button type="button" class="btn-reg-clear" onclick="clearGenForm()">Clear</button>
+                            <button type="submit" class="btn-reg-submit" id="genSubmitBtn">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                                Generate
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div>
+                    <div class="gen-result-box" id="genResultBox" style="display:none">
+                        <h4>Generation Report</h4>
+                        <div id="genReportContent"></div>
+                    </div>
+                    <div id="genInfoCards" style="display:flex;flex-direction:column;gap:12px">
+                        <div class="reg-info-card"><div class="reg-info-icon" style="color:#10b981;background:rgba(16,185,129,0.1)"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div style="font-size:0.82rem;font-weight:700;margin-bottom:4px">Conflict-Free</div><div style="font-size:0.77rem;color:var(--text-muted);line-height:1.5">Algorithm checks faculty & classroom availability before each slot assignment.</div></div></div>
+                        <div class="reg-info-card"><div class="reg-info-icon" style="color:#6366f1;background:rgba(99,102,241,0.1)"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div style="font-size:0.82rem;font-weight:700;margin-bottom:4px">Template-Driven</div><div style="font-size:0.77rem;color:var(--text-muted);line-height:1.5">All timing, breaks, and lunch windows come from the selected template.</div></div></div>
+                        <div class="reg-info-card"><div class="reg-info-icon" style="color:#f59e0b;background:rgba(245,158,11,0.1)"><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div style="font-size:0.82rem;font-weight:700;margin-bottom:4px">Re-Generating?</div><div style="font-size:0.77rem;color:var(--text-muted);line-height:1.5">Use delete options from the View Timetable tab first to clear existing slots safely before generating fresh.</div></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ftab-content" id="ftab-view">
+            <div class="reg-card" style="margin-bottom:16px">
+                <div class="reg-card-header" style="margin-bottom:14px">
+                    <h3>View Timetable</h3>
+                    <p>Enter your admin password, select semester and section to display the weekly schedule.</p>
+                </div>
+                <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;align-items:flex-end">
+                    <div class="reg-field" style="max-width:150px">
+                        <label>Semester <span class="req">*</span></label>
+                        <select id="viewSemester">
+                            <option value="">Select…</option>
+                            <option value="1">Semester 1</option><option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option><option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option><option value="6">Semester 6</option>
+                        </select>
+                    </div>
+                    <div class="reg-field" style="max-width:110px">
+                        <label>Section <span class="req">*</span></label>
+                        <input type="text" id="viewSection" placeholder="e.g. A" maxlength="4">
+                    </div>
+                    <div class="reg-field" style="max-width:220px">
+                        <label>Admin Password <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <input type="password" id="viewAdminPwd" placeholder="Required to view">
+                            <button type="button" class="pwd-toggle" onclick="togglePwd('viewAdminPwd',this)">
+                                <svg class="eye" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="eye-off" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="display:flex;align-items:flex-end;gap:8px;flex-wrap:wrap">
+                        <button class="btn-filter" onclick="fetchTimetable()" style="height:38px">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/></svg>
+                            Load Grid
+                        </button>
+
+                        <div class="delete-split-group" id="deleteSplitGroup">
+                            <button type="button" class="delete-split-main" id="genDeleteBtn" onclick="openDeleteModal('with-backup')" style="height:38px">
+                                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" d="M19 6l-1 14H6L5 6"/><path stroke-linecap="round" d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+                                Delete Timetable
+                            </button>
+                            <button type="button" class="delete-split-arrow" id="deleteSplitArrow" onclick="toggleDeleteDropdown(event)" title="More delete options">
+                                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                            <div class="delete-split-dropdown" id="deleteSplitDropdown">
+                                <button type="button" class="delete-option" onclick="closeDeleteDropdown(); openDeleteModal('with-backup');">
+                                    <div class="delete-option-icon safe">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="delete-option-title">Delete with Backup</div>
+                                        <div class="delete-option-desc">Slots are archived before removal. Recoverable from delete history.</div>
+                                        <span class="delete-option-badge safe">RECOMMENDED</span>
+                                    </div>
+                                </button>
+                                <button type="button" class="delete-option" onclick="closeDeleteDropdown(); openDeleteModal('without-backup');">
+                                    <div class="delete-option-icon hard">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" d="M19 6l-1 14H6L5 6"/><path stroke-linecap="round" d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="delete-option-title">Delete without Backup</div>
+                                        <div class="delete-option-desc">Slots are permanently erased. This action cannot be undone.</div>
+                                        <span class="delete-option-badge hard">PERMANENT</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button class="btn-filter-clear" onclick="clearViewTab()" style="height:38px">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="viewEmptyState" class="faculty-table-wrap">
+                <div class="faculty-empty-state">
+                    <svg width="44" height="44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3" style="opacity:0.3;margin-bottom:12px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                    <p>Enter password, choose Semester and Section, then click <strong>Load Grid</strong>.</p>
+                </div>
+            </div>
+            <div id="viewLoadingState" class="faculty-table-wrap" style="display:none">
+                <div class="faculty-empty-state"><div class="spinner"></div><p style="margin-top:12px">Loading timetable…</p></div>
+            </div>
+            <div id="viewGridWrap" style="display:none">
+                <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+                    <div style="font-size:0.8rem;color:var(--text-muted)" id="viewGridLabel"></div>
+                    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                        <button type="button" class="ask-ai-btn" id="askAiBtn" onclick="openAiChat()">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 3c4.97 0 9 3.582 9 8 0 1.82-.684 3.498-1.836 4.858L20 21l-4.877-1.66A10.39 10.39 0 0112 19c-4.97 0-9-3.582-9-8s4.03-8 9-8z"/>
+                            </svg>
+                            Ask AI
+                        </button>
+                        <div style="display:flex;gap:6px;font-size:0.72rem;font-weight:600;color:var(--text-muted)">
+                            <span style="padding:2px 8px;background:var(--active-bg);border-radius:4px;color:var(--accent)">■ Subject</span>
+                            <span style="padding:2px 8px;background:var(--cream-2);border-radius:4px">— Free</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="tt-grid-wrap">
+                    <table class="tt-grid" id="ttGrid"></table>
+                </div>
+            </div>
+        </div>
+
+        <div class="ftab-content" id="ftab-backup">
+            <div class="reg-card" style="margin-bottom:16px">
+                <div class="reg-card-header" style="margin-bottom:14px">
+                    <h3>Backup Restore</h3>
+                    <p>List archived timetable backups, preview conflicts, and restore a backup for a class.</p>
+                </div>
+
+                <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end">
+                    <div class="reg-field" style="max-width:150px">
+                        <label>Semester <span class="req">*</span></label>
+                        <select id="backupSemester">
+                            <option value="">Select…</option>
+                            <option value="1">Semester 1</option>
+                            <option value="2">Semester 2</option>
+                            <option value="3">Semester 3</option>
+                            <option value="4">Semester 4</option>
+                            <option value="5">Semester 5</option>
+                            <option value="6">Semester 6</option>
+                        </select>
+                    </div>
+
+                    <div class="reg-field" style="max-width:110px">
+                        <label>Section <span class="req">*</span></label>
+                        <input type="text" id="backupSection" placeholder="e.g. A" maxlength="4">
+                    </div>
+
+                    <div class="reg-field" style="max-width:230px">
+                        <label>Admin Password <span class="req">*</span></label>
+                        <div class="input-wrap">
+                            <input type="password" id="backupAdminPwd" placeholder="Required to list backups">
+                            <button type="button" class="pwd-toggle" onclick="togglePwd('backupAdminPwd',this)">
+                                <svg class="eye" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                                <svg class="eye-off" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="display:flex;gap:8px;align-items:flex-end">
+                        <button class="btn-filter" onclick="fetchBackupList()" style="height:38px">
+                            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h10"/>
+                            </svg>
+                            List Backups
+                        </button>
+                        <button class="btn-filter-clear" onclick="clearBackupTab()" style="height:38px">Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="backup-layout">
+                <div>
+                    <div id="backupEmptyState" class="faculty-table-wrap">
+                        <div class="faculty-empty-state">
+                            <svg width="44" height="44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3" style="opacity:0.3;margin-bottom:12px">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h10"/>
+                            </svg>
+                            <p>Choose semester, section, and password, then click <strong>List Backups</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div id="backupLoadingState" class="faculty-table-wrap" style="display:none">
+                        <div class="faculty-empty-state">
+                            <div class="spinner"></div>
+                            <p style="margin-top:12px">Loading backups…</p>
+                        </div>
+                    </div>
+
+                    <div id="backupListWrap" style="display:none">
+                        <div class="backup-list-grid" id="backupListGrid"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="backup-preview-box">
+                        <h4>Preview Restore</h4>
+                        <div id="backupPreviewContent" class="backup-preview-empty">
+                            Select a backup and click <strong>Preview</strong> to inspect restore conflicts.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="editModal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <h3>Edit Template</h3>
+            <button class="close-btn" onclick="closeEditModal()"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        </div>
+        <form id="editForm" onsubmit="submitEditTemplate(event)">
+            <input type="hidden" id="editTemplateId">
+            <div class="reg-section-label">Admin Password Required</div>
+            <div class="reg-row">
+                <div class="reg-field">
+                    <label>Admin Password <span class="req">*</span></label>
+                    <div class="input-wrap">
+                        <input type="password" id="editAdminPassword" placeholder="Confirm your password" required>
+                        <button type="button" class="pwd-toggle" onclick="togglePwd('editAdminPassword',this)">
+                            <svg class="eye" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg class="eye-off" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="display:none"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="reg-section-label" style="margin-top:16px">Update Fields (leave blank to keep current)</div>
+            <div class="reg-row"><div class="reg-field" style="flex:2"><label>Template Name</label><input type="text" id="editTemplateName" placeholder="Leave blank to keep current"></div></div>
+            <div class="reg-section-label" style="margin-top:12px">Working Days</div>
+            <div class="days-picker" id="editDaysPicker">
+                <button type="button" class="day-btn" data-day="Mon" onclick="toggleEditDay(this)">Mon</button>
+                <button type="button" class="day-btn" data-day="Tue" onclick="toggleEditDay(this)">Tue</button>
+                <button type="button" class="day-btn" data-day="Wed" onclick="toggleEditDay(this)">Wed</button>
+                <button type="button" class="day-btn" data-day="Thu" onclick="toggleEditDay(this)">Thu</button>
+                <button type="button" class="day-btn" data-day="Fri" onclick="toggleEditDay(this)">Fri</button>
+                <button type="button" class="day-btn" data-day="Sat" onclick="toggleEditDay(this)">Sat</button>
+                <button type="button" class="day-btn" data-day="Sun" onclick="toggleEditDay(this)">Sun</button>
+            </div>
+            <input type="hidden" id="editWorkingDays">
+            <div class="reg-row" style="margin-top:14px">
+                <div class="reg-field"><label>Start Time</label><input type="time" id="editStartTime"></div>
+                <div class="reg-field"><label>End Time</label><input type="time" id="editEndTime"></div>
+                <div class="reg-field"><label>Classes / Day</label><input type="number" id="editClassesPerDay" min="1" max="20"></div>
+                <div class="reg-field"><label>Duration / Class (min)</label><input type="number" id="editDurationPerClass" min="15" max="180"></div>
+            </div>
+            <div class="reg-row">
+                <div class="reg-field"><label>Num Breaks</label><input type="number" id="editNumBreaks" min="0" max="5"></div>
+                <div class="reg-field"><label>Break Duration (min)</label><input type="number" id="editDurationOfBreak" min="0" max="120"></div>
+                <div class="reg-field"><label>Break From</label><input type="time" id="editBreakTimeFrom"></div>
+                <div class="reg-field"><label>Break To</label><input type="time" id="editBreakTimeTo"></div>
+            </div>
+            <div class="reg-row">
+                <div class="reg-field"><label>Lunch From</label><input type="time" id="editLunchBreakFrom"></div>
+                <div class="reg-field"><label>Lunch To</label><input type="time" id="editLunchBreakTo"></div>
+                <div class="reg-field"><label>Max Hrs/Day</label><input type="number" id="editMaxHoursDay" min="1" max="12"></div>
+                <div class="reg-field"><label>Max Hrs/Week</label><input type="number" id="editMaxHoursWeek" min="1" max="60"></div>
+            </div>
+            <div class="reg-actions">
+                <button type="button" class="btn-reg-clear" onclick="closeEditModal()">Cancel</button>
+                <button type="submit" class="btn-reg-submit" id="editSubmitBtn">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg>
+                    Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="modal-overlay" id="deleteConfirmModal">
+    <div class="del-modal-box">
+        <div class="del-modal-icon-wrap" id="delModalIcon"></div>
+        <div class="del-modal-title" id="delModalTitle">Delete Timetable</div>
+        <div class="del-modal-desc" id="delModalDesc">Are you sure you want to delete this timetable?</div>
+        <div class="del-modal-info" id="delModalInfo"></div>
+        <div class="del-modal-actions">
+            <button class="btn-del-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <button class="btn-del-confirm-safe" id="delConfirmBtn" onclick="executeDelete()">
+                <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" d="M19 6l-1 14H6L5 6"/></svg>
+                <span id="delConfirmBtnLabel">Confirm Delete</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="aiChatModal">
+    <div class="ai-modal-box">
+        <div class="ai-chat-head">
+            <div>
+                <h3>Ask AI About This Timetable</h3>
+                <div class="ai-chat-sub" id="aiChatSub">Load a timetable to start asking questions.</div>
+            </div>
+            <button class="close-btn" onclick="closeAiChat()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <div class="ai-chat-body" id="aiChatBody">
+            <div class="ai-empty">Ask about clashes, free periods, subject distribution, faculty load, or improvements.</div>
+        </div>
+
+        <div class="ai-chat-foot">
+            <form class="ai-chat-form" onsubmit="sendAiMessage(event)">
+                <textarea id="aiChatInput" placeholder="Ask something about the loaded timetable..."></textarea>
+                <button class="ai-send-btn" id="aiSendBtn" type="submit">
+                    <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+    const API       = 'http://localhost:8080/api/templates';
+    const TTAPI     = 'http://localhost:8080/api/timetable';
+    const MAINTAPI  = 'http://localhost:8080/api/timetable/maintenance';
+    const VIEWAPI   = 'http://localhost:8080/api/admin/timetable/view';
+    const AICHATAPI = 'http://localhost:8080/api/ai/chat';
+    const BACKUPAPI = 'http://localhost:8080/api/timetable/backup';
+    const html      = document.documentElement;
+
+    let _deleteMode = 'with-backup';
+    let _loadedTimetableSlots = [];
+    let _loadedTimetableMeta = { semester: '', section: '' };
+    let _aiChatHistory = [];
+    let _backupList = [];
+    let _selectedBackupId = null;
+    let _backupPreview = null;
+
+    function getSession() {
+        return JSON.parse(localStorage.getItem('cfAdminSession') || '{}');
+    }
+
+    function loadSession() {
+        const s = getSession();
+        const name = s.adminName || 'Admin';
+        const role = s.role || 'Super Admin';
+        const initials = name.split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+        const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=8B6F47&color=fff&size=80`;
+        document.getElementById('topbarName').textContent = name;
+        document.getElementById('topbarRole').textContent = role;
+        document.getElementById('sidebarName').textContent = name;
+        document.getElementById('sidebarRole').textContent = role;
+
+        ['topbarAvatar','sidebarAvatar'].forEach(id => {
+            const el = document.getElementById(id);
+            el.innerHTML = `<img src="${avatarUrl}" alt="${initials}" onerror="this.parentElement.textContent='${initials}'">`;
+        });
+
+        if (s.adminPassword) {
+            ['tAdminPwd', 'addAdminPassword', 'genAdminPassword', 'viewAdminPwd', 'genTplPwd', 'backupAdminPwd'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = s.adminPassword;
+            });
+        }
+
+        document.getElementById('addAdminEmail').value = s.adminEmail || '';
+        document.getElementById('genAdminEmail').value = s.adminEmail || '';
+    }
+
+    function toggleTheme() {
+        const isDark = html.classList.toggle('dark');
+        document.getElementById('iconSun').style.display = isDark ? 'none' : 'block';
+        document.getElementById('iconMoon').style.display = isDark ? 'block' : 'none';
+        localStorage.setItem('cfTheme', isDark ? 'dark' : 'light');
+    }
+
+    function initTheme() {
+        const saved = localStorage.getItem('cfTheme') || localStorage.getItem('cfDashPrefs');
+        let isDark = false;
+        if (saved && saved.startsWith('{')) {
+            try { isDark = JSON.parse(saved).theme === 'dark'; } catch {}
+        } else {
+            isDark = saved === 'dark';
+        }
+        if (isDark) {
+            html.classList.add('dark');
+            document.getElementById('iconSun').style.display = 'none';
+            document.getElementById('iconMoon').style.display = 'block';
+        }
+    }
+
+    const sidebar = document.getElementById('sidebar');
+    const mainEl = document.getElementById('main');
+    const toggleBtn = document.getElementById('sidebarToggle');
+    toggleBtn.addEventListener('click', () => {
+        const c = sidebar.classList.toggle('collapsed');
+        mainEl.classList.toggle('sidebar-collapsed', c);
+        toggleBtn.style.transform = c ? 'rotate(180deg)' : '';
+    });
+
+    function switchTab(tab, el) {
+        document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.ftab-content').forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('ftab-' + tab).classList.add('active');
+        const s = getSession();
+
+        if (tab === 'add') {
+            document.getElementById('addAdminEmail').value = s.adminEmail || '';
+            if (s.adminPassword) document.getElementById('addAdminPassword').value = s.adminPassword;
+        }
+
+        if (tab === 'generate') {
+            document.getElementById('genAdminEmail').value = s.adminEmail || '';
+            if (s.adminPassword) {
+                document.getElementById('genAdminPassword').value = s.adminPassword;
+                document.getElementById('genTplPwd').value = s.adminPassword;
+            }
+        }
+
+        if (tab === 'view' && s.adminPassword && !document.getElementById('viewAdminPwd').value) {
+            document.getElementById('viewAdminPwd').value = s.adminPassword;
+        }
+
+        if (tab === 'backup') {
+            if (s.adminPassword && !document.getElementById('backupAdminPwd').value) {
+                document.getElementById('backupAdminPwd').value = s.adminPassword;
+            }
+        }
+    }
+
+    function togglePwd(id, btn) {
+        const inp = document.getElementById(id);
+        const h = inp.type === 'password';
+        inp.type = h ? 'text' : 'password';
+        btn.querySelector('.eye').style.display = h ? 'none' : '';
+        btn.querySelector('.eye-off').style.display = h ? '' : 'none';
+    }
+
+    function toggleDay(btn) { btn.classList.toggle('selected'); syncDays(); }
+    function syncDays() { document.getElementById('addWorkingDays').value = [...document.querySelectorAll('#daysPicker .day-btn.selected')].map(b => b.dataset.day).join(','); }
+    function toggleEditDay(btn) { btn.classList.toggle('selected'); syncEditDays(); }
+    function syncEditDays() { document.getElementById('editWorkingDays').value = [...document.querySelectorAll('#editDaysPicker .day-btn.selected')].map(b => b.dataset.day).join(','); }
+
+    let toastTimer;
+    function showToast(msg, type = 'info') {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.className = `show ${type}`;
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => { t.className = ''; }, 3800);
+    }
+
+    async function fetchTemplates() {
+        const s = getSession();
+        if (!s.adminEmail) { showToast('No admin session found.', 'error'); return; }
+        const pw = document.getElementById('tAdminPwd').value.trim();
+        if (!pw) { showToast('Enter admin password to load templates.', 'error'); document.getElementById('tAdminPwd').focus(); return; }
+
+        setListState('loading');
+        try {
+            const res = await fetch(`${API}/fetch-all`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminEmail: s.adminEmail, adminPassword: pw })
+            });
+            const text = await res.text();
+            let data; try { data = JSON.parse(text); } catch { data = text; }
+            if (!res.ok) { showToast(data?.error || data || 'Failed.', 'error'); setListState('empty'); return; }
+            if (data?.message) { setListState('empty', 'none'); return; }
+            renderTemplateCards(Array.isArray(data) ? data : [data]);
+        } catch {
+            showToast('Backend offline.', 'error');
+            setListState('empty');
+        }
+    }
+
+    function setListState(state, sub = '') {
+        document.getElementById('templateEmptyState').style.display = state === 'empty' ? 'block' : 'none';
+        document.getElementById('templateLoadingState').style.display = state === 'loading' ? 'block' : 'none';
+        document.getElementById('templateCardsContainer').style.display = state === 'cards' ? 'grid' : 'none';
+        document.getElementById('templateStatStrip').style.display = state === 'cards' ? 'flex' : 'none';
+
+        if (sub === 'none') {
+            document.getElementById('templateEmptyState').innerHTML = `<div class="faculty-empty-state"><svg width="44" height="44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3" style="opacity:0.3;margin-bottom:12px"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg><p>No templates found. <a href="#" onclick="switchTab('add',document.querySelectorAll('.ftab')[1]);return false;" style="color:var(--accent-warm);font-weight:600">Create one →</a></p></div>`;
+        }
+    }
+
+    function renderTemplateCards(data) {
+        const c = document.getElementById('templateCardsContainer');
+        c.innerHTML = '';
+        data.forEach(t => {
+            const days = (t.workingDays || '').split(',').map(d => d.trim()).filter(Boolean);
+            const created = t.createdAt ? new Date(t.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
+            const isActive = t.status === 'ACTIVE' || !t.status;
+            const card = document.createElement('div');
+            card.className = 'template-card';
+            card.dataset.name = (t.templateName || '').toLowerCase();
+            card.innerHTML = `
+                <div class="template-card-accent"></div>
+                <div class="tc-header">
+                    <div><div class="tc-name">${esc(t.templateName)}</div><div class="tc-created">Created ${created} by ${esc(t.createdBy?.adminName || t.createdBy?.name || '—')}</div></div>
+                    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+                        <span class="status-badge ${isActive ? 'active' : 'inactive'}"><span class="status-dot"></span>${isActive ? 'Active' : 'Inactive'}</span>
+                        <div class="tc-actions">
+                            <button class="tc-btn edit" onclick="openEditModal(${t.templateId})">Edit</button>
+                            <button class="tc-btn generate" onclick="prefillGenerate(${t.templateId})">Generate</button>
+                            <button class="tc-btn delete" onclick="deleteTemplate(${t.templateId})">Delete</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="tc-grid">
+                    <div class="tc-field"><div class="tc-field-label">Start → End</div><div class="tc-field-val">${t.startTime || '—'} → ${t.endTime || '—'}</div></div>
+                    <div class="tc-field"><div class="tc-field-label">Classes / Day</div><div class="tc-field-val">${t.classesPerDay ?? '—'} × ${t.durationPerClass ?? '—'} min</div></div>
+                    <div class="tc-field"><div class="tc-field-label">Breaks</div><div class="tc-field-val">${t.numBreaks ?? 0} × ${t.durationOfBreak ?? 0} min</div></div>
+                    <div class="tc-field"><div class="tc-field-label">Lunch Break</div><div class="tc-field-val">${t.lunchBreakFrom ? t.lunchBreakFrom + ' – ' + (t.lunchBreakTo || '?') : '—'}</div></div>
+                    <div class="tc-field"><div class="tc-field-label">Max Hrs / Faculty</div><div class="tc-field-val">${t.maxHoursPerFacultyPerDay ?? '—'}h/day · ${t.maxHoursPerFacultyPerWeek ?? '—'}h/wk</div></div>
+                    <div class="tc-field"><div class="tc-field-label">Break Window</div><div class="tc-field-val">${t.breakTimeFrom ? t.breakTimeFrom + ' – ' + (t.breakTimeTo || '?') : '—'}</div></div>
+                </div>
+                <div class="tc-days">${days.map(d => `<span class="tc-day-chip">${d}</span>`).join('')}</div>`;
+            c.appendChild(card);
+        });
+
+        const active = data.filter(t => t.status === 'ACTIVE' || !t.status).length;
+        document.getElementById('tTotal').textContent = data.length;
+        document.getElementById('tActive').textContent = active;
+        document.getElementById('tInactive').textContent = data.length - active;
+        setListState('cards');
+        showToast(`Loaded ${data.length} template${data.length !== 1 ? 's' : ''}.`, 'success');
+    }
+
+    function filterTemplateCards() {
+        const q = document.getElementById('tSearchInput').value.toLowerCase().trim();
+        document.querySelectorAll('#templateCardsContainer .template-card').forEach(c => {
+            c.style.display = (q && !c.dataset.name.includes(q)) ? 'none' : '';
+        });
+    }
+
+    function clearListFilters() {
+        document.getElementById('tAdminPwd').value = '';
+        document.getElementById('tSearchInput').value = '';
+        document.querySelectorAll('#templateCardsContainer .template-card').forEach(c => c.style.display = '');
+    }
+
+    async function loadPickerTemplates() {
+        const s = getSession();
+        const pw = document.getElementById('genTplPwd').value.trim();
+        if (!pw) { showToast('Enter admin password to load templates.', 'error'); return; }
+
+        const stateEl = document.getElementById('genTplState');
+        const cardsEl = document.getElementById('genTplCards');
+        stateEl.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;gap:10px;padding:12px"><div class="spinner" style="width:20px;height:20px;border-width:2px"></div><span>Loading templates…</span></div>';
+        stateEl.style.display = 'block';
+        cardsEl.style.display = 'none';
+
+        try {
+            const res = await fetch(`${API}/fetch-all`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminEmail: s.adminEmail, adminPassword: pw })
+            });
+            const text = await res.text();
+            let data; try { data = JSON.parse(text); } catch { data = text; }
+            if (!res.ok || data?.message) {
+                stateEl.innerHTML = '<span style="color:var(--text-muted)">No templates found. Create one first.</span>';
+                return;
+            }
+
+            const templates = Array.isArray(data) ? data : [data];
+            cardsEl.innerHTML = '';
+            templates.forEach(t => {
+                const days = (t.workingDays || '').split(',').map(d => d.trim()).filter(Boolean).join(', ');
+                const card = document.createElement('div');
+                card.className = 'tpl-pick-card';
+                card.dataset.id = t.templateId;
+                card.innerHTML = `<div class="tpl-pick-name">${esc(t.templateName)}</div><div class="tpl-pick-meta">${t.startTime || '?'} – ${t.endTime || '?'} &nbsp;·&nbsp; ${t.classesPerDay || '?'} classes/day<br>${days || 'No days'}</div><div class="tpl-pick-id">ID: ${t.templateId}</div>`;
+                card.addEventListener('click', () => {
+                    document.querySelectorAll('#genTplCards .tpl-pick-card').forEach(c => c.classList.remove('selected'));
+                    card.classList.add('selected');
+                    document.getElementById('genTemplateId').value = t.templateId;
+                    if (!document.getElementById('genAdminPassword').value) {
+                        document.getElementById('genAdminPassword').value = pw;
+                    }
+                });
+                cardsEl.appendChild(card);
+            });
+
+            stateEl.style.display = 'none';
+            cardsEl.style.display = 'grid';
+            showToast(`${templates.length} template${templates.length !== 1 ? 's' : ''} loaded.`, 'success');
+        } catch {
+            stateEl.innerHTML = '<span style="color:#ef4444">Backend offline.</span>';
+        }
+    }
+
+    function prefillGenerate(templateId) {
+        const s = getSession();
+        document.getElementById('genAdminEmail').value = s.adminEmail || '';
+        switchTab('generate', document.querySelectorAll('.ftab')[2]);
+        const listPw = document.getElementById('tAdminPwd').value;
+        if (listPw) {
+            document.getElementById('genTplPwd').value = listPw;
+            loadPickerTemplates().then(() => {
+                const card = document.querySelector(`#genTplCards .tpl-pick-card[data-id="${templateId}"]`);
+                if (card) {
+                    card.click();
+                    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        } else {
+            document.getElementById('genTemplateId').value = templateId;
+            document.getElementById('genAdminPassword').focus();
+        }
+    }
+
+    async function submitAddTemplate(e) {
+        e.preventDefault();
+        const days = document.getElementById('addWorkingDays').value;
+        if (!days) { showToast('Please select at least one working day.', 'error'); return; }
+        const btn = document.getElementById('addSubmitBtn');
+        setBtn(btn, true, 'Saving…');
+
+        const s = getSession();
+        const payload = {
+            adminEmail: s.adminEmail || '',
+            adminPassword: v('addAdminPassword'),
+            templateName: v('addTemplateName'),
+            workingDays: days,
+            startTime: v('addStartTime') || null,
+            endTime: v('addEndTime') || null,
+            classesPerDay: num('addClassesPerDay'),
+            durationPerClass: num('addDurationPerClass'),
+            numBreaks: num('addNumBreaks'),
+            durationOfBreak: num('addDurationOfBreak'),
+            breakTimeFrom: v('addBreakTimeFrom') || null,
+            breakTimeTo: v('addBreakTimeTo') || null,
+            lunchBreakFrom: v('addLunchBreakFrom') || null,
+            lunchBreakTo: v('addLunchBreakTo') || null,
+            maxHoursPerFacultyPerDay: num('addMaxHoursDay'),
+            maxHoursPerFacultyPerWeek: num('addMaxHoursWeek'),
+        };
+
+        try {
+            const res = await fetch(`${API}/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const text = await res.text();
+            let data; try { data = JSON.parse(text); } catch { data = text; }
+            if (res.ok) {
+                showToast(`Template "${payload.templateName}" created!`, 'success');
+                clearAddForm();
+            } else {
+                showToast(data?.error || data || 'Failed.', 'error');
+            }
+        } catch {
+            showToast('Backend offline.', 'error');
+        } finally {
+            setBtn(btn, false, '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg> Save Template');
+        }
+    }
+
+    function clearAddForm() {
+        document.getElementById('templateAddForm').reset();
+        document.getElementById('addAdminEmail').value = getSession().adminEmail || '';
+        document.querySelectorAll('#daysPicker .day-btn').forEach(b => b.classList.remove('selected'));
+        document.getElementById('addWorkingDays').value = '';
+    }
+
+    async function submitGenerate(e) {
+        e.preventDefault();
+        if (!v('genTemplateId')) { showToast('Please select a template first.', 'error'); return; }
+        if (!v('genSemester')) { showToast('Please select a semester.', 'error'); return; }
+        if (!v('genSection')) { showToast('Please enter a section.', 'error'); return; }
+
+        const btn = document.getElementById('genSubmitBtn');
+        setBtn(btn, true, 'Generating…');
+
+        const parseJson = id => {
+            const val = v(id);
+            if (!val) return null;
+            try { return JSON.parse(val); }
+            catch { showToast(`Invalid JSON in "${id}" field.`, 'error'); return 'ERR'; }
+        };
+
+        const maxDay = parseJson('genMaxDay'); if (maxDay === 'ERR') { resetGenBtn(); return; }
+        const maxWeek = parseJson('genMaxWeek'); if (maxWeek === 'ERR') { resetGenBtn(); return; }
+        const labDays = parseJson('genLabDays'); if (labDays === 'ERR') { resetGenBtn(); return; }
+
+        const priorityRaw = v('genPrioritySubj');
+        const priority = priorityRaw ? priorityRaw.split(',').map(x => x.trim()).filter(Boolean) : null;
+        const s = getSession();
+
+        const payload = {
+            adminEmail: s.adminEmail || '',
+            adminPassword: v('genAdminPassword'),
+            semester: v('genSemester'),
+            section: v('genSection').toUpperCase(),
+            templateId: Number(v('genTemplateId')),
+            filters: {
+                freeSlotsPerDay: Number(v('genFreeDay') || 0),
+                freeSlotsPerWeek: Number(v('genFreeWeek') || 0),
+                avoidConsecutiveSameSubject: document.getElementById('genAvoidConsec').checked,
+                enforceFacultyLimits: document.getElementById('genEnforceFac').checked,
+                ...(priority && { prioritySubjectsEarly: priority }),
+                ...(maxDay && { maxRepeatsPerDay: maxDay }),
+                ...(maxWeek && { maxRepeatsPerWeek: maxWeek }),
+                ...(labDays && { preferredDaysForLabs: labDays }),
+            }
+        };
+
+        try {
+            const res = await fetch(`${TTAPI}/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const text = await res.text();
+            let data; try { data = JSON.parse(text); } catch { data = text; }
+            if (res.ok) {
+                showToast('Timetable generated!', 'success');
+                renderGenReport(typeof data === 'object' ? data : null, typeof data === 'string' ? data : null);
+            } else {
+                showToast(data?.message || data || 'Generation failed.', 'error');
+            }
+        } catch {
+            showToast('Backend offline.', 'error');
+        } finally {
+            resetGenBtn();
+        }
+    }
+
+    function resetGenBtn() {
+        setBtn(document.getElementById('genSubmitBtn'), false, '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg> Generate');
+    }
+
+    function renderGenReport(obj, rawStr) {
+        const box = document.getElementById('genResultBox');
+        const content = document.getElementById('genReportContent');
+        document.getElementById('genInfoCards').style.display = 'none';
+        box.style.display = 'block';
+
+        if (!obj) {
+            content.innerHTML = `<pre style="font-size:0.78rem;color:var(--text-muted);white-space:pre-wrap;word-break:break-word">${esc(rawStr || '')}</pre>`;
+            return;
+        }
+
+        const isOk = obj.status === 'success';
+        const miss = obj.missingSubjects || [];
+        const extra = obj.extraSubjects || [];
+        const freq = obj.frequencyPerSubject || {};
+
+        content.innerHTML = `
+            <div class="gen-report-grid">
+                <div class="gen-report-item"><div class="label">Status</div><div class="val"><span class="tag ${isOk ? 'ok' : 'err'}">${esc(obj.status || '—')}</span></div></div>
+                <div class="gen-report-item"><div class="label">Template</div><div class="val">${esc(obj.template || '—')}</div></div>
+                <div class="gen-report-item"><div class="label">Semester</div><div class="val">${esc(obj.semester || '—')}</div></div>
+                <div class="gen-report-item"><div class="label">Section</div><div class="val">${esc(obj.section || '—')}</div></div>
+            </div>
+            ${miss.length ? `<div style="margin-bottom:10px"><div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px">Missing Subjects</div><div class="tag-list">${miss.map(x => `<span class="tag err">${esc(x)}</span>`).join('')}</div></div>` : ''}
+            ${extra.length ? `<div style="margin-bottom:10px"><div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:6px">Extra Subjects</div><div class="tag-list">${extra.map(x => `<span class="tag warn">${esc(x)}</span>`).join('')}</div></div>` : ''}
+            <div><div style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text-faint);margin-bottom:8px">Frequency</div>
+            <div style="display:flex;flex-direction:column;gap:4px">
+            ${Object.entries(freq).map(([subj, cnt]) => `
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:0.78rem;flex:1;font-weight:500">${esc(subj)}</span>
+                    <div style="width:80px;height:6px;background:var(--border);border-radius:3px;overflow:hidden"><div style="height:100%;width:${Math.min(100, (cnt / 6) * 100)}%;background:var(--gold);border-radius:3px"></div></div>
+                    <span style="font-size:0.72rem;font-weight:700;color:var(--text-muted);min-width:20px;text-align:right">${cnt}</span>
+                </div>`).join('')}
+            </div></div>
+            ${obj.message ? `<div class="section-divider"></div><div style="font-size:0.8rem;color:var(--text-muted);line-height:1.5">${esc(obj.message)}</div>` : ''}
+            <div class="section-divider"></div>
+            <button class="btn-filter" onclick="prefillViewFromGen()" style="width:100%;justify-content:center">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                View Generated Timetable
+            </button>`;
+    }
+
+    function prefillViewFromGen() {
+        document.getElementById('viewSemester').value = v('genSemester');
+        document.getElementById('viewSection').value = v('genSection');
+        document.getElementById('viewAdminPwd').value = v('genAdminPassword');
+        switchTab('view', document.querySelectorAll('.ftab')[3]);
+        fetchTimetable();
+    }
+
+    function clearGenForm() {
+        document.getElementById('genForm').reset();
+        document.getElementById('genAdminEmail').value = getSession().adminEmail || '';
+        document.getElementById('genTemplateId').value = '';
+        document.getElementById('genTplPwd').value = '';
+        document.getElementById('genTplState').innerHTML = 'Enter your password and click Load to choose a template.';
+        document.getElementById('genTplState').style.display = 'block';
+        document.getElementById('genTplCards').style.display = 'none';
+        document.querySelectorAll('#genTplCards .tpl-pick-card').forEach(c => c.classList.remove('selected'));
+        document.getElementById('genResultBox').style.display = 'none';
+        document.getElementById('genInfoCards').style.display = 'flex';
+    }
+
+    function toggleDeleteDropdown(e) {
+        e.stopPropagation();
+        const dropdown = document.getElementById('deleteSplitDropdown');
+        const arrow = document.getElementById('deleteSplitArrow');
+        const isOpen = dropdown.classList.contains('show');
+        closeDeleteDropdown();
+        if (!isOpen) {
+            dropdown.classList.add('show');
+            arrow.classList.add('open');
+        }
+    }
+
+    function closeDeleteDropdown() {
+        document.getElementById('deleteSplitDropdown').classList.remove('show');
+        document.getElementById('deleteSplitArrow').classList.remove('open');
+    }
+
+    document.addEventListener('click', function(e) {
+        const group = document.getElementById('deleteSplitGroup');
+        if (group && !group.contains(e.target)) closeDeleteDropdown();
+    });
+
+    function getDeleteFormValues() {
+        return {
+            pw: v('viewAdminPwd'),
+            sem: v('viewSemester'),
+            sec: v('viewSection').toUpperCase()
+        };
+    }
+
+    function openDeleteModal(mode) {
+        const { pw, sem, sec } = getDeleteFormValues();
+        if (!pw || !sem || !sec) {
+            showToast('Fill Admin Password, Semester and Section first.', 'error');
+            return;
+        }
+
+        _deleteMode = mode;
+
+        const iconEl = document.getElementById('delModalIcon');
+        const titleEl = document.getElementById('delModalTitle');
+        const descEl = document.getElementById('delModalDesc');
+        const infoEl = document.getElementById('delModalInfo');
+        const btnEl = document.getElementById('delConfirmBtn');
+
+        const semLabel = toRoman(sem);
+        const secLabel = sec.toUpperCase();
+
+        if (mode === 'with-backup') {
+            iconEl.className = 'del-modal-icon-wrap safe';
+            iconEl.innerHTML = `<svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>`;
+            titleEl.textContent = 'Delete with Backup';
+            descEl.innerHTML = 'All timetable slots for this class will be <strong>archived</strong> before deletion. You can restore them later from the delete history.';
+            infoEl.innerHTML = `Semester: <strong>${semLabel}</strong> &nbsp;·&nbsp; Section: <strong>${secLabel}</strong><br><span style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;display:block">Endpoint: POST /api/timetable/maintenance/delete</span>`;
+            btnEl.className = 'btn-del-confirm-safe';
+            btnEl.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg> Delete & Archive`;
+        } else {
+            iconEl.className = 'del-modal-icon-wrap hard';
+            iconEl.innerHTML = `<svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" d="M19 6l-1 14H6L5 6"/><path stroke-linecap="round" d="M10 11v6M14 11v6M9 6V4h6v2"/></svg>`;
+            titleEl.textContent = 'Delete without Backup';
+            descEl.innerHTML = 'All timetable slots for this class will be <strong>permanently deleted</strong>. There is no way to recover them after this action.';
+            infoEl.innerHTML = `Semester: <strong>${semLabel}</strong> &nbsp;·&nbsp; Section: <strong>${secLabel}</strong><br><span style="font-size:0.75rem;color:#ef4444;margin-top:4px;display:block">⚠ This action is irreversible.</span>`;
+            btnEl.className = 'btn-del-confirm-hard';
+            btnEl.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path stroke-linecap="round" d="M19 6l-1 14H6L5 6"/></svg> Permanently Delete`;
+        }
+
+        document.getElementById('deleteConfirmModal').classList.add('show');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteConfirmModal').classList.remove('show');
+    }
+
+    async function executeDelete() {
+        if (_deleteMode === 'with-backup') await deleteTimetableWithBackup();
+        else await deleteTimetableWithoutBackup();
+    }
+
+    async function deleteTimetableWithBackup() {
+        const s = getSession();
+        const { pw, sem, sec } = getDeleteFormValues();
+        const btn = document.getElementById('delConfirmBtn');
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;border-top-color:white"></div> Archiving…';
+
+        try {
+            const res = await fetch(`${MAINTAPI}/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminEmail: s.adminEmail || '', adminPassword: pw, semester: sem, section: sec })
+            });
+
+            const text = await res.text();
+            let data; try { data = JSON.parse(text); } catch { data = text; }
+            closeDeleteModal();
+
+            if (res.ok) {
+                const msg = data?.message || data || 'Timetable archived and deleted.';
+                showToast(msg, 'success');
+                fetchTimetable();
+            } else if (res.status === 401) {
+                showToast('Invalid admin credentials.', 'error');
+            } else {
+                showToast(data?.message || data || 'Delete with backup failed.', 'error');
+            }
+        } catch {
+            closeDeleteModal();
+            showToast('Backend offline.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+        }
+    }
+
+    async function deleteTimetableWithoutBackup() {
+        const s = getSession();
+        const { pw, sem, sec } = getDeleteFormValues();
+        const btn = document.getElementById('delConfirmBtn');
+        const origHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner" style="width:16px;height:16px;border-width:2px;border-top-color:white"></div> Deleting…';
+
+        try {
+            const res = await fetch(`${TTAPI}/delete`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminEmail: s.adminEmail || '', adminPassword: pw, semester: sem, section: sec })
+            });
+
+            const text = await res.text();
+            let msg = text; try { msg = JSON.parse(text)?.message || text; } catch {}
+            closeDeleteModal();
+
+            if (res.ok) {
+                showToast(msg || 'Timetable deleted.', 'success');
+                fetchTimetable();
+            } else {
+                showToast(msg || 'Delete failed.', 'error');
+            }
+        } catch {
+            closeDeleteModal();
+            showToast('Backend offline.', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = origHtml;
+        }
+    }
+
+    async function fetchTimetable() {
+        const sem = v('viewSemester');
+        const sec = v('viewSection').toUpperCase();
+        const pw = v('viewAdminPwd');
+
+        if (!sem) { showToast('Please select a semester.', 'error'); return; }
+        if (!sec) { showToast('Please enter a section.', 'error'); return; }
+        if (!pw) { showToast('Enter admin password to load timetable.', 'error'); document.getElementById('viewAdminPwd').focus(); return; }
+
+        const s = getSession();
+        if (!s.adminEmail) { showToast('No admin session. Please log in again.', 'error'); return; }
+
+        document.getElementById('viewEmptyState').style.display = 'none';
+        document.getElementById('viewGridWrap').style.display = 'none';
+        document.getElementById('viewLoadingState').style.display = 'block';
+        document.getElementById('viewGridLabel').textContent = `Semester ${toRoman(sem)} · Section ${sec}`;
+
+        try {
+            const res = await fetch(VIEWAPI, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminEmail: s.adminEmail, adminPassword: pw, semester: sem, section: sec })
+            });
+
+            document.getElementById('viewLoadingState').style.display = 'none';
+
+            if (res.status === 401) { showToast('Invalid admin credentials.', 'error'); showViewEmpty('Authentication failed. Check your password.'); return; }
+            if (res.status === 404 || res.status === 204) { showViewEmpty('No timetable found. Generate one first.'); return; }
+            if (!res.ok) {
+                const err = await res.text();
+                let msg = err; try { msg = JSON.parse(err)?.message || err; } catch {}
+                showViewEmpty(msg || 'Failed to load timetable.');
+                return;
+            }
+
+            const text = await res.text();
+            let slots; try { slots = JSON.parse(text); } catch { showViewEmpty('Invalid server response.'); return; }
+            if (!Array.isArray(slots) || slots.length === 0) { showViewEmpty('No slots found. Generate the timetable first.'); return; }
+
+            _loadedTimetableSlots = slots;
+            _loadedTimetableMeta = { semester: sem, section: sec };
+            _aiChatHistory = [];
+
+            renderTimetableGrid(slots);
+            document.getElementById('askAiBtn').style.display = 'inline-flex';
+            showToast(`Loaded ${slots.length} slots.`, 'success');
+        } catch {
+            document.getElementById('viewLoadingState').style.display = 'none';
+            showViewEmpty('Backend offline — cannot fetch timetable.');
+        }
+    }
+
+    function showViewEmpty(msg) {
+        _loadedTimetableSlots = [];
+        _loadedTimetableMeta = { semester: '', section: '' };
+        _aiChatHistory = [];
+        const askBtn = document.getElementById('askAiBtn');
+        if (askBtn) askBtn.style.display = 'none';
+
+        const el = document.getElementById('viewEmptyState');
+        el.innerHTML = `<div class="faculty-empty-state">
+            <svg width="44" height="44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3" style="opacity:0.3;margin-bottom:12px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            <p>${esc(msg)}</p></div>`;
+        el.style.display = 'block';
+    }
+
+    function renderTimetableGrid(slots) {
+        const DAYS_ORDER = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+        const byDay = {};
+
+        slots.forEach(s => {
+            const d = (s.day || '').toUpperCase();
+            if (!byDay[d]) byDay[d] = [];
+            byDay[d].push(s);
+        });
+
+        Object.keys(byDay).forEach(d => byDay[d].sort((a, b) => cmpTime(a.startTime, b.startTime)));
+        const allTimes = [...new Set(slots.map(s => s.startTime + '|' + s.endTime))].sort((a, b) => cmpTime(a.split('|')[0], b.split('|')[0]));
+        const days = DAYS_ORDER.filter(d => byDay[d]);
+
+        const table = document.getElementById('ttGrid');
+        table.innerHTML = '';
+
+        const thead = table.createTHead();
+        const hrow = thead.insertRow();
+        const thT = document.createElement('th');
+        thT.textContent = 'Time';
+        thT.className = 'tt-time-col';
+        hrow.appendChild(thT);
+
+        days.forEach(d => {
+            const th = document.createElement('th');
+            th.innerHTML = `<span class="day-chip">${d}</span>`;
+            hrow.appendChild(th);
+        });
+
+        const tbody = table.createTBody();
+        allTimes.forEach(tp => {
+            const [start, end] = tp.split('|');
+            const row = tbody.insertRow();
+            const tc = row.insertCell();
+            tc.className = 'tt-time-col';
+            tc.innerHTML = `<div class="tt-time-cell">${fmtTime(start)}<br><span style="color:var(--text-faint);font-weight:400">${fmtTime(end)}</span></div>`;
+
+            days.forEach(d => {
+                const cell = row.insertCell();
+                const slot = byDay[d]?.find(s => s.startTime === start && s.endTime === end);
+                if (!slot) {
+                    cell.innerHTML = `<div class="tt-slot"><span class="tt-chip">—</span></div>`;
+                    return;
+                }
+
+                const subj = slot.subjectName || null;
+                const fac = slot.facultyName || null;
+                if (!subj && !fac) {
+                    cell.innerHTML = `<div class="tt-slot break-slot"><span class="tt-chip">Break</span></div>`;
+                } else {
+                    cell.innerHTML = `<div class="tt-slot"><div class="tt-subject">${esc(subj || '—')}</div>${fac ? `<div class="tt-faculty">${esc(fac)}</div>` : ''}</div>`;
+                }
+            });
+        });
+
+        document.getElementById('viewGridWrap').style.display = 'block';
+    }
+
+    function clearViewTab() {
+        document.getElementById('viewSemester').value = '';
+        document.getElementById('viewSection').value = '';
+        document.getElementById('viewAdminPwd').value = '';
+        document.getElementById('viewGridWrap').style.display = 'none';
+        document.getElementById('viewEmptyState').innerHTML = `<div class="faculty-empty-state">
+            <svg width="44" height="44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3" style="opacity:0.3;margin-bottom:12px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+            <p>Enter password, choose Semester and Section, then click <strong>Load Grid</strong>.</p></div>`;
+        document.getElementById('viewEmptyState').style.display = 'block';
+        closeDeleteDropdown();
+
+        _loadedTimetableSlots = [];
+        _loadedTimetableMeta = { semester: '', section: '' };
+        _aiChatHistory = [];
+        document.getElementById('askAiBtn').style.display = 'none';
+        closeAiChat();
+    }
+
+    function openAiChat() {
+        if (!_loadedTimetableSlots.length) {
+            showToast('Load a timetable first.', 'error');
+            return;
+        }
+
+        document.getElementById('aiChatSub').textContent =
+            `Semester ${toRoman(_loadedTimetableMeta.semester)} · Section ${_loadedTimetableMeta.section}`;
+
+        document.getElementById('aiChatModal').classList.add('show');
+        renderAiMessages();
+
+        setTimeout(() => {
+            document.getElementById('aiChatInput').focus();
+        }, 80);
+    }
+
+    function closeAiChat() {
+        document.getElementById('aiChatModal').classList.remove('show');
+    }
+
+    function renderAiMessages() {
+        const body = document.getElementById('aiChatBody');
+
+        if (!_aiChatHistory.length) {
+            body.innerHTML = `<div class="ai-empty">Ask about clashes, faculty usage, breaks, free slots, balancing, or timetable quality.</div>`;
+            return;
+        }
+
+        body.innerHTML = _aiChatHistory.map(msg => `
+            <div class="ai-msg ${msg.role === 'user' ? 'user' : 'bot'}">${esc(msg.content)}</div>
+        `).join('');
+
+        body.scrollTop = body.scrollHeight;
+    }
+
+    function buildTimetableContextText() {
+        const meta = `Semester: ${_loadedTimetableMeta.semester}\nSection: ${_loadedTimetableMeta.section}`;
+        const rows = _loadedTimetableSlots.map((slot, i) => {
+            return [
+                `Slot ${i + 1}`,
+                `Day: ${slot.day || '-'}`,
+                `Start: ${slot.startTime || '-'}`,
+                `End: ${slot.endTime || '-'}`,
+                `Subject: ${slot.subjectName || 'Break/Free'}`,
+                `Faculty: ${slot.facultyName || '-'}`
+            ].join(' | ');
+        }).join('\n');
+
+        return `${meta}\n\nTimetable Slots:\n${rows}`;
+    }
+
+    async function sendAiMessage(e) {
+        e.preventDefault();
+
+        if (!_loadedTimetableSlots.length) {
+            showToast('No timetable loaded.', 'error');
+            return;
+        }
+
+        const input = document.getElementById('aiChatInput');
+        const btn = document.getElementById('aiSendBtn');
+        const question = input.value.trim();
+        if (!question) return;
+
+        _aiChatHistory.push({ role: 'user', content: question });
+        renderAiMessages();
+        input.value = '';
+        btn.disabled = true;
+
+        const historyText = _aiChatHistory.map(m => `${m.role === 'user' ? 'User' : 'AI'}: ${m.content}`).join('\n\n');
+
+        const rawBody = `
+You are an academic timetable assistant.
+
+Use the timetable below to answer the user's question accurately.
+If the timetable has gaps, say so clearly.
+Be concise and helpful.
+
+${buildTimetableContextText()}
+
+Conversation so far:
+${historyText}
+
+User question:
+${question}
+        `.trim();
+
+        try {
+            const res = await fetch(AICHATAPI, {
+                method: 'POST',
+                headers: { 'Content-Type': 'text/plain' },
+                body: rawBody
+            });
+
+            const reply = await res.text();
+            _aiChatHistory.push({
+                role: 'bot',
+                content: reply || (res.ok ? 'No response from AI.' : 'AI request failed.')
+            });
+            renderAiMessages();
+        } catch {
+            _aiChatHistory.push({ role: 'bot', content: 'Could not reach AI service.' });
+            renderAiMessages();
+        } finally {
+            btn.disabled = false;
+            input.focus();
+        }
+    }
+
+    async function fetchBackupList() {
+        const sem = v('backupSemester');
+        const sec = v('backupSection').toUpperCase();
+        const pw = v('backupAdminPwd');
+        const s = getSession();
+
+        if (!sem) { showToast('Select a semester.', 'error'); return; }
+        if (!sec) { showToast('Enter a section.', 'error'); return; }
+        if (!pw) { showToast('Enter admin password.', 'error'); return; }
+        if (!s.adminEmail) { showToast('No admin session found.', 'error'); return; }
+
+        _backupList = [];
+        _selectedBackupId = null;
+        _backupPreview = null;
+
+        document.getElementById('backupEmptyState').style.display = 'none';
+        document.getElementById('backupListWrap').style.display = 'none';
+        document.getElementById('backupLoadingState').style.display = 'block';
+        document.getElementById('backupPreviewContent').innerHTML =
+            `<div class="backup-preview-empty">Select a backup and click <strong>Preview</strong> to inspect restore conflicts.</div>`;
+
+        try {
+            const res = await fetch(`${BACKUPAPI}/list`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: s.adminEmail,
+                    adminPassword: pw,
+                    semester: sem,
+                    section: sec
+                })
+            });
+
+            const text = await res.text();
+            let data; try { data = JSON.parse(text); } catch { data = text; }
+
+            document.getElementById('backupLoadingState').style.display = 'none';
+
+            if (!res.ok) {
+                showBackupEmpty(typeof data === 'string' ? data : (data?.message || 'Failed to load backups.'));
+                return;
+            }
+
+            if (!Array.isArray(data) || data.length === 0) {
+                showBackupEmpty('No backups found for this semester and section.');
+                return;
+            }
+
+            _backupList = data;
+            renderBackupList(data);
+            showToast(`Loaded ${data.length} backup${data.length !== 1 ? 's' : ''}.`, 'success');
+        } catch {
+            document.getElementById('backupLoadingState').style.display = 'none';
+            showBackupEmpty('Backend offline — cannot load backups.');
+        }
+    }
+
+    function renderBackupList(list) {
+        const wrap = document.getElementById('backupListWrap');
+        const grid = document.getElementById('backupListGrid');
+
+        grid.innerHTML = list.map(item => `
+            <div class="backup-card ${_selectedBackupId === item.backupId ? 'selected' : ''}" id="backup-card-${item.backupId}">
+                <div class="backup-card-top">
+                    <div>
+                        <div class="backup-card-title">Backup #${item.backupId}</div>
+                        <div class="backup-card-meta">
+                            Semester ${esc(item.semester || '—')} · Section ${esc(item.section || '—')}<br>
+                            Backed up: ${esc(formatDateTime(item.backedUpAt))}<br>
+                            Admin ID: ${esc(item.adminId ?? '—')} · Slots: ${esc(item.slotsCount ?? '—')}
+                        </div>
+                    </div>
+                    <span class="backup-pill">Backup</span>
+                </div>
+                <div class="backup-card-actions">
+                    <button class="btn-preview" onclick="previewBackup(${item.backupId})">Preview</button>
+                    <button class="btn-restore" onclick="restoreBackup(${item.backupId})">Restore</button>
+                </div>
+            </div>
+        `).join('');
+
+        wrap.style.display = 'block';
+    }
+
+    function showBackupEmpty(msg) {
+        document.getElementById('backupListWrap').style.display = 'none';
+        const el = document.getElementById('backupEmptyState');
+        el.innerHTML = `<div class="faculty-empty-state">
+            <svg width="44" height="44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3" style="opacity:0.3;margin-bottom:12px">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h10"/>
+            </svg>
+            <p>${esc(msg)}</p>
+        </div>`;
+        el.style.display = 'block';
+    }
+
+    async function previewBackup(backupId) {
+        const pw = v('backupAdminPwd');
+        const s = getSession();
+
+        if (!pw) { showToast('Enter admin password first.', 'error'); return; }
+
+        _selectedBackupId = backupId;
+        document.querySelectorAll('.backup-card').forEach(card => card.classList.remove('selected'));
+        const card = document.getElementById(`backup-card-${backupId}`);
+        if (card) card.classList.add('selected');
+
+        document.getElementById('backupPreviewContent').innerHTML =
+            `<div class="faculty-empty-state" style="padding:30px 10px"><div class="spinner"></div><p style="margin-top:12px">Checking conflicts…</p></div>`;
+
+        try {
+            const res = await fetch(`${BACKUPAPI}/preview`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: s.adminEmail,
+                    adminPassword: pw,
+                    backupId: backupId
+                })
+            });
+
+            const text = await res.text();
+            let data; try { data = JSON.parse(text); } catch { data = text; }
+
+            if (!res.ok) {
+                document.getElementById('backupPreviewContent').innerHTML =
+                    `<div class="backup-preview-empty">${esc(typeof data === 'string' ? data : (data?.message || 'Preview failed.'))}</div>`;
+                return;
+            }
+
+            _backupPreview = data;
+            renderBackupPreview(data);
+        } catch {
+            document.getElementById('backupPreviewContent').innerHTML =
+                `<div class="backup-preview-empty">Backend offline — cannot preview restore.</div>`;
+        }
+    }
+
+    function renderBackupPreview(data) {
+        const conflicts = Array.isArray(data.conflicts) ? data.conflicts : [];
+        const safe = Number(data.conflictCount || 0) === 0;
+
+        document.getElementById('backupPreviewContent').innerHTML = `
+            <div class="backup-preview-grid">
+                <div class="backup-preview-item">
+                    <div class="label">Backup ID</div>
+                    <div class="val">${esc(data.backupId ?? '—')}</div>
+                </div>
+                <div class="backup-preview-item">
+                    <div class="label">Total Slots</div>
+                    <div class="val">${esc(data.totalSlots ?? '—')}</div>
+                </div>
+                <div class="backup-preview-item">
+                    <div class="label">Semester</div>
+                    <div class="val">${esc(data.semester ?? '—')}</div>
+                </div>
+                <div class="backup-preview-item">
+                    <div class="label">Section</div>
+                    <div class="val">${esc(data.section ?? '—')}</div>
+                </div>
+                <div class="backup-preview-item">
+                    <div class="label">Conflicts</div>
+                    <div class="val" style="color:${safe ? '#16a34a' : '#dc2626'}">${esc(data.conflictCount ?? 0)}</div>
+                </div>
+                <div class="backup-preview-item">
+                    <div class="label">Restore Status</div>
+                    <div class="val">${safe ? 'Safe to restore' : 'Blocked by conflicts'}</div>
+                </div>
+            </div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:4px">
+                <button class="btn-restore" onclick="restoreBackup(${data.backupId})" ${safe ? '' : 'disabled'}>
+                    Restore This Backup
+                </button>
+            </div>
+
+            ${conflicts.length ? `
+                <div class="backup-conflicts">
+                    ${conflicts.map(c => `
+                        <div class="backup-conflict">
+                            <div class="backup-conflict-head">${esc(c.reason || 'Conflict')}</div>
+                            <div class="backup-conflict-body">
+                                Day: ${esc(c.day || '—')}<br>
+                                Time: ${esc(c.startTime || '—')} - ${esc(c.endTime || '—')}
+                                ${c.conflictingAvailabilityId ? `<br>Conflicting Availability ID: ${esc(c.conflictingAvailabilityId)}` : ''}
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : `
+                <div style="margin-top:14px;padding:12px 14px;border-radius:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.18);font-size:0.8rem;color:#166534">
+                    No conflicts detected. This backup can be restored safely.
+                </div>
+            `}
+        `;
+    }
+
+    async function restoreBackup(backupId) {
+        const pw = v('backupAdminPwd');
+        const s = getSession();
+
+        if (!pw) { showToast('Enter admin password first.', 'error'); return; }
+        if (!confirm('Restore this backup? Current timetable entries for this class will be replaced.')) return;
+
+        const previewEl = document.getElementById('backupPreviewContent');
+        previewEl.innerHTML = `<div class="faculty-empty-state" style="padding:30px 10px"><div class="spinner"></div><p style="margin-top:12px">Restoring backup…</p></div>`;
+
+        try {
+            const res = await fetch(`${BACKUPAPI}/restore`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    adminEmail: s.adminEmail,
+                    adminPassword: pw,
+                    backupId: backupId
+                })
+            });
+
+            const text = await res.text();
+            let data; try { data = JSON.parse(text); } catch { data = text; }
+
+            if (res.ok) {
+                const msg = data?.message || 'Timetable restored successfully.';
+                previewEl.innerHTML = `
+                    <div style="padding:14px;border-radius:12px;background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.18);font-size:0.82rem;color:#166534;line-height:1.6">
+                        <strong>${esc(msg)}</strong><br>
+                        Restored Slots: ${esc(data?.restoredSlots ?? '—')}<br>
+                        Skipped Slots: ${esc(data?.skippedSlots ?? '—')}
+                    </div>
+                `;
+                showToast(msg, 'success');
+                return;
+            }
+
+            if (res.status === 409 && data && typeof data === 'object') {
+                _backupPreview = data;
+                previewEl.innerHTML = `
+                    <div style="padding:14px;border-radius:12px;background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18);font-size:0.82rem;color:#991b1b;line-height:1.6;margin-bottom:12px">
+                        <strong>${esc(data.message || 'Restore blocked due to conflicts.')}</strong><br>
+                        Restored Slots: ${esc(data.restoredSlots ?? 0)}<br>
+                        Skipped Slots: ${esc(data.skippedSlots ?? '—')}
+                    </div>
+                    <div class="backup-conflicts">
+                        ${(data.conflicts || []).map(c => `
+                            <div class="backup-conflict">
+                                <div class="backup-conflict-head">${esc(c.reason || 'Conflict')}</div>
+                                <div class="backup-conflict-body">
+                                    Day: ${esc(c.day || '—')}<br>
+                                    Time: ${esc(c.startTime || '—')} - ${esc(c.endTime || '—')}
+                                    ${c.conflictingAvailabilityId ? `<br>Conflicting Availability ID: ${esc(c.conflictingAvailabilityId)}` : ''}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                showToast(data.message || 'Restore blocked.', 'error');
+                return;
+            }
+
+            previewEl.innerHTML = `<div class="backup-preview-empty">${esc(typeof data === 'string' ? data : (data?.message || 'Restore failed.'))}</div>`;
+            showToast(typeof data === 'string' ? data : (data?.message || 'Restore failed.'), 'error');
+        } catch {
+            previewEl.innerHTML = `<div class="backup-preview-empty">Backend offline — cannot restore backup.</div>`;
+            showToast('Backend offline.', 'error');
+        }
+    }
+
+    function clearBackupTab() {
+        document.getElementById('backupSemester').value = '';
+        document.getElementById('backupSection').value = '';
+        document.getElementById('backupAdminPwd').value = '';
+        document.getElementById('backupListWrap').style.display = 'none';
+        document.getElementById('backupLoadingState').style.display = 'none';
+        document.getElementById('backupEmptyState').innerHTML = `<div class="faculty-empty-state">
+            <svg width="44" height="44" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.3" style="opacity:0.3;margin-bottom:12px">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h10"/>
+            </svg>
+            <p>Choose semester, section, and password, then click <strong>List Backups</strong>.</p>
+        </div>`;
+        document.getElementById('backupEmptyState').style.display = 'block';
+        document.getElementById('backupPreviewContent').innerHTML =
+            `<div class="backup-preview-empty">Select a backup and click <strong>Preview</strong> to inspect restore conflicts.</div>`;
+
+        _backupList = [];
+        _selectedBackupId = null;
+        _backupPreview = null;
+    }
+
+    function formatDateTime(value) {
+        if (!value) return '—';
+        try {
+            return new Date(value).toLocaleString('en-IN', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch {
+            return value;
+        }
+    }
+
+    function openEditModal(templateId) {
+        document.getElementById('editTemplateId').value = templateId;
+        document.getElementById('editAdminPassword').value = document.getElementById('tAdminPwd').value || '';
+        ['editTemplateName','editStartTime','editEndTime','editBreakTimeFrom','editBreakTimeTo','editLunchBreakFrom','editLunchBreakTo'].forEach(id => { document.getElementById(id).value = ''; });
+        ['editClassesPerDay','editDurationPerClass','editNumBreaks','editDurationOfBreak','editMaxHoursDay','editMaxHoursWeek'].forEach(id => { document.getElementById(id).value = ''; });
+        document.querySelectorAll('#editDaysPicker .day-btn').forEach(b => b.classList.remove('selected'));
+        document.getElementById('editWorkingDays').value = '';
+        document.getElementById('editModal').classList.add('show');
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('show');
+    }
+
+    async function submitEditTemplate(e) {
+        e.preventDefault();
+        const btn = document.getElementById('editSubmitBtn');
+        setBtn(btn, true, 'Saving…');
+        const s = getSession();
+        const id = v('editTemplateId');
+        const payload = { adminEmail: s.adminEmail || '', adminPassword: v('editAdminPassword') };
+
+        const nm = v('editTemplateName'), wd = v('editWorkingDays'), st = v('editStartTime'), et = v('editEndTime'),
+            cpd = v('editClassesPerDay'), dpc = v('editDurationPerClass'),
+            nb = v('editNumBreaks'), dob = v('editDurationOfBreak'),
+            btf = v('editBreakTimeFrom'), btt = v('editBreakTimeTo'),
+            lbf = v('editLunchBreakFrom'), lbt = v('editLunchBreakTo'),
+            mhd = v('editMaxHoursDay'), mhw = v('editMaxHoursWeek');
+
+        if (nm) payload.templateName = nm;
+        if (wd) payload.workingDays = wd;
+        if (st) payload.startTime = st;
+        if (et) payload.endTime = et;
+        if (cpd) payload.classesPerDay = Number(cpd);
+        if (dpc) payload.durationPerClass = Number(dpc);
+        if (nb) payload.numBreaks = Number(nb);
+        if (dob) payload.durationOfBreak = Number(dob);
+        if (btf) payload.breakTimeFrom = btf;
+        if (btt) payload.breakTimeTo = btt;
+        if (lbf) payload.lunchBreakFrom = lbf;
+        if (lbt) payload.lunchBreakTo = lbt;
+        if (mhd) payload.maxHoursPerFacultyPerDay = Number(mhd);
+        if (mhw) payload.maxHoursPerFacultyPerWeek = Number(mhw);
+
+        try {
+            const res = await fetch(`${API}/edit/${id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const text = await res.text();
+            let data; try { data = JSON.parse(text); } catch { data = text; }
+            if (res.ok) {
+                showToast('Template updated.', 'success');
+                closeEditModal();
+                fetchTemplates();
+            } else {
+                showToast(data?.error || data || 'Update failed.', 'error');
+            }
+        } catch {
+            showToast('Backend offline.', 'error');
+        } finally {
+            setBtn(btn, false, '<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" d="M5 13l4 4L19 7"/></svg> Save Changes');
+        }
+    }
+
+    async function deleteTemplate(templateId) {
+        const pw = document.getElementById('tAdminPwd').value.trim();
+        if (!pw) { showToast('Enter admin password in the filter bar first.', 'error'); return; }
+        if (!confirm('Delete this template? This cannot be undone.')) return;
+        const s = getSession();
+        try {
+            const res = await fetch(`${API}/delete/${templateId}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ adminEmail: s.adminEmail, adminPassword: pw })
+            });
+            if (res.ok) {
+                showToast('Template deleted.', 'success');
+                fetchTemplates();
+            } else {
+                const err = await res.text();
+                let msg = err; try { msg = JSON.parse(err)?.error || err; } catch {}
+                showToast(msg || 'Delete failed.', 'error');
+            }
+        } catch {
+            showToast('Backend offline.', 'error');
+        }
+    }
+
+    function v(id) { return (document.getElementById(id)?.value || '').trim(); }
+    function num(id) { const x = v(id); return x ? Number(x) : null; }
+    function esc(s) { if (!s && s !== 0) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function fmtTime(t) {
+        if (!t) return '—';
+        try {
+            const [h, m] = t.split(':');
+            const hr = Number(h);
+            return (hr % 12 || 12) + ':' + (m || '00') + ' ' + (hr < 12 ? 'AM' : 'PM');
+        } catch {
+            return t;
+        }
+    }
+    function cmpTime(a, b) {
+        const tm = t => {
+            const [h, m] = (t || '00:00').split(':');
+            return Number(h) * 60 + Number(m);
+        };
+        return tm(a) - tm(b);
+    }
+    function toRoman(n) {
+        const map = { '1':'I','2':'II','3':'III','4':'IV','5':'V','6':'VI' };
+        return map[String(n)] || String(n);
+    }
+    function setBtn(btn, disabled, html) {
+        btn.disabled = disabled;
+        btn.innerHTML = html;
+    }
+
+    (function init() {
+        initTheme();
+        loadSession();
+    })();
+</script>
+</body>
+</html>

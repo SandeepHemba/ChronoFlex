@@ -28,6 +28,7 @@ public class EmailService {
     private EmailLogRepository emailLogRepository;
 
 
+
     @Async
     public void sendEmailFromTemplate(String templateFileName, String toEmail, Map<String, String> values) throws IOException {
 

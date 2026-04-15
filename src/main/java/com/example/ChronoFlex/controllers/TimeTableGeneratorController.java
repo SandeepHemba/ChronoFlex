@@ -3,6 +3,7 @@ package com.example.ChronoFlex.controllers;
 import com.example.ChronoFlex.dto.DeleteTimeTableRequest;
 import com.example.ChronoFlex.dto.TimeTableGenerationRequest;
 import com.example.ChronoFlex.model.Admin;
+import com.example.ChronoFlex.model.College;
 import com.example.ChronoFlex.model.TimeTableAuditLog;
 import com.example.ChronoFlex.repository.AdminRepository;
 import com.example.ChronoFlex.service.TimeTableGeneratorService;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import com.example.ChronoFlex.repository.CollegeRepository;
 
 @RestController
 @RequestMapping("/api/timetable")
@@ -21,12 +23,14 @@ public class TimeTableGeneratorController {
     private final TimeTableGeneratorService generatorService;
     private final AdminRepository adminRepo;
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final CollegeRepository collegeRepo;
 
     @Autowired
     public TimeTableGeneratorController(TimeTableGeneratorService generatorService,
-                                        AdminRepository adminRepo) {
+                                        AdminRepository adminRepo, CollegeRepository collegeRepo) {
         this.generatorService = generatorService;
         this.adminRepo = adminRepo;
+        this.collegeRepo = collegeRepo;
     }
 
     /**
@@ -49,12 +53,25 @@ public class TimeTableGeneratorController {
             }
 
             // ✅ Step 2: Use the verified admin’s ID for the service call
+//            String result = generatorService.generateTimeTable(
+//                    request.getCollegeId(),
+//                    request.getSemester(),
+//                    request.getSection(),
+//                    request.getTemplateId(),
+//                    admin.getAdminId(), // resolved dynamically
+//                    request.getFilters()
+//            );
+
+            // Resolve collegeId from the authenticated admin's college
+            College college = collegeRepo.findByCollegeCode(admin.getCollegeCode())
+                    .orElseThrow(() -> new IllegalStateException("College not found for admin"));
+
             String result = generatorService.generateTimeTable(
-                    request.getCollegeId(),
+                    college.getCollegeId(),    // ✅ resolved server-side
                     request.getSemester(),
                     request.getSection(),
                     request.getTemplateId(),
-                    admin.getAdminId(), // resolved dynamically
+                    admin.getAdminId(),
                     request.getFilters()
             );
 

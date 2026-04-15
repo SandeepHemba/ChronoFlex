@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoFlex | Faculty Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+
+        /* ══════════════════════════════════
+           LIGHT — soft cream / sand / blush
+        ══════════════════════════════════ */
+        :root,[data-theme="light"]{
+          --bg:        #faf7f2;
+          --left-bg:   #f6f0e8;
+          --surface:   #fdf9f4;
+          --card:      #fffefb;
+          --border:    rgba(180,140,100,.15);
+          --bfocus:    rgba(180,120,60,.45);
+          --text:      #2c2218;
+          --muted:     #9a8070;
+          --subtle:    #ede5d8;
+          --a:         #c17f3a;   /* warm caramel */
+          --a2:        #e09f5a;   /* golden sand */
+          --a3:        #d4756a;   /* dusty rose */
+          --asoft:     rgba(193,127,58,.1);
+          --aglow:     rgba(193,127,58,.2);
+          --green:     #7a9e7e;
+          --red:       #c4674f;
+          --ibg:       #f8f3ec;
+          --shadow:    0 24px 70px rgba(100,70,40,.1);
+          --or1: rgba(224,159,90,.45);
+          --or2: rgba(212,117,106,.35);
+          --or3: rgba(245,210,170,.6);
+          --or4: rgba(193,127,58,.3);
+        }
+
+        /* ══════════════════════════════════
+           DARK — cool charcoal grey
+        ══════════════════════════════════ */
+        [data-theme="dark"]{
+          --bg:        #111214;
+          --left-bg:   #131518;
+          --surface:   #0f1012;
+          --card:      #1a1c20;
+          --border:    rgba(160,170,185,.1);
+          --bfocus:    rgba(160,170,200,.45);
+          --text:      #e4e6eb;
+          --muted:     #7a8090;
+          --subtle:    #1e2128;
+          --a:         #a0aec0;   /* cool slate */
+          --a2:        #cbd5e1;   /* light silver */
+          --a3:        #94a3b8;   /* muted blue-grey */
+          --asoft:     rgba(160,174,192,.1);
+          --aglow:     rgba(160,174,192,.18);
+          --green:     #86efac;
+          --red:       #fca5a5;
+          --ibg:       #0d0e10;
+          --shadow:    0 32px 80px rgba(0,0,0,.75);
+          --or1: rgba(148,163,184,.35);
+          --or2: rgba(100,116,139,.3);
+          --or3: rgba(203,213,225,.25);
+          --or4: rgba(71,85,105,.4);
+        }
+
+        /* ── global theme transition ── */
+        *{ transition:background-color .5s ease,border-color .5s ease,color .4s ease,box-shadow .4s ease; }
+        svg,img{ transition:none!important; }
+
+        /* ══════════════════════════════════
+           LAYOUT
+        ══════════════════════════════════ */
+        html,body{ height:100%; overflow:hidden; }
+        body{
+          font-family:'Manrope',sans-serif;
+          background:var(--bg); color:var(--text);
+          display:grid; grid-template-columns:1fr 1fr; min-height:100vh;
+        }
+
+        /* ══════════════════════════════════
+           LEFT PANEL
+        ══════════════════════════════════ */
+        .left{
+          display:flex; flex-direction:column; justify-content:space-between;
+          padding:2.6rem 3rem;
+          background:var(--left-bg);
+          border-right:1px solid var(--border);
+          position:relative; overflow:hidden;
+        }
+        .left::before{
+          content:''; position:absolute;
+          width:580px; height:580px; border-radius:50%;
+          background:radial-gradient(circle,var(--aglow) 0%,transparent 65%);
+          top:-210px; left:-170px;
+          animation:orb-drift 11s ease-in-out infinite alternate;
+          pointer-events:none; z-index:0;
+        }
+        .left::after{
+          content:''; position:absolute;
+          width:260px; height:260px; border-radius:50%;
+          background:radial-gradient(circle,rgba(212,117,106,.12) 0%,transparent 65%);
+          bottom:-60px; right:-50px;
+          animation:orb-drift 16s ease-in-out infinite alternate-reverse;
+          pointer-events:none; z-index:0;
+        }
+        @keyframes orb-drift{
+          from{ transform:translate(0,0) scale(1); }
+          to{   transform:translate(20px,15px) scale(1.07); }
+        }
+        .top-bar,.left-center,.left-footer{ position:relative; z-index:2; }
+
+        /* top bar */
+        .top-bar{
+          display:flex; align-items:center; justify-content:space-between;
+          animation:fade-down .7s .05s cubic-bezier(.34,1.3,.64,1) both;
+        }
+        @keyframes fade-down{ from{opacity:0;transform:translateY(-20px);} to{opacity:1;transform:translateY(0);} }
+
+        .brand{ display:flex; align-items:center; gap:10px; }
+        .brand-icon{
+          width:38px; height:38px;
+          background:linear-gradient(135deg,var(--a),var(--a2));
+          border-radius:11px; display:grid; place-items:center;
+          box-shadow:0 4px 20px var(--aglow);
+          animation:brand-pulse 3.2s ease-in-out infinite;
+        }
+        @keyframes brand-pulse{
+          0%,100%{ box-shadow:0 4px 20px var(--aglow); }
+          50%{     box-shadow:0 6px 36px var(--aglow),0 0 0 7px rgba(160,174,192,.05); }
+        }
+        .brand-icon svg{ width:18px; height:18px; fill:white; transition:none!important; }
+        .brand-name{ font-size:1rem; font-weight:800; letter-spacing:-.02em; }
+        .brand-name span{ color:var(--a); }
+
+        /* theme toggle */
+        .theme-toggle{
+          display:flex; align-items:center; gap:8px;
+          background:var(--subtle); border:1px solid var(--border);
+          border-radius:99px; padding:6px 14px 6px 8px;
+          cursor:pointer; font-family:'Manrope',sans-serif;
+          font-size:.74rem; font-weight:700; color:var(--muted);
+          transition:all .3s ease!important;
+        }
+        .theme-toggle:hover{ color:var(--text); border-color:var(--a); box-shadow:0 0 0 3px var(--asoft); }
+        .theme-toggle:active{ transform:scale(.95); }
+        .toggle-track{
+          width:32px; height:18px; background:var(--subtle);
+          border:1.5px solid var(--border); border-radius:99px;
+          position:relative; flex-shrink:0;
+        }
+        [data-theme="light"] .toggle-track{ background:var(--a); border-color:var(--a); }
+        .toggle-thumb{
+          position:absolute; top:2px; left:2px;
+          width:12px; height:12px; border-radius:50%; background:var(--muted);
+          transition:transform .35s cubic-bezier(.34,1.56,.64,1),background .35s!important;
+        }
+        [data-theme="light"] .toggle-thumb{ transform:translateX(14px); background:#fff; }
+
+        /* left center */
+        .left-center{ animation:fade-up .85s .18s cubic-bezier(.34,1.2,.64,1) both; }
+        @keyframes fade-up{ from{opacity:0;transform:translateY(26px);} to{opacity:1;transform:translateY(0);} }
+
+        .pill{
+          display:inline-flex; align-items:center; gap:7px;
+          font-size:.7rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase;
+          color:var(--a); background:var(--asoft);
+          border:1px solid rgba(193,127,58,.2); border-radius:99px;
+          padding:5px 14px; margin-bottom:1.6rem;
+        }
+        .pill-dot{ width:6px; height:6px; border-radius:50%; background:var(--a); animation:blink 2s infinite; }
+        @keyframes blink{ 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.25;transform:scale(.6);} }
+
+        .headline{
+          font-size:clamp(2.1rem,3vw,3.1rem);
+          font-weight:800; letter-spacing:-.045em; line-height:1.06; margin-bottom:1.2rem;
+        }
+        .grad{
+          background:linear-gradient(105deg,var(--a) 0%,var(--a2) 45%,var(--a3) 100%);
+          -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+          background-size:200%;
+          animation:grad-move 4s ease-in-out infinite alternate;
+        }
+        @keyframes grad-move{ from{background-position:0%;} to{background-position:100%;} }
+
+        .sub{ font-size:.875rem; color:var(--muted); line-height:1.75; max-width:350px; font-family:'Inter',sans-serif; }
+
+        .features{ display:flex; flex-direction:column; gap:11px; margin-top:2rem; }
+        .feat{
+          display:flex; align-items:center; gap:12px;
+          font-size:.81rem; color:var(--muted); font-family:'Inter',sans-serif;
+          opacity:0; animation:feat-in .6s cubic-bezier(.34,1.3,.64,1) both;
+        }
+        .feat:nth-child(1){ animation-delay:.5s; }
+        .feat:nth-child(2){ animation-delay:.65s; }
+        .feat:nth-child(3){ animation-delay:.8s; }
+        @keyframes feat-in{ from{opacity:0;transform:translateX(-18px);} to{opacity:1;transform:translateX(0);} }
+        .feat-icon{
+          width:32px; height:32px; border-radius:8px;
+          background:var(--subtle); display:grid; place-items:center;
+          flex-shrink:0; border:1px solid var(--border);
+        }
+        .feat-icon svg{ width:14px; height:14px; stroke:var(--a); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:none!important; }
+
+        .left-footer{
+          font-size:.7rem; color:var(--muted); font-family:'Inter',sans-serif;
+          display:flex; align-items:center; gap:8px;
+          animation:fade-up .7s .9s both;
+        }
+        .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--green); flex-shrink:0; animation:live-ring 2s infinite; }
+        @keyframes live-ring{ 0%,100%{box-shadow:0 0 0 0 rgba(122,158,126,.5);} 60%{box-shadow:0 0 0 5px rgba(122,158,126,0);} }
+
+        /* ══════════════════════════════════
+           RIGHT PANEL
+        ══════════════════════════════════ */
+        .right{
+          position:relative; overflow:hidden;
+          display:flex; align-items:center; justify-content:center;
+          padding:2rem;
+          background:var(--surface);
+        }
+
+        /* ─ AURORA BLOBS ─ */
+        .aurora{ position:absolute; inset:0; z-index:0; pointer-events:none; filter:blur(50px); }
+        [data-theme="dark"] .aurora{ filter:blur(60px); }
+        .blob{ position:absolute; border-radius:50%; }
+        [data-theme="light"] .blob{ mix-blend-mode:multiply; opacity:.75; }
+        [data-theme="dark"]  .blob{ mix-blend-mode:screen;   opacity:.6; }
+
+        .b1{
+          width:480px; height:480px;
+          background:radial-gradient(circle,var(--or3),transparent 68%);
+          top:-160px; left:-130px;
+          animation:bl1 12s ease-in-out infinite alternate;
+        }
+        .b2{
+          width:380px; height:380px;
+          background:radial-gradient(circle,var(--or1),transparent 68%);
+          top:-80px; right:-110px;
+          animation:bl2 15s ease-in-out infinite alternate;
+        }
+        .b3{
+          width:340px; height:340px;
+          background:radial-gradient(circle,var(--or2),transparent 68%);
+          bottom:-90px; left:-70px;
+          animation:bl3 17s ease-in-out infinite alternate;
+        }
+        .b4{
+          width:300px; height:300px;
+          background:radial-gradient(circle,var(--or4),transparent 68%);
+          bottom:-60px; right:-50px;
+          animation:bl4 10s ease-in-out infinite alternate;
+        }
+        @keyframes bl1{ 0%{transform:translate(0,0) scale(1);}     50%{transform:translate(50px,30px) scale(1.1);}  100%{transform:translate(12px,60px) scale(.93);} }
+        @keyframes bl2{ 0%{transform:translate(0,0) scale(1);}     50%{transform:translate(-40px,50px) scale(1.15);} 100%{transform:translate(-15px,22px) scale(.87);} }
+        @keyframes bl3{ 0%{transform:translate(0,0) scale(1);}     50%{transform:translate(60px,-40px) scale(1.08);}  100%{transform:translate(24px,-16px) scale(1.03);} }
+        @keyframes bl4{ 0%{transform:translate(0,0) scale(1);}     50%{transform:translate(-50px,-30px) scale(1.12);} 100%{transform:translate(-22px,-50px) scale(.9);} }
+
+        /* ─ SOFT GRID ─ */
+        .grid-bg{
+          position:absolute; inset:0; z-index:1; pointer-events:none;
+          background-image:
+            linear-gradient(rgba(180,130,80,.07) 1px,transparent 1px),
+            linear-gradient(90deg,rgba(180,130,80,.07) 1px,transparent 1px);
+          background-size:52px 52px;
+          animation:grid-scroll 26s linear infinite;
+          transition:background-image .5s ease!important;
+        }
+        [data-theme="dark"] .grid-bg{
+          background-image:
+            linear-gradient(rgba(160,174,192,.06) 1px,transparent 1px),
+            linear-gradient(90deg,rgba(160,174,192,.06) 1px,transparent 1px);
+        }
+        @keyframes grid-scroll{ from{background-position:0 0;} to{background-position:52px 52px;} }
+
+        /* ─ RINGS ─ */
+        .rings{ position:absolute; inset:0; z-index:1; pointer-events:none; }
+        .ring{
+          position:absolute; border-radius:50%;
+          border:1px solid rgba(193,127,58,.18);
+          transform:translate(-50%,-50%);
+          animation:ring-expand linear infinite;
+        }
+        [data-theme="dark"] .ring{ border-color:rgba(160,174,192,.12); }
+        .ring:nth-child(1){ width:160px; height:160px; top:25%; left:20%; animation-duration:8s;  animation-delay:0s; }
+        .ring:nth-child(2){ width:290px; height:290px; top:25%; left:20%; animation-duration:8s;  animation-delay:-2.7s; }
+        .ring:nth-child(3){ width:420px; height:420px; top:25%; left:20%; animation-duration:8s;  animation-delay:-5.4s; }
+        .ring:nth-child(4){ width:150px; height:150px; top:75%; left:78%; animation-duration:10s; animation-delay:0s; }
+        .ring:nth-child(5){ width:270px; height:270px; top:75%; left:78%; animation-duration:10s; animation-delay:-3.3s; }
+        .ring:nth-child(6){ width:390px; height:390px; top:75%; left:78%; animation-duration:10s; animation-delay:-6.6s; }
+        @keyframes ring-expand{
+          0%{   transform:translate(-50%,-50%) scale(.3); opacity:.6; }
+          100%{ transform:translate(-50%,-50%) scale(2); opacity:0; }
+        }
+
+        /* ─ FLOATING SHAPES ─ */
+        .shapes{ position:absolute; inset:0; z-index:1; pointer-events:none; overflow:hidden; }
+        .sh{ position:absolute; }
+
+        /* rounded square top-right */
+        .sh1{
+          width:78px; height:78px; top:7%; right:10%;
+          border:1.5px solid rgba(193,127,58,.22); border-radius:20px;
+          animation:sh-rot 15s ease-in-out infinite;
+        }
+        [data-theme="dark"] .sh1{ border-color:rgba(160,174,192,.18); }
+        [data-theme="dark"] .sh2{ border-color:rgba(100,116,139,.25); }
+        [data-theme="dark"] .sh7{ border-color:rgba(160,174,192,.1); }
+
+        /* blush diamond bottom-left */
+        .sh2{
+          width:42px; height:42px; bottom:16%; left:7%;
+          border:1.5px solid rgba(212,117,106,.3);
+          transform:rotate(45deg);
+          animation:sh-float 10s ease-in-out infinite;
+        }
+
+        /* soft circle mid-left */
+        .sh3{
+          width:62px; height:62px; top:48%; left:5%;
+          border:1.5px solid rgba(180,140,100,.22); border-radius:50%;
+          animation:sh-float 13s ease-in-out infinite reverse;
+        }
+
+        /* warm glowing dots */
+        .sh4{ width:8px;  height:8px;  top:28%; left:12%; border-radius:50%; background:rgba(224,159,90,.6);  box-shadow:0 0 10px rgba(224,159,90,.4);  animation:sh-float 6s  ease-in-out infinite; }
+        .sh5{ width:7px;  height:7px;  top:33%; left:17%; border-radius:50%; background:rgba(212,117,106,.55); box-shadow:0 0 10px rgba(212,117,106,.4); animation:sh-float 8s  ease-in-out infinite reverse; }
+        .sh6{ width:6px;  height:6px;  top:37%; left:9%;  border-radius:50%; background:rgba(193,127,58,.55);  box-shadow:0 0 8px rgba(193,127,58,.4);   animation:sh-float 7s  ease-in-out infinite; }
+
+        /* big faint square bottom-right */
+        .sh7{
+          width:105px; height:105px; bottom:9%; right:8%;
+          border:1px solid rgba(193,127,58,.12); border-radius:22px;
+          animation:sh-rot 22s linear infinite reverse;
+        }
+
+        @keyframes sh-rot{
+          0%{   transform:rotate(0deg) translateY(0); }
+          50%{  transform:rotate(180deg) translateY(-14px); }
+          100%{ transform:rotate(360deg) translateY(0); }
+        }
+        @keyframes sh-float{
+          0%,100%{ transform:translateY(0); }
+          50%{     transform:translateY(-16px); }
+        }
+
+        /* ─ NOISE ─ */
+        .noise{
+          position:absolute; inset:0; z-index:2; pointer-events:none; opacity:.03;
+          background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+          background-size:160px;
+        }
+
+        /* ─ VIGNETTE ─ */
+        .vignette{
+          position:absolute; inset:0; z-index:2; pointer-events:none;
+          background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 45%,rgba(245,235,220,.55) 100%);
+          transition:background .5s ease!important;
+        }
+        [data-theme="dark"] .vignette{
+          background:radial-gradient(ellipse 80% 80% at 50% 50%,transparent 45%,rgba(8,9,11,.65) 100%);
+        }
+
+        /* ─ CENTER GLOW ─ */
+        .cglow{
+          position:absolute; z-index:2; pointer-events:none;
+          width:460px; height:460px;
+          top:50%; left:50%; transform:translate(-50%,-50%);
+          background:radial-gradient(circle,rgba(224,159,90,.1) 0%,transparent 65%);
+          animation:cglow-breath 5s ease-in-out infinite alternate;
+        }
+        [data-theme="dark"] .cglow{ background:radial-gradient(circle,rgba(160,174,192,.07) 0%,transparent 65%); }
+        @keyframes cglow-breath{ from{transform:translate(-50%,-50%) scale(1);opacity:.7;} to{transform:translate(-50%,-50%) scale(1.2);opacity:1;} }
+
+        /* ══════════════════════════════════
+           CARD
+        ══════════════════════════════════ */
+        .card{
+          width:100%; max-width:430px;
+          background:var(--card);
+          border:1px solid var(--border);
+          border-radius:26px;
+          padding:2.4rem 2.2rem;
+          position:relative; z-index:10;
+          box-shadow:var(--shadow);
+          backdrop-filter:blur(28px) saturate(1.5);
+          -webkit-backdrop-filter:blur(28px) saturate(1.5);
+          animation:card-pop .8s cubic-bezier(.34,1.2,.64,1) both;
+          overflow:hidden;
+        }
+        @keyframes card-pop{ from{opacity:0;transform:translateY(44px) scale(.95);} to{opacity:1;transform:translateY(0) scale(1);} }
+
+        /* shimmer line */
+        .card::before{
+          content:''; position:absolute; top:0; left:-110%; width:100%; height:2px;
+          background:linear-gradient(90deg,transparent,var(--a2),var(--a),var(--a3),transparent);
+          animation:shimmer 4s ease-in-out infinite; z-index:1;
+        }
+        @keyframes shimmer{ 0%{left:-110%;} 60%,100%{left:130%;} }
+
+        /* hover glow */
+        .card::after{
+          content:''; position:absolute; inset:0; border-radius:26px;
+          background:radial-gradient(ellipse 55% 35% at 50% 0%,var(--asoft),transparent);
+          opacity:0; pointer-events:none;
+          transition:opacity .4s ease!important;
+        }
+        .card:hover::after{ opacity:1; }
+
+        /* ── VIEWS ── */
+        .view{ display:none; }
+        .view.active{ display:block; animation:view-in .4s cubic-bezier(.34,1.1,.64,1) both; }
+        @keyframes view-in{ from{opacity:0;transform:translateY(14px);} to{opacity:1;transform:translateY(0);} }
+
+        /* back btn */
+        .back-btn{
+          display:inline-flex; align-items:center; gap:6px;
+          font-size:.79rem; font-weight:700; color:var(--muted);
+          background:none; border:none; cursor:pointer; padding:0;
+          margin-bottom:1.6rem; font-family:'Manrope',sans-serif;
+          transition:color .2s!important;
+        }
+        .back-btn:hover{ color:var(--text); }
+        .back-arrow{ transition:transform .2s ease!important; }
+        .back-btn:hover .back-arrow{ transform:translateX(-4px); }
+        .back-btn svg{ width:15px; height:15px; stroke:currentColor; fill:none; stroke-width:2.3; stroke-linecap:round; stroke-linejoin:round; transition:none!important; }
+
+        /* card header */
+        .card-header{ margin-bottom:1.7rem; }
+        .card-icon{
+          width:46px; height:46px; background:var(--asoft);
+          border:1px solid rgba(193,127,58,.2); border-radius:13px;
+          display:grid; place-items:center; margin-bottom:1.2rem;
+          animation:icon-pop .5s .1s cubic-bezier(.34,1.56,.64,1) both;
+        }
+        @keyframes icon-pop{ from{transform:scale(.5) rotate(-15deg);opacity:0;} to{transform:scale(1) rotate(0);opacity:1;} }
+        .card-icon svg{ width:21px; height:21px; stroke:var(--a); fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:none!important; }
+
+        .card-title{ font-size:1.45rem; font-weight:800; letter-spacing:-.035em; margin-bottom:.3rem; }
+        .card-sub{ font-size:.82rem; color:var(--muted); font-family:'Inter',sans-serif; line-height:1.55; }
+
+        /* ── FIELDS ── */
+        .field{
+          margin-bottom:1rem;
+          opacity:0; animation:field-in .48s cubic-bezier(.34,1.2,.64,1) both;
+        }
+        .field:nth-child(1){ animation-delay:.06s; }
+        .field:nth-child(2){ animation-delay:.14s; }
+        .field:nth-child(3){ animation-delay:.22s; }
+        @keyframes field-in{ from{opacity:0;transform:translateY(12px);} to{opacity:1;transform:translateY(0);} }
+
+        .frow{ display:flex; justify-content:space-between; align-items:center; margin-bottom:.48rem; }
+        .frow span{ font-size:.77rem; font-weight:700; color:var(--text); }
+        .frow button{ font-size:.74rem; font-weight:600; color:var(--a); background:none; border:none; cursor:pointer; padding:0; font-family:'Manrope',sans-serif; }
+        .frow button:hover{ text-decoration:underline; }
+
+        .iw{ position:relative; }
+        .iw input{
+          width:100%; background:var(--ibg); border:1.5px solid var(--border);
+          color:var(--text); padding:.82rem 2.8rem .82rem 1rem;
+          border-radius:12px; font-size:.875rem; font-family:'Inter',sans-serif; outline:none;
+        }
+        .iw input::placeholder{ color:var(--muted); }
+        .iw input:focus{
+          border-color:var(--bfocus);
+          box-shadow:0 0 0 4px var(--asoft),0 2px 14px var(--aglow);
+          transform:translateY(-1px);
+        }
+        .iw::after{
+          content:''; position:absolute; inset:0; border-radius:12px;
+          pointer-events:none;
+          box-shadow:0 0 0 0 var(--aglow);
+          transition:box-shadow .3s ease!important;
+        }
+        .iw:focus-within::after{ box-shadow:0 0 0 6px rgba(193,127,58,.05); }
+
+        .eye-btn{
+          position:absolute; right:.85rem; top:50%; transform:translateY(-50%);
+          background:none; border:none; cursor:pointer; padding:4px;
+          color:var(--muted); display:flex; align-items:center;
+          transition:color .2s,transform .2s!important;
+        }
+        .eye-btn:hover{ color:var(--a); transform:translateY(-50%) scale(1.15); }
+        .eye-btn svg{ width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; transition:none!important; }
+
+        .otp-in{
+          text-align:center!important; font-size:1.55rem!important;
+          font-family:'Manrope',sans-serif!important; font-weight:700!important;
+          letter-spacing:.5em!important; padding-left:1rem!important; padding-right:1rem!important;
+        }
+
+        /* ── BUTTON ── */
+        .btn{
+          width:100%; padding:.9rem;
+          background:linear-gradient(135deg,var(--a) 0%,#a85e1a 100%);
+          color:#fff; border:none; border-radius:12px;
+          font-family:'Manrope',sans-serif; font-size:.9rem; font-weight:800;
+          cursor:pointer; margin-top:.5rem;
+          display:flex; align-items:center; justify-content:center; gap:8px;
+          position:relative; overflow:hidden;
+          box-shadow:0 4px 24px var(--aglow);
+          opacity:0; animation:field-in .5s .28s both;
+          transition:transform .18s ease,box-shadow .18s ease!important;
+        }
+        [data-theme="dark"] .btn{ background:linear-gradient(135deg,#4b5563 0%,#374151 100%); box-shadow:0 4px 24px rgba(100,116,139,.25); }
+        .btn::before{
+          content:''; position:absolute; top:0; left:-75%; width:50%; height:100%;
+          background:linear-gradient(90deg,transparent,rgba(255,255,255,.22),transparent);
+          transform:skewX(-20deg);
+          animation:btn-sheen 2.8s ease-in-out infinite;
+          pointer-events:none;
+        }
+        @keyframes btn-sheen{ 0%,100%{left:-75%;} 50%{left:125%;} }
+        .btn:hover{ transform:translateY(-2px); box-shadow:0 10px 36px var(--aglow); }
+        .btn:active{ transform:translateY(0) scale(.98); }
+        .btn:disabled{ opacity:.45; cursor:not-allowed; transform:none; box-shadow:none; }
+        .btn svg{ width:16px; height:16px; stroke:#fff; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; transition:none!important; }
+
+        /* ripple */
+        .ripple{
+          position:absolute; border-radius:50%;
+          background:rgba(255,255,255,.3);
+          transform:scale(0); animation:ripple-exp .55s ease-out forwards;
+          pointer-events:none;
+        }
+        @keyframes ripple-exp{ to{transform:scale(4);opacity:0;} }
+
+        /* ══════════════════════════════════
+           TOAST
+        ══════════════════════════════════ */
+        #tc{ position:fixed; top:22px; right:22px; z-index:9999; display:flex; flex-direction:column; gap:10px; }
+        .toast{
+          display:flex; align-items:center; gap:10px;
+          padding:.85rem 1.2rem; border-radius:14px;
+          font-family:'Manrope',sans-serif; font-size:.82rem; font-weight:600;
+          color:var(--text); background:var(--card);
+          border:1px solid var(--border);
+          box-shadow:0 12px 40px rgba(100,60,20,.12);
+          backdrop-filter:blur(16px); max-width:300px;
+          animation:t-in .4s cubic-bezier(.34,1.4,.64,1) forwards,t-out .3s 4.1s forwards;
+        }
+        .ti{ width:22px; height:22px; border-radius:50%; display:grid; place-items:center; flex-shrink:0; font-size:.7rem; font-weight:900; }
+        .toast.s .ti{ background:rgba(122,158,126,.15); color:var(--green); }
+        .toast.e .ti{ background:rgba(196,103,79,.15); color:var(--red); }
+        @keyframes t-in{  from{transform:translateX(110%) scale(.88);opacity:0;} to{transform:translateX(0) scale(1);opacity:1;} }
+        @keyframes t-out{ to{opacity:0;transform:translateX(80px) scale(.9);} }
+        @keyframes spin{  to{transform:rotate(360deg);} }
+
+        /* responsive */
+        @media(max-width:768px){
+          html,body{ overflow:auto; height:auto; }
+          body{ grid-template-columns:1fr; grid-template-rows:auto 1fr; }
+          .left{ border-right:none; border-bottom:1px solid var(--border); padding:2rem 1.5rem; }
+          .headline{ font-size:2rem; }
+          .features{ display:none; }
+          .right{ padding:2rem 1.5rem; min-height:100vh; align-items:flex-start; padding-top:3rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- LEFT -->
+<div class="left">
+    <div class="top-bar">
+        <div class="brand">
+            <div class="brand-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            </div>
+            <span class="brand-name">Chrono<span>Flex</span></span>
+        </div>
+        <button class="theme-toggle" id="themeToggle">
+            <div class="toggle-track"><div class="toggle-thumb"></div></div>
+            <span id="tIcon">☀️</span>
+            <span id="tLbl">Light</span>
+        </button>
+    </div>
+
+    <div class="left-center">
+        <div class="pill"><span class="pill-dot"></span>Faculty Portal</div>
+        <h1 class="headline">Smart Scheduling<br>for <span class="grad">Modern<br>Academia.</span></h1>
+        <p class="sub">Coordinate timetables, manage sessions, and collaborate across departments — from one intelligent workspace.</p>
+        <div class="features">
+            <div class="feat">
+                <div class="feat-icon"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+                AI-powered timetable conflict detection
+            </div>
+            <div class="feat">
+                <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+                Real-time department collaboration
+            </div>
+            <div class="feat">
+                <div class="feat-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                End-to-end encrypted faculty data
+            </div>
+        </div>
+    </div>
+
+    <div class="left-footer">
+        <span class="live-dot"></span>
+        All systems operational &nbsp;·&nbsp; v2.5.0 &nbsp;·&nbsp; © 2025 ChronoFlex
+    </div>
+</div>
+
+<!-- RIGHT -->
+<div class="right">
+    <div class="aurora">
+        <div class="blob b1"></div>
+        <div class="blob b2"></div>
+        <div class="blob b3"></div>
+        <div class="blob b4"></div>
+    </div>
+    <div class="grid-bg"></div>
+    <div class="rings">
+        <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+        <div class="ring"></div><div class="ring"></div><div class="ring"></div>
+    </div>
+    <div class="shapes">
+        <div class="sh sh1"></div>
+        <div class="sh sh2"></div>
+        <div class="sh sh3"></div>
+        <div class="sh sh4"></div>
+        <div class="sh sh5"></div>
+        <div class="sh sh6"></div>
+        <div class="sh sh7"></div>
+    </div>
+    <div class="noise"></div>
+    <div class="vignette"></div>
+    <div class="cglow"></div>
+
+    <div class="card" id="mainCard">
+
+        <!-- LOGIN -->
+        <div class="view active" id="loginView">
+            <div class="card-header">
+                <div class="card-icon" onclick="gotohome()">
+                    <svg viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+                </div>
+                <h2 class="card-title">Welcome back</h2>
+                <p class="card-sub">Sign in to access your faculty workspace.</p>
+            </div>
+            <form id="loginForm">
+                <div class="field">
+                    <div class="frow"><span>Email address</span></div>
+                    <div class="iw"><input type="email" id="loginEmail" placeholder="you@college.edu" required></div>
+                </div>
+                <div class="field">
+                    <div class="frow">
+                        <span>Password</span>
+                        <button type="button" onclick="go('forgotView')">Forgot password?</button>
+                    </div>
+                    <div class="iw">
+                        <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                        <button type="button" class="eye-btn" onclick="togglePass('loginPassword',this)">
+                            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn" id="loginBtn">
+                    Sign In <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </form>
+        </div>
+
+        <!-- FORGOT -->
+        <div class="view" id="forgotView">
+            <button class="back-btn" onclick="go('loginView')">
+                <svg class="back-arrow" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Back to sign in
+            </button>
+            <div class="card-header">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                </div>
+                <h2 class="card-title">Recover access</h2>
+                <p class="card-sub">We'll send a one-time code to your registered email.</p>
+            </div>
+            <form id="sendOtpForm">
+                <div class="field">
+                    <div class="frow"><span>Registered email</span></div>
+                    <div class="iw"><input type="email" id="resetEmail" placeholder="you@college.edu" required></div>
+                </div>
+                <button type="submit" class="btn" id="otpBtn">
+                    Send OTP Code <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </form>
+        </div>
+
+        <!-- RESET -->
+        <div class="view" id="resetView">
+            <button class="back-btn" onclick="go('forgotView')">
+                <svg class="back-arrow" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+                Back
+            </button>
+            <div class="card-header">
+                <div class="card-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h2 class="card-title">Set new password</h2>
+                <p class="card-sub">Enter the 6-digit code from your email, then choose a new password.</p>
+            </div>
+            <form id="resetPasswordForm">
+                <div class="field">
+                    <div class="frow"><span>One-time code (OTP)</span></div>
+                    <div class="iw"><input type="text" id="resetOtp" class="otp-in" placeholder="· · · · · ·" maxlength="6" required inputmode="numeric"></div>
+                </div>
+                <div class="field">
+                    <div class="frow"><span>New password</span></div>
+                    <div class="iw">
+                        <input type="password" id="resetNewPassword" placeholder="Create a strong password" required>
+                        <button type="button" class="eye-btn" onclick="togglePass('resetNewPassword',this)">
+                            <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        </button>
+                    </div>
+                </div>
+                <button type="submit" class="btn" id="resetBtn">
+                    Update Password <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<div id="tc"></div>
+
+<script>
+    const API = 'http://localhost:8080/api/faculty';
+
+    /* THEME */
+    const html = document.documentElement;
+    function applyTheme(t){
+      html.setAttribute('data-theme', t);
+      localStorage.setItem('cf_theme', t);
+      document.getElementById('tIcon').textContent = t === 'dark' ? '🌙' : '☀️';
+      document.getElementById('tLbl').textContent  = t === 'dark' ? 'Dark' : 'Light';
+    }
+    applyTheme(localStorage.getItem('cf_theme') || 'light');
+    document.getElementById('themeToggle').addEventListener('click', () => {
+      applyTheme(html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+    });
+
+    /* VIEW SWITCH */
+    function go(id){
+      const curr = document.querySelector('.view.active');
+      if(curr){
+        curr.style.cssText = 'opacity:0;transform:translateX(-28px);transition:opacity .22s ease,transform .22s ease;';
+        setTimeout(() => {
+          curr.classList.remove('active'); curr.style.cssText = '';
+          document.getElementById(id).classList.add('active');
+        }, 210);
+      } else { document.getElementById(id).classList.add('active'); }
+    }
+
+    /* PASSWORD TOGGLE */
+    function togglePass(id, btn){
+      const inp = document.getElementById(id);
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      btn.style.cssText = 'position:absolute;right:.85rem;top:50%;transform:translateY(-50%) scale(0);transition:transform .15s ease;';
+      setTimeout(() => {
+        btn.querySelector('svg').innerHTML = show
+          ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>`
+          : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+        btn.style.cssText = 'position:absolute;right:.85rem;top:50%;transform:translateY(-50%) scale(1);transition:transform .2s cubic-bezier(.34,1.56,.64,1);';
+      }, 130);
+    }
+
+    /* RIPPLE */
+    document.querySelectorAll('.btn').forEach(b => {
+      b.addEventListener('click', e => {
+        const r = document.createElement('span');
+        r.className = 'ripple';
+        const rect = b.getBoundingClientRect(), sz = Math.max(rect.width, rect.height);
+        r.style.cssText = `width:${sz}px;height:${sz}px;left:${e.clientX-rect.left-sz/2}px;top:${e.clientY-rect.top-sz/2}px;`;
+        b.appendChild(r); setTimeout(() => r.remove(), 600);
+      });
+    });
+
+    /* CARD TILT */
+    const card = document.getElementById('mainCard');
+    document.querySelector('.right').addEventListener('mousemove', e => {
+      const rc = card.getBoundingClientRect();
+      const dx = (e.clientX - rc.left - rc.width/2)  / rc.width;
+      const dy = (e.clientY - rc.top  - rc.height/2) / rc.height;
+      card.style.transition = 'transform .08s ease';
+      card.style.transform  = `perspective(1000px) rotateY(${dx*6}deg) rotateX(${-dy*6}deg) scale(1.02)`;
+    });
+    document.querySelector('.right').addEventListener('mouseleave', () => {
+      card.style.transition = 'transform .7s cubic-bezier(.34,1.1,.64,1)';
+      card.style.transform  = 'perspective(1000px) rotateY(0) rotateX(0) scale(1)';
+    });
+
+    /* TOAST */
+    function toast(msg, type = 's'){
+      const c = document.getElementById('tc');
+      const el = document.createElement('div');
+      el.className = `toast ${type}`;
+      el.innerHTML = `<div class="ti">${type==='e'?'✕':'✓'}</div><span>${msg}</span>`;
+      c.appendChild(el); setTimeout(() => el.remove(), 4500);
+    }
+
+    /* LOADING */
+    function load(id, on, lbl){
+      const b = document.getElementById(id); b.disabled = on;
+      b.innerHTML = on
+        ? `<svg style="animation:spin .8s linear infinite;width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></svg> Please wait…`
+        : `${lbl} <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>`;
+    }
+
+    /* API */
+    // In faculty-login.html, replace the loginForm submit handler:
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+      e.preventDefault(); load('loginBtn', true);
+      try {
+        const r = await fetch(`${API}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: loginEmail.value, password: loginPassword.value })
+        });
+        const d = await r.json();
+        if (r.ok) {
+          // Save session for dashboard use
+          localStorage.setItem('cfFacultySession', JSON.stringify({
+            email: loginEmail.value,
+            name: d.faculty.name, // Store the name here
+            dept: d.faculty.department,
+            password: loginPassword.value
+          }));
+          toast(d.message || 'Signed in successfully');
+          setTimeout(() => window.location.href = '/faculty-dashboard', 800);
+        } else {
+          toast(d.error || 'Invalid credentials', 'e');
+        }
+      } catch { toast('Cannot reach server', 'e'); }
+      finally { load('loginBtn', false, 'Sign In'); }
+    });
+
+
+    document.getElementById('sendOtpForm').addEventListener('submit', async e => {
+      e.preventDefault(); load('otpBtn', true);
+      try {
+        const r = await fetch(`${API}/forgot-password`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:resetEmail.value})});
+        const t = await r.text();
+        if(r.ok){ toast(t||'OTP sent — check your inbox'); go('resetView'); }
+        else toast(t||'Email not found','e');
+      } catch { toast('Cannot reach server','e'); }
+      finally { load('otpBtn', false, 'Send OTP Code'); }
+    });
+    document.getElementById('resetPasswordForm').addEventListener('submit', async e => {
+      e.preventDefault(); load('resetBtn', true);
+      try {
+        const r = await fetch(`${API}/reset-password`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:resetEmail.value,otp:resetOtp.value,newPassword:resetNewPassword.value})});
+        const t = await r.text();
+        if(r.ok){ toast(t||'Password updated successfully'); setTimeout(()=>go('loginView'),1500); }
+        else toast(t||'Invalid or expired code','e');
+      } catch { toast('Cannot reach server','e'); }
+      finally { load('resetBtn', false, 'Update Password'); }
+    });
+
+     function gotohome(){
+        window.location.href="/home";
+    }
+</script>
+</body>
+</html>

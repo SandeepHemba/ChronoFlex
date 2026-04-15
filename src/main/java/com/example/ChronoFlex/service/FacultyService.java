@@ -60,8 +60,22 @@ public class FacultyService {
             throw new IllegalArgumentException("Faculty already exists in this college with this email");
         }
 
-        // 4️⃣ Generate default password
-        String defaultPassword = college.getCollegeCode() + department + "@123";
+        // 4️⃣ Generate default password - old version
+        //String defaultPassword = college.getCollegeCode() + department + "@123";
+
+        // 4️⃣ Generate default password (CollegeCode + CleanDept + @ + DOB) - new version - 27th feb 2026
+        if (dob == null || dob.isEmpty()) {
+            throw new IllegalArgumentException("DOB is required to generate default password");
+        }
+
+        // Remove spaces from department
+        String cleanDept = department.replaceAll("\\s+", "");
+
+        // Remove dashes from DOB (yyyy-mm-dd → yyyymmdd)
+        String formattedDob = dob.replace("-", "");
+
+        // Final password format
+        String defaultPassword = college.getCollegeCode() + cleanDept + "@" + formattedDob;
 
         // 5️⃣ Create faculty object
         Faculty faculty = new Faculty();
@@ -85,7 +99,7 @@ public class FacultyService {
         Faculty savedFaculty = facultyRepository.save(faculty);
 
         // 7️⃣ Send email
-        emailService.sendEmailFromTemplate("faculty_registration_email.txt", facultyEmail,
+        emailService.sendEmailFromTemplate("faculty_registration_email.html", facultyEmail,
                 java.util.Map.of("Name", facultyName, "Password", defaultPassword));
 
         // 8️⃣ Log email
@@ -114,7 +128,7 @@ public class FacultyService {
         passwordResetOtpMap.put(email, otp);
 
         // Send OTP email using template
-        emailService.sendEmailFromTemplate("faculty_password_reset_otp.txt",
+        emailService.sendEmailFromTemplate("faculty_password_reset_otp.html",
                 email, Map.of("Name", faculty.getName(), "OTP", otp));
 
         // Log email
@@ -240,5 +254,6 @@ public class FacultyService {
         return facultyRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Faculty not found with email: " + email));
     }
+
 
 }

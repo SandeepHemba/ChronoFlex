@@ -138,4 +138,48 @@ public class AllFacultyTimeTableService {
         );
     }
 
+
+    /**
+     * ✅ Fetch timetable for a specific faculty using email + password
+     */
+    public FacultyTimetableOverviewDTO getFacultyTimetable(String email, String password)
+            throws IllegalAccessException {
+
+        // 🔐 Step 1: Authenticate faculty
+        Faculty faculty = facultyRepo.findByEmail(email)
+                .orElseThrow(() -> new IllegalAccessException("Invalid faculty email or password."));
+
+        if (!passwordEncoder.matches(password, faculty.getPassword())) {
+            throw new IllegalAccessException("Invalid faculty credentials.");
+        }
+
+        Long facultyId = faculty.getFacultyId();
+        String facultyName = faculty.getName();
+
+        // 📅 Step 2: Fetch timetable slots
+        List<FacultyAvailability> slots = facultyAvailabilityRepo.findByFacultyId(facultyId);
+
+        List<TimetableSlotDTO> timetable = slots.stream().map(slot -> {
+                    String subjectName = subjectRepo.findById(slot.getSubjectId())
+                            .map(Subject::getSubjectName)
+                            .orElse("Unknown Subject");
+
+                    return new TimetableSlotDTO(
+                            slot.getDayOfWeek().name(),
+                            slot.getStartTime().toString(),
+                            slot.getEndTime().toString(),
+                            slot.getSection(),
+                            slot.getSemester(),
+                            subjectName,
+                            facultyName
+                    );
+                })
+                .sorted(Comparator
+                        .comparing(TimetableSlotDTO::getDay)
+                        .thenComparing(TimetableSlotDTO::getStartTime))
+                .toList();
+
+        return new FacultyTimetableOverviewDTO(facultyId, facultyName, timetable);
+    }
+
 }

@@ -1,175 +1,279 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
     <meta charset="UTF-8">
-    <title>Faculty Timetable</title>
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>ChronoFlex — Faculty Timetable</title>
+    <!--[if mso]>
+    <noscript><xml><o:OfficeDocumentSettings><o:AllowPNG/><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript>
+    <![endif]-->
     <style>
-        body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background: #eef2f7;
-            margin: 0;
-            padding: 20px;
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+        img { -ms-interpolation-mode: bicubic; border: 0; outline: none; text-decoration: none; }
+        body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+        @media only screen and (max-width: 680px) {
+          .email-wrapper { width: 100% !important; }
+          .inner-pad { padding: 28px 16px !important; }
         }
-
-        .container {
-            max-width: 700px;
-            margin: auto;
-            background: #ffffff;
-            border-radius: 14px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        /* ⭐ ANIMATED BANNER (EMAIL SAFE GIF) */
-        .banner {
-            width: 100%;
-            border-radius: 12px;
-            margin-bottom: 20px;
-        }
-
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #1c7ed6, #228be6);
-            color: #ffffff;
-            padding: 18px;
-            border-radius: 12px;
-            text-align: center;
-            font-size: 22px;
-            letter-spacing: 0.5px;
-            font-weight: bold;
-        }
-
-        .sub-header {
-            text-align: center;
-            margin-top: 12px;
-            font-size: 15px;
-            color: #444;
-        }
-
-        /* ⭐ PROFILE CARD */
-        .profile-card {
-            display: flex;
-            align-items: center;
-            background: #f8fbff;
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 12px;
-            border-left: 5px solid #1c7ed6;
-        }
-
-        .avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #dde7f3;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            color: #1c7ed6;
-            font-weight: bold;
-        }
-
-        .profile-info {
-            font-size: 14px;
-            color: #333;
-        }
-
-        .profile-info b {
-            color: #1c7ed6;
-        }
-
-        /* Timetable styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 25px;
-            font-size: 14px;
-        }
-
-        th {
-            background: #1c7ed6;
-            color: white;
-            padding: 10px;
-            text-align: center;
-        }
-
-        td {
-            background: #f8fbff;
-            padding: 10px;
-            border: 1px solid #dce3eb;
-            text-align: center;
-        }
-
-        tr:nth-child(even) td {
-            background: #eef4fa;
-        }
-
-        /* ⭐ SUBJECT TAG ICONS */
-        .tag {
-            padding: 6px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            color: white;
-            font-weight: bold;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .lab { background: #d6336c; }
-        .theory { background: #0ca678; }
-        .project { background: #7048e8; }
-
-        .footer {
-            text-align: center;
-            color: #555;
-            margin-top: 30px;
-            font-size: 13px;
-        }
-
-        .footer b {
-            color: #1c7ed6;
-        }
-
-        .highlight {
-            color: #1c7ed6;
-            font-weight: bold;
-        }
-
     </style>
 </head>
+<body style="margin:0; padding:0; background-color:#F5F7FA; width:100%;">
 
-<body>
-
-<div class="container">
-
-    <div class="header">
-        ChronoFlex – Faculty Timetable
-    </div>
-
-    <p class="sub-header">
-        Hello <b class="highlight">{{FACULTY_NAME}}</b>,<br>
-        Here is your updated teaching schedule for <b>{{COLLEGE_NAME}}</b>.
-    </p>
-
-    <!-- ⭐ PROFILE CARD -->
-    <div class="profile-card">
-        <div class="profile-info">
-            <b>{{FACULTY_NAME}}</b>
-        </div>
-    </div>
-
-    {{TIMETABLE_ROWS}}
-
-    <div class="footer">
-        Powered by 🚀,<br>
-        <b>ChronoFlex Team</b>
-    </div>
-
+<div style="display:none; font-size:1px; color:#F5F7FA; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+    Your updated ChronoFlex teaching schedule is ready — view and download inside.
 </div>
+
+<table width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#F5F7FA">
+    <tr>
+        <td align="center" style="padding:44px 12px;">
+
+            <table class="email-wrapper" width="680" cellpadding="0" cellspacing="0" border="0">
+
+                <!-- ══════════════════════════════════════════════ -->
+                <!--  TOP NAV BAR                                  -->
+                <!-- ══════════════════════════════════════════════ -->
+                <tr>
+                    <td style="background-color:#ffffff; border-radius:14px 14px 0 0; border-bottom:2px solid #E8F0FE; padding:18px 40px;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="vertical-align:middle;">
+                                    <table cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td style="background-color:#EEF2FF; border-radius:8px; padding:8px 12px; vertical-align:middle;">
+                                                <span style="font-family:Georgia,'Times New Roman',serif; font-size:16px; font-weight:700; color:#4338CA; display:inline-block;">⏱ ChronoFlex</span>
+                                            </td>
+                                            <td style="padding-left:12px; vertical-align:middle;">
+                                                <span style="font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#94A3B8; display:block;">Faculty Timetable System</span>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td align="right" style="vertical-align:middle;">
+                                    <span style="font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#94A3B8; letter-spacing:1px; text-transform:uppercase;">Academic Year 2025–26</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+
+                <!-- ══════════════════════════════════════════════ -->
+                <!--  HERO BAND — light indigo gradient simulation -->
+                <!-- ══════════════════════════════════════════════ -->
+                <tr>
+                    <td style="background-color:#EEF2FF; padding:36px 40px 44px; border-left:1px solid #E0E7FF; border-right:1px solid #E0E7FF;">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr valign="middle">
+                                <!-- Left: greeting -->
+                                <td>
+                                    <p style="margin:0 0 6px 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:700; color:#6366F1; letter-spacing:3px; text-transform:uppercase;">New Schedule Published</p>
+                                    <p style="margin:0 0 14px 0; font-family:Georgia,'Times New Roman',serif; font-size:28px; font-weight:700; color:#1E1B4B; line-height:1.2; letter-spacing:-0.3px;">
+                                        Hello, {{FACULTY_NAME}}
+                                    </p>
+                                    <p style="margin:0; font-family:Arial,Helvetica,sans-serif; font-size:14px; color:#4B5563; line-height:1.7; max-width:360px;">
+                                        Your updated teaching timetable for <strong style="color:#4338CA;">{{COLLEGE_NAME}}</strong> has been published by your department administrator.
+                                    </p>
+                                </td>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!--  BODY — WHITE CARD                            -->
+    <!-- ══════════════════════════════════════════════ -->
+    <tr>
+        <td class="inner-pad" style="background-color:#ffffff; padding:36px 40px 40px; border-left:1px solid #E2E8F0; border-right:1px solid #E2E8F0;">
+
+            <!-- Timetable header row -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+                <tr valign="middle">
+                    <td>
+                        <span style="font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:700; color:#374151; letter-spacing:2px; text-transform:uppercase;">📅 Weekly Schedule</span>
+                    </td>
+                    <td align="right">
+                        <!-- Legend -->
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td style="padding-right:6px;">
+                                    <span style="font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:700; color:#ffffff; background-color:#4F46E5; border-radius:10px; padding:3px 9px; display:inline-block;">Theory</span>
+                                </td>
+                                <td style="padding-right:6px;">
+                                    <span style="font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:700; color:#ffffff; background-color:#DB2777; border-radius:10px; padding:3px 9px; display:inline-block;">Lab</span>
+                                </td>
+                                <td style="padding-right:6px;">
+                                    <span style="font-family:Arial,Helvetica,sans-serif; font-size:10px; font-weight:700; color:#ffffff; background-color:#7C3AED; border-radius:10px; padding:3px 9px; display:inline-block;">Project</span>
+                                </td>
+                                <td>
+                                    <span style="font-family:Arial,Helvetica,sans-serif; font-size:10px; color:#9CA3AF; background-color:#F9FAFB; border-radius:10px; padding:3px 9px; display:inline-block; border:1px solid #E5E7EB;">Free</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- ════ TIMETABLE ════
+              BACKEND INSTRUCTIONS:
+              ──────────────────────────────────────────────────
+              {{HEADERS}} — inject <th> per column. Use this style:
+                <th style="background-color:#4F46E5; color:#ffffff; padding:13px 14px;
+                    font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:700;
+                    letter-spacing:1px; text-transform:uppercase; border:1px solid #4338CA;
+                    text-align:center;">YOUR_COLUMN_LABEL</th>
+
+              {{TIMETABLE_ROWS}} — inject <tr> rows. Example:
+                <tr>
+                  <td style="font-family:Arial,Helvetica,sans-serif; font-size:13px;
+                      font-weight:700; color:#1E1B4B; background-color:#F5F3FF;
+                      padding:12px 14px; border:1px solid #E5E7EB; text-align:center;">
+                    Monday
+                  </td>
+                  <td style="background-color:#ffffff; padding:12px 14px;
+                      border:1px solid #E5E7EB; text-align:center;">
+                    <span style="background-color:#4F46E5; color:#fff; font-size:11px;
+                        font-weight:700; border-radius:10px; padding:4px 10px;
+                        font-family:Arial,Helvetica,sans-serif; display:inline-block;">
+                      Data Structures
+                    </span>
+                  </td>
+                  <td style="background-color:#F9FAFB; padding:12px 14px;
+                      border:1px solid #E5E7EB; text-align:center;
+                      font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#D1D5DB;">
+                    —
+                  </td>
+                </tr>
+
+              Alternating row bg: odd → #ffffff, even → #F9FAFB
+              Day cell bg: #F5F3FF (light indigo tint)
+              Tag colors:
+                Theory  → background-color:#4F46E5
+                Lab     → background-color:#DB2777
+                Project → background-color:#7C3AED
+                Free    → "—" in color:#D1D5DB
+              ──────────────────────────────────────────────────
+            -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                   style="border-collapse:collapse; border:1px solid #E5E7EB; border-radius:10px; overflow:hidden; margin-bottom:32px;">
+                <thead>
+                </thead>
+                <tbody>
+                {{TIMETABLE_ROWS}}
+                </tbody>
+            </table>
+            <!-- ════ END TIMETABLE ════ -->
+
+            <!-- ════ DOWNLOAD BUTTON ════ -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:32px;">
+                <tr>
+                    <td align="center">
+                        <table cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <!--[if mso]>
+                                <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+                                             href="{{DOWNLOAD_URL}}"
+                                             style="height:50px;v-text-anchor:middle;width:260px;" arcsize="16%"
+                                             fillcolor="#4F46E5" stroked="false">
+                                    <w:anchorlock/>
+                                    <center style="color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:14px;font-weight:bold;">
+                                        ↓  Download My Timetable
+                                    </center>
+                                </v:roundrect>
+                                <![endif]-->
+                                <!--[if !mso]><!-->
+                                <td>
+                                    <a href="{{DOWNLOAD_URL}}"
+                                       style="display:inline-block; background-color:#4F46E5; color:#ffffff; font-family:Arial,Helvetica,sans-serif; font-size:14px; font-weight:700; text-decoration:none; padding:15px 44px; border-radius:8px; letter-spacing:0.3px;">
+                                        ↓ &nbsp; Download My Timetable
+                                    </a>
+                                </td>
+                                <!--<![endif]-->
+                            </tr>
+                        </table>
+                        <p style="margin:10px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#94A3B8;">
+                            Downloads as PDF &nbsp;·&nbsp; Secured by ChronoFlex
+                        </p>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Two info tiles -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:36px;">
+                <tr valign="top">
+                    <td width="49%" style="background-color:#F5F3FF; border-radius:8px; padding:16px 18px; border:1px solid #DDD6FE;">
+                        <span style="font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:700; color:#4338CA; display:block; margin-bottom:5px; letter-spacing:0.5px; text-transform:uppercase;">📅 Latest Update</span>
+                        <span style="font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#475569; line-height:1.6; display:block;">This reflects the most recent changes approved by your department administrator.</span>
+                    </td>
+                    <td width="2%">&nbsp;</td>
+                    <td width="49%" style="background-color:#FFF7ED; border-radius:8px; padding:16px 18px; border:1px solid #FED7AA;">
+                        <span style="font-family:Arial,Helvetica,sans-serif; font-size:11px; font-weight:700; color:#C2410C; display:block; margin-bottom:5px; letter-spacing:0.5px; text-transform:uppercase;">⚠ Errors?</span>
+                        <span style="font-family:Arial,Helvetica,sans-serif; font-size:12px; color:#475569; line-height:1.6; display:block;">Contact your department coordinator immediately if you spot any discrepancies.</span>
+                    </td>
+                </tr>
+            </table>
+
+            <!-- Divider -->
+            <table width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:26px;">
+                <tr><td style="border-top:1px solid #F1F5F9; font-size:0; line-height:0;">&nbsp;</td></tr>
+            </table>
+
+            <!-- Sign-off -->
+            <p style="margin:0 0 2px 0; font-family:Arial,Helvetica,sans-serif; font-size:13px; color:#94A3B8;">Regards,</p>
+            <p style="margin:0; font-family:Georgia,'Times New Roman',serif; font-size:16px; font-weight:700; color:#1E1B4B;">The ChronoFlex Team</p>
+
+        </td>
+    </tr>
+
+    <!-- ══════════════════════════════════════════════ -->
+    <!--  FOOTER                                       -->
+    <!-- ══════════════════════════════════════════════ -->
+    <tr>
+        <td style="background-color:#F5F3FF; border-top:1px solid #DDD6FE; border-radius:0 0 14px 14px; padding:20px 40px;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td>
+                        <span style="font-family:Georgia,'Times New Roman',serif; font-size:13px; font-weight:700; color:#4338CA;">ChronoFlex</span>
+                        <span style="font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#A5B4FC; margin-left:8px;">· Smart Timetable Automation</span>
+                    </td>
+                    <td align="right">
+                        <span style="font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#C4B5FD;">© 2026 ChronoFlex</span>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2" style="padding-top:6px;">
+                        <span style="font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#C4B5FD;">Automated message · Do not reply · Contact your administrator for schedule changes</span>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+    <!-- Bottom stripe -->
+    <tr>
+        <td style="padding:0; line-height:0; font-size:0;">
+            <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                    <td width="30%" style="background-color:#818CF8; height:4px; line-height:4px; font-size:4px;">&nbsp;</td>
+                    <td width="40%" style="background-color:#4F46E5; height:4px; line-height:4px; font-size:4px;">&nbsp;</td>
+                    <td width="20%" style="background-color:#6366F1; height:4px; line-height:4px; font-size:4px;">&nbsp;</td>
+                    <td width="10%" style="background-color:#C7D2FE; height:4px; line-height:4px; font-size:4px;">&nbsp;</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+
+</table>
+
+<p style="margin:16px 0 0 0; font-family:Arial,Helvetica,sans-serif; font-size:11px; color:#94A3B8; text-align:center;">
+    Automated message · Do not reply · Contact your administrator for schedule changes
+</p>
+
+</td>
+</tr>
+</table>
 
 </body>
 </html>

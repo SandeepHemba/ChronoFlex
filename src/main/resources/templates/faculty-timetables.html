@@ -1,0 +1,1847 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoFlex | Faculty Timetables</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        /* ══════════════════════════════════════════════════════
+           CSS VARIABLES — LIGHT & DARK & CUSTOM THEMES
+        ══════════════════════════════════════════════════════ */
+        :root {
+          --cream: #FAF7F2;
+          --cream-2: #F2EDE4;
+          --cream-3: #E8DDD0;
+          --warm-white: #FFFEFB;
+          --text: #1C1C1E;
+          --text-2: #2C2C2E;
+          --text-muted: #6B6B70;
+          --text-faint: #AEAEB2;
+          --accent: #4A3728;
+          --accent-warm: #8B6F47;
+          --gold: #C9A96E;
+          --gold-light: #E8C98A;
+          --accent-glow: rgba(139,111,71,0.15);
+          --border: rgba(139,111,71,0.18);
+          --border-strong: rgba(139,111,71,0.35);
+          --panel: rgba(250,247,242,0.95);
+          --panel-2: rgba(242,237,228,0.8);
+          --input-bg: rgba(255,254,251,0.95);
+          --shadow-sm: 0 2px 8px rgba(74,55,40,0.08);
+          --shadow-md: 0 8px 32px rgba(74,55,40,0.12);
+          --shadow-lg: 0 24px 64px rgba(74,55,40,0.16);
+          --shadow-xl: 0 40px 80px rgba(74,55,40,0.2);
+          --sidebar-w: 300px;
+          --topbar-h: 70px;
+          --radius: 16px;
+          --radius-sm: 10px;
+          --radius-xs: 6px;
+          --tag-bg: rgba(201,169,110,0.12);
+          --tag-text: var(--accent);
+          --success: #2d7a4f;
+          --success-bg: rgba(45,122,79,0.1);
+          --day-colors-mon: rgba(139,111,71,0.12);
+          --day-colors-tue: rgba(201,169,110,0.1);
+          --day-colors-wed: rgba(74,55,40,0.09);
+          --day-colors-thu: rgba(232,201,138,0.12);
+          --day-colors-fri: rgba(139,111,71,0.08);
+          --day-colors-sat: rgba(201,169,110,0.15);
+        }
+
+        html.dark {
+          --cream: #0F0F11;
+          --cream-2: #18181B;
+          --cream-3: #1E1E22;
+          --warm-white: #18181B;
+          --text: #F0EEE8;
+          --text-2: #E0DDD5;
+          --text-muted: #8A8A90;
+          --text-faint: #5A5A60;
+          --accent: #C9A96E;
+          --accent-warm: #E8C98A;
+          --gold: #C9A96E;
+          --gold-light: #E8C98A;
+          --accent-glow: rgba(201,169,110,0.1);
+          --border: rgba(201,169,110,0.12);
+          --border-strong: rgba(201,169,110,0.28);
+          --panel: rgba(24,24,27,0.96);
+          --panel-2: rgba(30,30,34,0.85);
+          --input-bg: rgba(24,24,27,0.95);
+          --shadow-sm: 0 2px 8px rgba(0,0,0,0.4);
+          --shadow-md: 0 8px 32px rgba(0,0,0,0.5);
+          --shadow-lg: 0 24px 64px rgba(0,0,0,0.6);
+          --shadow-xl: 0 40px 80px rgba(0,0,0,0.7);
+          --tag-bg: rgba(201,169,110,0.1);
+          --tag-text: var(--gold);
+          --success: #4ade80;
+          --success-bg: rgba(74,222,128,0.08);
+          --day-colors-mon: rgba(201,169,110,0.08);
+          --day-colors-tue: rgba(139,111,71,0.07);
+          --day-colors-wed: rgba(232,201,138,0.06);
+          --day-colors-thu: rgba(201,169,110,0.1);
+          --day-colors-fri: rgba(139,111,71,0.06);
+          --day-colors-sat: rgba(201,169,110,0.12);
+        }
+
+        *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+
+        body {
+          font-family: 'DM Sans', sans-serif;
+          background: var(--cream);
+          color: var(--text);
+          min-height: 100vh;
+          overflow-x: hidden;
+          transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* ── AMBIENT ── */
+        .ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .ambient-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.25; }
+        .orb-1 { width: 600px; height: 600px; background: radial-gradient(circle, var(--gold) 0%, transparent 70%); top: -200px; left: -150px; animation: drift1 20s ease-in-out infinite alternate; }
+        .orb-2 { width: 450px; height: 450px; background: radial-gradient(circle, var(--accent-warm) 0%, transparent 70%); bottom: -100px; right: -100px; animation: drift2 25s ease-in-out infinite alternate; }
+        @keyframes drift1 { to { transform: translate(60px, 40px) scale(1.1); } }
+        @keyframes drift2 { to { transform: translate(-40px, -60px) scale(0.9); } }
+        body::before { content:''; position:fixed; inset:0; background-image:radial-gradient(circle,var(--border) 1px,transparent 1px); background-size:28px 28px; pointer-events:none; z-index:0; opacity:0.5; }
+
+        /* ── LAYOUT ── */
+        .app { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+        /* ── TOPBAR ── */
+        .topbar {
+          height: var(--topbar-h);
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 0 2rem;
+          background: var(--panel);
+          border-bottom: 1px solid var(--border);
+          backdrop-filter: blur(20px);
+          position: sticky; top: 0; z-index: 100;
+          box-shadow: var(--shadow-sm);
+        }
+        .topbar-left { display: flex; align-items: center; gap: 16px; }
+        .logo-mark { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--gold)); border-radius: 9px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px var(--accent-glow); }
+        .logo-icon svg { width: 18px; height: 18px; color: white; }
+        .logo-text { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--text); }
+        .breadcrumb { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--text-muted); }
+        .breadcrumb span { color: var(--text); font-weight: 500; }
+        .topbar-right { display: flex; align-items: center; gap: 10px; }
+
+        /* Icon buttons */
+        .icon-btn {
+          width: 38px; height: 38px; border-radius: 50%;
+          background: var(--panel-2); border: 1px solid var(--border);
+          color: var(--text-muted); cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          transition: all 0.2s ease; flex-shrink: 0;
+        }
+        .icon-btn:hover { color: var(--accent); border-color: var(--border-strong); box-shadow: var(--shadow-sm); transform: scale(1.05); }
+        .icon-btn svg { width: 17px; height: 17px; }
+
+        /* Admin badge */
+        .admin-badge {
+          display: flex; align-items: center; gap: 10px;
+          padding: 6px 14px 6px 6px;
+          background: var(--panel-2); border: 1px solid var(--border);
+          border-radius: 99px; cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .admin-badge:hover { border-color: var(--border-strong); box-shadow: var(--shadow-sm); }
+        .admin-avatar {
+          width: 28px; height: 28px; border-radius: 50%;
+          background: linear-gradient(135deg, var(--accent), var(--gold));
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.7rem; font-weight: 700; color: white; flex-shrink: 0;
+        }
+        .admin-info { display: flex; flex-direction: column; }
+        .admin-name { font-size: 0.8rem; font-weight: 600; color: var(--text); line-height: 1.2; }
+        .admin-role { font-size: 0.68rem; color: var(--text-muted); line-height: 1.2; }
+
+        /* ── MAIN BODY ── */
+        .main-body { display: flex; flex: 1; overflow: hidden; }
+
+        /* ── SIDEBAR ── */
+        .sidebar {
+          width: var(--sidebar-w);
+          background: var(--panel);
+          border-right: 1px solid var(--border);
+          display: flex; flex-direction: column;
+          position: sticky; top: var(--topbar-h);
+          height: calc(100vh - var(--topbar-h));
+          overflow: hidden;
+          transition: transform 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s ease;
+          flex-shrink: 0;
+        }
+        .sidebar-header { padding: 20px 18px 14px; border-bottom: 1px solid var(--border); }
+        .sidebar-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+
+        /* Search */
+        .search-wrap { position: relative; }
+        .search-input {
+          width: 100%; padding: 9px 14px 9px 36px;
+          border-radius: 10px; border: 1px solid var(--border);
+          background: var(--input-bg); color: var(--text);
+          font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+          outline: none; transition: all 0.3s ease;
+        }
+        .search-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+        .search-icon svg { width: 15px; height: 15px; }
+
+        /* Filter bar */
+        .filter-bar { padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 6px; }
+        .filter-chip {
+          display: inline-flex; align-items: center; gap: 5px;
+          padding: 4px 10px; border-radius: 99px;
+          border: 1px solid var(--border); background: var(--panel-2);
+          font-size: 0.72rem; font-weight: 500; color: var(--text-muted);
+          cursor: pointer; transition: all 0.2s ease;
+        }
+        .filter-chip:hover { border-color: var(--gold); color: var(--accent); }
+        .filter-chip.active { background: var(--tag-bg); border-color: var(--gold); color: var(--tag-text); font-weight: 600; }
+        .filter-chip svg { width: 11px; height: 11px; }
+
+        /* Faculty count */
+        .faculty-count-bar { padding: 8px 18px; display: flex; align-items: center; justify-content: space-between; }
+        .fc-label { font-size: 0.72rem; color: var(--text-muted); }
+        .fc-num { font-size: 0.72rem; font-weight: 700; color: var(--accent); }
+
+        /* Faculty list */
+        .faculty-list { flex: 1; overflow-y: auto; padding: 8px 10px 20px; }
+        .faculty-list::-webkit-scrollbar { width: 4px; }
+        .faculty-list::-webkit-scrollbar-track { background: transparent; }
+        .faculty-list::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+
+        .faculty-item {
+          display: flex; align-items: center; gap: 12px;
+          padding: 11px 10px; border-radius: var(--radius-sm);
+          cursor: pointer; transition: all 0.2s ease; margin-bottom: 2px;
+          border: 1px solid transparent; position: relative;
+        }
+        .faculty-item:hover { background: var(--panel-2); border-color: var(--border); }
+        .faculty-item.active { background: var(--tag-bg); border-color: var(--gold); }
+        .faculty-item.active .fi-name { color: var(--accent); font-weight: 600; }
+        .fi-avatar {
+          width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+          background: linear-gradient(135deg, var(--accent), var(--gold));
+          display: flex; align-items: center; justify-content: center;
+          font-size: 0.75rem; font-weight: 700; color: white;
+          box-shadow: var(--shadow-sm);
+        }
+        .fi-info { flex: 1; min-width: 0; }
+        .fi-name { font-size: 0.875rem; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .fi-meta { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+        .fi-slots { font-size: 0.68rem; font-weight: 600; color: var(--gold); background: var(--tag-bg); padding: 2px 7px; border-radius: 99px; flex-shrink: 0; }
+        .fi-active-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--gold); position: absolute; right: 10px; top: 10px; }
+
+        /* No results */
+        .no-results { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.85rem; }
+        .no-results svg { width: 32px; height: 32px; margin: 0 auto 12px; display: block; opacity: 0.4; }
+
+        /* ── CONTENT AREA ── */
+        .content { flex: 1; overflow-y: auto; padding: 2rem; display: flex; flex-direction: column; gap: 1.5rem; min-width: 0; }
+        .content::-webkit-scrollbar { width: 5px; }
+        .content::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+
+        /* Loading state */
+        .loading-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; gap: 16px; color: var(--text-muted); }
+        .spinner { width: 44px; height: 44px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin 0.8s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Empty state */
+        .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 400px; gap: 16px; text-align: center; }
+        .empty-icon { width: 80px; height: 80px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+        .empty-icon svg { width: 36px; height: 36px; color: var(--text-faint); }
+        .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--text); }
+        .empty-state p { font-size: 0.875rem; color: var(--text-muted); max-width: 320px; line-height: 1.6; }
+
+        /* Faculty header card */
+        .faculty-header-card {
+          background: var(--panel);
+          border: 1px solid var(--border);
+          border-radius: var(--radius);
+          padding: 1.5rem 2rem;
+          display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+          box-shadow: var(--shadow-sm);
+          animation: fadeIn 0.4s ease both;
+        }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+        .fh-left { display: flex; align-items: center; gap: 16px; }
+        .fh-avatar {
+          width: 56px; height: 56px; border-radius: 50%;
+          background: linear-gradient(135deg, var(--accent), var(--gold));
+          display: flex; align-items: center; justify-content: center;
+          font-size: 1.1rem; font-weight: 700; color: white;
+          box-shadow: var(--shadow-md); flex-shrink: 0;
+        }
+        .fh-name { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+        .fh-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+        .fh-tag { padding: 3px 10px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; background: var(--tag-bg); color: var(--tag-text); border: 1px solid var(--border); }
+        .fh-right { display: flex; gap: 10px; align-items: center; }
+
+        .btn-secondary {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 9px 18px; border-radius: 10px;
+          border: 1px solid var(--border); background: var(--panel-2);
+          color: var(--text-muted); font-family: 'DM Sans', sans-serif;
+          font-size: 0.875rem; font-weight: 500; cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .btn-secondary:hover { border-color: var(--border-strong); color: var(--text); box-shadow: var(--shadow-sm); }
+        .btn-secondary svg { width: 15px; height: 15px; }
+
+        .btn-primary {
+          display: inline-flex; align-items: center; gap: 8px;
+          padding: 9px 20px; border-radius: 10px;
+          border: none; background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%);
+          color: white; font-family: 'DM Sans', sans-serif;
+          font-size: 0.875rem; font-weight: 600; cursor: pointer;
+          transition: all 0.2s ease; box-shadow: 0 4px 12px var(--accent-glow);
+          position: relative; overflow: hidden;
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(139,111,71,0.3); }
+        .btn-primary::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.15),transparent); transform:translateX(-100%); transition:0.4s; }
+        .btn-primary:hover::after { transform:translateX(100%); }
+        .btn-primary svg { width: 15px; height: 15px; }
+
+        /* Stats row */
+        .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; animation: fadeIn 0.4s 0.1s ease both; }
+        @media(max-width:900px) { .stats-row { grid-template-columns: repeat(2, 1fr); } }
+        .stat-card {
+          background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius-sm);
+          padding: 14px 16px; display: flex; align-items: center; gap: 12px;
+          box-shadow: var(--shadow-sm);
+        }
+        .stat-icon { width: 36px; height: 36px; border-radius: 9px; background: var(--tag-bg); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .stat-icon svg { width: 17px; height: 17px; color: var(--accent); }
+        .stat-num { font-size: 1.3rem; font-weight: 700; color: var(--text); line-height: 1; }
+        .stat-label { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+
+        /* Timetable view toggle */
+        .view-controls { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; animation: fadeIn 0.4s 0.15s ease both; }
+        .view-tabs { display: flex; background: var(--panel-2); border: 1px solid var(--border); border-radius: 10px; padding: 3px; gap: 2px; }
+        .view-tab {
+          padding: 7px 16px; border-radius: 8px; cursor: pointer;
+          font-size: 0.8rem; font-weight: 500; color: var(--text-muted);
+          transition: all 0.2s ease; border: 1px solid transparent;
+        }
+        .view-tab.active { background: var(--panel); color: var(--text); border-color: var(--border); box-shadow: var(--shadow-sm); }
+        .view-tab:hover:not(.active) { color: var(--text); }
+        .day-filter { display: flex; flex-wrap: wrap; gap: 5px; }
+        .day-chip {
+          padding: 5px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 600;
+          cursor: pointer; border: 1px solid var(--border); background: var(--panel-2);
+          color: var(--text-muted); transition: all 0.2s ease;
+        }
+        .day-chip:hover { border-color: var(--border-strong); color: var(--text); }
+        .day-chip.active { background: var(--tag-bg); border-color: var(--gold); color: var(--tag-text); }
+
+        /* Grid view */
+        .tt-grid-view { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; animation: fadeIn 0.35s ease both; }
+
+        /* Day section */
+        .day-section { animation: fadeIn 0.35s ease both; }
+        .day-header {
+          display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 10px 16px;
+          border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 700;
+          letter-spacing: 0.05em; text-transform: uppercase;
+          border: 1px solid var(--border); color: var(--text);
+        }
+        .day-header-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+
+        .slot-card {
+          background: var(--panel); border: 1px solid var(--border);
+          border-radius: var(--radius-sm); padding: 14px 16px;
+          transition: all 0.25s ease; cursor: default; position: relative; overflow: hidden;
+          box-shadow: var(--shadow-sm);
+        }
+        .slot-card::before { content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:linear-gradient(180deg,var(--accent),var(--gold)); }
+        .slot-card:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); transform: translateY(-2px); }
+        .slot-time { font-size: 0.75rem; font-weight: 600; color: var(--gold); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .slot-time svg { width: 12px; height: 12px; }
+        .slot-subject { font-size: 0.9rem; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .slot-meta { display: flex; flex-wrap: wrap; gap: 6px; }
+        .slot-tag { padding: 2px 8px; border-radius: 99px; font-size: 0.68rem; font-weight: 600; background: var(--tag-bg); color: var(--tag-text); border: 1px solid var(--border); }
+
+        /* Table view */
+        .tt-table-wrap { overflow-x: auto; animation: fadeIn 0.35s ease both; }
+        .tt-table { width: 100%; border-collapse: collapse; min-width: 700px; }
+        .tt-table th { padding: 11px 16px; text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); background: var(--panel-2); border-bottom: 1px solid var(--border); white-space: nowrap; }
+        .tt-table td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 0.875rem; color: var(--text); vertical-align: middle; }
+        .tt-table tr:hover td { background: var(--panel-2); }
+        .tt-table tr:last-child td { border-bottom: none; }
+        .day-badge { padding: 3px 10px; border-radius: 99px; font-size: 0.72rem; font-weight: 600; white-space: nowrap; }
+        .d-MON { background: var(--day-colors-mon); color: var(--accent); }
+        .d-TUE { background: var(--day-colors-tue); color: var(--accent); }
+        .d-WED { background: var(--day-colors-wed); color: var(--accent); }
+        .d-THU { background: var(--day-colors-thu); color: var(--accent); }
+        .d-FRI { background: var(--day-colors-fri); color: var(--accent); }
+        .d-SAT { background: var(--day-colors-sat); color: var(--accent); }
+
+        /* No slots */
+        .no-slots { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+        .no-slots svg { width: 40px; height: 40px; margin: 0 auto 12px; display: block; opacity: 0.3; }
+
+        /* ── AI CHAT ── */
+        .ai-panel {
+          background: var(--panel); border: 1px solid var(--border);
+          border-radius: var(--radius); box-shadow: var(--shadow-sm);
+          overflow: hidden; animation: fadeIn 0.4s 0.2s ease both;
+        }
+        .ai-panel-header {
+          padding: 14px 20px; border-bottom: 1px solid var(--border);
+          display: flex; align-items: center; gap: 12px;
+          background: var(--panel-2);
+        }
+        .ai-avatar {
+          width: 34px; height: 34px; border-radius: 50%;
+          background: linear-gradient(135deg, var(--accent), var(--gold));
+          display: flex; align-items: center; justify-content: center;
+          box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+        .ai-avatar svg { width: 16px; height: 16px; color: white; }
+        .ai-header-text { flex: 1; }
+        .ai-header-title { font-size: 0.875rem; font-weight: 600; color: var(--text); }
+        .ai-header-sub { font-size: 0.72rem; color: var(--text-muted); }
+        .ai-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 6px rgba(74,222,128,0.5); animation: pulse-dot 2s ease-in-out infinite; }
+        @keyframes pulse-dot { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+
+        .ai-messages { height: 280px; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+        .ai-messages::-webkit-scrollbar { width: 4px; }
+        .ai-messages::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+
+        .ai-msg { max-width: 85%; display: flex; flex-direction: column; gap: 4px; }
+        .ai-msg.ai { align-self: flex-start; }
+        .ai-msg.user { align-self: flex-end; }
+        .ai-bubble {
+          padding: 10px 14px; border-radius: 14px; font-size: 0.85rem; line-height: 1.6;
+          word-break: break-word;
+        }
+        .ai-msg.ai .ai-bubble { background: var(--panel-2); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+        .ai-msg.user .ai-bubble { background: linear-gradient(135deg, var(--accent), var(--gold)); color: white; border-bottom-right-radius: 4px; }
+        .ai-msg-time { font-size: 0.65rem; color: var(--text-faint); }
+        .ai-msg.user .ai-msg-time { text-align: right; }
+
+        .ai-typing { display: flex; align-items: center; gap: 4px; padding: 10px 14px; background: var(--panel-2); border: 1px solid var(--border); border-radius: 14px; border-bottom-left-radius: 4px; width: fit-content; }
+        .typing-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); animation: typing 1.4s ease-in-out infinite; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typing { 0%,60%,100% { transform:translateY(0); opacity:0.4; } 30% { transform:translateY(-6px); opacity:1; } }
+
+        .ai-suggestions { padding: 10px 16px; display: flex; flex-wrap: wrap; gap: 6px; border-top: 1px solid var(--border); }
+        .ai-suggestion { padding: 5px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 500; cursor: pointer; border: 1px solid var(--border); background: var(--panel-2); color: var(--text-muted); transition: all 0.2s ease; }
+        .ai-suggestion:hover { border-color: var(--gold); color: var(--accent); background: var(--tag-bg); }
+
+        .ai-input-row { padding: 12px 16px; border-top: 1px solid var(--border); display: flex; gap: 10px; }
+        .ai-input {
+          flex: 1; padding: 10px 14px; border-radius: 10px;
+          border: 1px solid var(--border); background: var(--input-bg);
+          color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 0.875rem;
+          outline: none; transition: all 0.3s ease; resize: none;
+        }
+        .ai-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px var(--accent-glow); }
+        .ai-send-btn {
+          width: 40px; height: 40px; border-radius: 10px; flex-shrink: 0;
+          background: linear-gradient(135deg, var(--accent), var(--gold));
+          border: none; color: white; cursor: pointer;
+          display: flex; align-items: center; justify-content: center;
+          transition: all 0.2s ease; box-shadow: 0 4px 10px var(--accent-glow);
+        }
+        .ai-send-btn:hover { transform: scale(1.05); }
+        .ai-send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .ai-send-btn svg { width: 16px; height: 16px; }
+
+        /* ── THEME SETTINGS PANEL ── */
+        .theme-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .theme-overlay.open { opacity: 1; pointer-events: auto; }
+        .theme-panel {
+          position: fixed; top: 0; right: 0; bottom: 0; width: 320px;
+          background: var(--panel); border-left: 1px solid var(--border);
+          box-shadow: var(--shadow-xl); z-index: 201;
+          transform: translateX(100%); transition: transform 0.4s cubic-bezier(0.4,0,0.2,1);
+          overflow-y: auto; display: flex; flex-direction: column;
+        }
+        .theme-panel.open { transform: translateX(0); }
+        .theme-panel::-webkit-scrollbar { width: 4px; }
+        .theme-panel::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 99px; }
+        .tp-header { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; background: var(--panel); z-index: 1; }
+        .tp-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; color: var(--text); }
+        .tp-section { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+        .tp-section-title { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 14px; }
+        .tp-option-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+        .tp-option-label { font-size: 0.875rem; color: var(--text); }
+        .tp-option-sub { font-size: 0.72rem; color: var(--text-muted); }
+
+        /* Toggle switch */
+        .toggle { position: relative; width: 42px; height: 24px; }
+        .toggle input { opacity: 0; width: 0; height: 0; }
+        .toggle-track { position: absolute; inset: 0; border-radius: 99px; background: var(--cream-3); border: 1px solid var(--border); transition: all 0.3s ease; cursor: pointer; }
+        .toggle input:checked + .toggle-track { background: linear-gradient(135deg, var(--accent), var(--gold)); border-color: transparent; }
+        .toggle-track::after { content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:white; top:2px; left:2px; transition:transform 0.3s ease; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+        .toggle input:checked + .toggle-track::after { transform: translateX(18px); }
+
+        /* Color palette */
+        .color-palette { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+        .color-swatch {
+          width: 100%; aspect-ratio: 1; border-radius: 8px; cursor: pointer;
+          border: 2px solid transparent; transition: all 0.2s ease;
+          position: relative;
+        }
+        .color-swatch:hover { transform: scale(1.1); }
+        .color-swatch.active { border-color: var(--text); }
+        .color-swatch.active::after { content:'✓'; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-size:0.75rem; font-weight:700; color:white; }
+
+        /* Range slider */
+        .range-wrap { position: relative; }
+        .range-slider { width: 100%; height: 4px; -webkit-appearance: none; appearance: none; background: var(--cream-3); border-radius: 99px; outline: none; cursor: pointer; }
+        .range-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--gold)); cursor: pointer; box-shadow: var(--shadow-sm); }
+        .range-value { font-size: 0.75rem; font-weight: 600; color: var(--accent); text-align: right; margin-top: 6px; }
+
+        /* Theme presets */
+        .theme-presets { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .preset-card {
+          padding: 12px; border-radius: 10px; border: 2px solid var(--border);
+          cursor: pointer; transition: all 0.2s ease; text-align: center;
+        }
+        .preset-card:hover { border-color: var(--border-strong); }
+        .preset-card.active { border-color: var(--gold); background: var(--tag-bg); }
+        .preset-preview { height: 36px; border-radius: 6px; margin-bottom: 6px; }
+        .preset-name { font-size: 0.75rem; font-weight: 600; color: var(--text); }
+
+        /* Font select */
+        .tp-select {
+          width: 100%; padding: 8px 12px; border-radius: 8px;
+          border: 1px solid var(--border); background: var(--input-bg); color: var(--text);
+          font-family: 'DM Sans', sans-serif; font-size: 0.875rem; outline: none;
+          cursor: pointer; transition: border-color 0.2s;
+        }
+        .tp-select:focus { border-color: var(--gold); }
+
+        /* ── MOBILE SIDEBAR TOGGLE ── */
+        .sidebar-toggle { display: none; }
+
+        /* ── TOAST ── */
+        #toast { position:fixed; top:20px; left:50%; transform:translateX(-50%) translateY(-20px); min-width:260px; padding:12px 20px; border-radius:10px; font-size:0.875rem; font-weight:500; text-align:center; z-index:9999; opacity:0; pointer-events:none; transition:all 0.4s cubic-bezier(0.68,-0.55,0.265,1.55); box-shadow:var(--shadow-lg); }
+        #toast.show { opacity:1; transform:translateX(-50%) translateY(0); pointer-events:auto; }
+        #toast.success { background:#1a3a2a; color:#4ade80; border:1px solid rgba(74,222,128,0.2); }
+        #toast.error { background:#3a1a1a; color:#f87171; border:1px solid rgba(248,113,113,0.2); }
+        #toast.info { background:var(--panel); color:var(--text); border:1px solid var(--border); }
+
+        /* Skeleton */
+        .skeleton { background: var(--cream-3); border-radius: 6px; animation: skeleton-pulse 1.5s ease-in-out infinite; }
+        @keyframes skeleton-pulse { 0%,100% { opacity:0.5; } 50% { opacity:1; } }
+
+        /* ── RESPONSIVE ── */
+        @media(max-width:768px) {
+          .sidebar {
+            position: fixed; top: var(--topbar-h); left: 0; bottom: 0; z-index: 90;
+            transform: translateX(-100%); box-shadow: var(--shadow-xl);
+            width: 280px;
+          }
+          .sidebar.mobile-open { transform: translateX(0); }
+          .sidebar-toggle { display: flex; }
+          .content { padding: 1.25rem; }
+          .faculty-header-card { padding: 1rem; }
+          .fh-name { font-size: 1.2rem; }
+          .stats-row { grid-template-columns: repeat(2, 1fr); }
+          .topbar { padding: 0 1rem; }
+          .admin-info { display: none; }
+          .breadcrumb { display: none; }
+          .tt-grid-view { grid-template-columns: 1fr; }
+          .theme-panel { width: 100%; max-width: 340px; }
+        }
+        @media(max-width:480px) {
+          .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+          .fh-right { flex-wrap: wrap; }
+          .view-controls { flex-direction: column; align-items: flex-start; }
+        }
+
+        /* ── EMAIL OVERLAY ── */
+/* ── LARGE EMAIL MODAL ── */
+.email-overlay {
+    position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    z-index: 2000;
+    display: none;
+    align-items: center; justify-content: center;
+}
+
+/* Ensure the button fits nicely in the topbar */
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+#emailAllBtn {
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Responsive: Hide text on small screens to save space */
+@media (max-width: 600px) {
+    #emailAllBtn .btn-text { display: none; }
+    #emailAllBtn { padding: 0; width: 38px; justify-content: center; border-radius: 50%; }
+}
+.email-overlay.show { display: flex; }
+
+.email-modal {
+    background: var(--panel);
+    padding: 2.5rem;
+    border-radius: var(--radius);
+    text-align: center;
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow-xl);
+    width: 550px; /* Wider modal for larger animation */
+}
+
+.email-status-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem; font-weight: 700;
+    margin-top: 1rem; color: var(--text);
+}
+
+/* ── FALLBACK ANIMATION ── */
+/* Ensure the custom fallback stays the same size as the Lottie */
+/* Fallback if Lottie fails */
+.email-fallback {
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.envelope {
+    width: 80px; height: 50px; background: var(--gold);
+    margin: 0 auto 20px; position: relative;
+    border-radius: 4px; animation: float 2s ease-in-out infinite;
+}
+.envelope::before {
+    content: ''; position: absolute; top: 0; left: 0;
+    border-left: 40px solid transparent; border-right: 40px solid transparent;
+    border-top: 30px solid var(--accent);
+}
+.loading-dots span {
+    animation: dots 1.4s infinite; opacity: 0;
+    font-weight: bold; font-size: 1lottieElement.2rem;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+#lottieContainer {
+    width: 100%;
+    height: 450px; /* Your requested size */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+@keyframes dots {
+    0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; }
+}
+    </style>
+</head>
+<body>
+
+<!-- Ambient -->
+<div class="ambient">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+</div>
+
+<!-- Theme overlay -->
+<div class="theme-overlay" id="themeOverlay" onclick="closeThemePanel()"></div>
+
+<!-- Theme panel -->
+<div class="theme-panel" id="themePanel">
+    <div class="tp-header">
+        <span class="tp-title">Theme Settings</span>
+        <button class="icon-btn" onclick="closeThemePanel()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
+
+    <div class="tp-section">
+        <div class="tp-section-title">Mode</div>
+        <div class="tp-option-row">
+            <div>
+                <div class="tp-option-label">Dark Mode</div>
+                <div class="tp-option-sub">Premium grey palette</div>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="darkToggle" onchange="toggleDark(this)">
+                <span class="toggle-track"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="tp-section">
+        <div class="tp-section-title">Presets</div>
+        <div class="theme-presets">
+            <div class="preset-card active" id="preset-default" onclick="applyPreset('default')">
+                <div class="preset-preview" style="background:linear-gradient(135deg,#FAF7F2,#C9A96E)"></div>
+                <div class="preset-name">Classic Cream</div>
+            </div>
+            <div class="preset-card" id="preset-ivory" onclick="applyPreset('ivory')">
+                <div class="preset-preview" style="background:linear-gradient(135deg,#FDFAF5,#D4A96A)"></div>
+                <div class="preset-name">Ivory Gold</div>
+            </div>
+            <div class="preset-card" id="preset-slate" onclick="applyPreset('slate')">
+                <div class="preset-preview" style="background:linear-gradient(135deg,#1a1a2e,#4a9eff)"></div>
+                <div class="preset-name">Midnight Blue</div>
+            </div>
+            <div class="preset-card" id="preset-forest" onclick="applyPreset('forest')">
+                <div class="preset-preview" style="background:linear-gradient(135deg,#1a2e1a,#4ade80)"></div>
+                <div class="preset-name">Forest Green</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tp-section">
+        <div class="tp-section-title">Accent Color</div>
+        <div class="color-palette" id="accentPalette">
+            <div class="color-swatch active" data-accent="gold" style="background:#C9A96E" onclick="setAccent('gold','#C9A96E','#8B6F47')"></div>
+            <div class="color-swatch" data-accent="blue" style="background:#4A90E2" onclick="setAccent('blue','#4A90E2','#2563EB')"></div>
+            <div class="color-swatch" data-accent="green" style="background:#4ade80" onclick="setAccent('green','#4ade80','#16a34a')"></div>
+            <div class="color-swatch" data-accent="rose" style="background:#fb7185" onclick="setAccent('rose','#fb7185','#e11d48')"></div>
+            <div class="color-swatch" data-accent="violet" style="background:#a78bfa" onclick="setAccent('violet','#a78bfa','#7c3aed')"></div>
+        </div>
+    </div>
+
+    <div class="tp-section">
+        <div class="tp-section-title">Typography</div>
+        <select class="tp-select" id="fontSelect" onchange="applyFont(this.value)">
+            <option value="'DM Sans', sans-serif">DM Sans (Default)</option>
+            <option value="'Inter', sans-serif">Inter</option>
+            <option value="'Nunito', sans-serif">Nunito</option>
+            <option value="'Outfit', sans-serif">Outfit</option>
+            <option value="system-ui, sans-serif">System UI</option>
+        </select>
+    </div>
+
+    <div class="tp-section">
+        <div class="tp-section-title">Border Radius</div>
+        <input type="range" class="range-slider" min="4" max="24" value="16" id="radiusSlider" oninput="setRadius(this.value)">
+        <div class="range-value" id="radiusVal">16px</div>
+    </div>
+
+    <div class="tp-section">
+        <div class="tp-section-title">Visual Effects</div>
+        <div class="tp-option-row">
+            <div>
+                <div class="tp-option-label">Ambient Orbs</div>
+                <div class="tp-option-sub">Background glow effects</div>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="orbToggle" checked onchange="toggleOrbs(this)">
+                <span class="toggle-track"></span>
+            </label>
+        </div>
+        <div class="tp-option-row">
+            <div>
+                <div class="tp-option-label">Grid Texture</div>
+                <div class="tp-option-sub">Dot grid background</div>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="gridToggle" checked onchange="toggleGrid(this)">
+                <span class="toggle-track"></span>
+            </label>
+        </div>
+        <div class="tp-option-row">
+            <div>
+                <div class="tp-option-label">Compact Mode</div>
+                <div class="tp-option-sub">Reduce spacing</div>
+            </div>
+            <label class="toggle">
+                <input type="checkbox" id="compactToggle" onchange="toggleCompact(this)">
+                <span class="toggle-track"></span>
+            </label>
+        </div>
+    </div>
+
+    <div class="tp-section">
+        <div class="tp-section-title">Sidebar Width</div>
+        <input type="range" class="range-slider" min="240" max="380" value="300" id="sidebarSlider" oninput="setSidebarWidth(this.value)">
+        <div class="range-value" id="sidebarVal">300px</div>
+    </div>
+
+    <div style="padding:20px 24px;">
+        <button class="btn-secondary" style="width:100%;justify-content:center;" onclick="resetTheme()">Reset to Default</button>
+    </div>
+</div>
+
+<!-- App -->
+<div class="app">
+
+    <!-- Topbar -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <button class="icon-btn sidebar-toggle" onclick="toggleSidebar()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <a href="/admin-dashboard" class="logo-mark">
+                <div class="logo-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <span class="logo-text">ChronoFlex</span>
+            </a>
+            <div class="breadcrumb">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                <span>Faculty Timetables</span>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <button class="btn-primary" onclick="emailAllFaculty()" id="emailAllBtn" title="Email all faculty timetables" style="padding: 7px 15px; height: 38px;">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="width: 16px; height: 16px;"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                <span class="btn-text">Email All</span>
+            </button>
+            <button class="icon-btn" onclick="toggleThemeMode()" title="Toggle dark/light">
+                <svg id="themeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </button>
+            <button class="icon-btn" onclick="openThemePanel()" title="Theme settings">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+            </button>
+            <button class="icon-btn" onclick="refreshData()" title="Refresh">
+                <svg id="refreshIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            </button>
+            <div class="admin-badge" id="adminBadge">
+                <div class="admin-avatar" id="adminAvatar">A</div>
+                <div class="admin-info">
+                    <div class="admin-name" id="adminName">Loading…</div>
+                    <div class="admin-role" id="adminRoleEl">Super Admin</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main body -->
+    <div class="main-body">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-title">Faculty Directory</div>
+                <div class="search-wrap">
+                    <span class="search-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></span>
+                    <input type="text" class="search-input" id="facultySearch" placeholder="Search faculty…" oninput="filterFaculty()">
+                </div>
+            </div>
+            <div class="filter-bar" id="filterBar">
+                <div class="filter-chip active" data-filter="all" onclick="setFilter('all')">All</div>
+                <div class="filter-chip" data-filter="mon" onclick="setFilter('mon')">Mon</div>
+                <div class="filter-chip" data-filter="tue" onclick="setFilter('tue')">Tue</div>
+                <div class="filter-chip" data-filter="wed" onclick="setFilter('wed')">Wed</div>
+                <div class="filter-chip" data-filter="thu" onclick="setFilter('thu')">Thu</div>
+                <div class="filter-chip" data-filter="fri" onclick="setFilter('fri')">Fri</div>
+                <div class="filter-chip" data-filter="sat" onclick="setFilter('sat')">Sat</div>
+            </div>
+            <div class="faculty-count-bar">
+                <span class="fc-label">Showing</span>
+                <span class="fc-num" id="facultyCountEl">0 faculty</span>
+            </div>
+            <div class="faculty-list" id="facultyList">
+                <!-- Skeleton loaders -->
+                <div style="padding:0 4px">
+                    ${Array(6).fill(0).map(()=>`
+                    <div class="faculty-item" style="pointer-events:none">
+                        <div class="skeleton" style="width:36px;height:36px;border-radius:50%;flex-shrink:0"></div>
+                        <div style="flex:1">
+                            <div class="skeleton" style="height:13px;border-radius:4px;margin-bottom:6px;width:70%"></div>
+                            <div class="skeleton" style="height:10px;border-radius:4px;width:50%"></div>
+                        </div>
+                    </div>`).join('')}
+                </div>
+            </div>
+        </aside>
+
+        <!-- Content -->
+        <main class="content" id="mainContent">
+            <!-- Initial loading state -->
+            <div class="loading-state" id="loadingState">
+                <div class="spinner"></div>
+                <div style="font-size:0.875rem;color:var(--text-muted)">Loading faculty timetables…</div>
+            </div>
+
+            <!-- Empty / select state -->
+            <div class="empty-state" id="emptyState" style="display:none">
+                <div class="empty-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h3>Select a Faculty</h3>
+                <p>Choose a faculty member from the left panel to view their complete timetable and schedule details.</p>
+            </div>
+
+            <!-- Faculty detail view -->
+            <div id="facultyDetail" style="display:none; display:flex; flex-direction:column; gap:1.5rem;">
+
+                <!-- Faculty header -->
+                <div class="faculty-header-card" id="facultyHeaderCard">
+                    <div class="fh-left">
+                        <div class="fh-avatar" id="detailAvatar"></div>
+                        <div>
+                            <div class="fh-name" id="detailName"></div>
+                            <div class="fh-tags" id="detailTags"></div>
+                        </div>
+                    </div>
+                    <div class="fh-right">
+                        <button class="btn-secondary" onclick="exportCSV()">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Export Excel
+                        </button>
+                        <button class="btn-primary" onclick="scrollToAI()">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                            Ask AI
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="stats-row" id="statsRow"></div>
+
+                <!-- View controls -->
+                <div class="view-controls">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                        <div class="view-tabs">
+                            <div class="view-tab active" onclick="setView('grid')">Grid</div>
+                            <div class="view-tab" onclick="setView('table')">Table</div>
+                        </div>
+                        <div class="day-filter" id="dayFilter"></div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px">
+                        <span style="font-size:0.8rem;color:var(--text-muted)">Sort:</span>
+                        <select class="tp-select" style="width:auto;padding:6px 10px;font-size:0.8rem" onchange="sortSlots(this.value)" id="sortSelect">
+                            <option value="day">By Day</option>
+                            <option value="time">By Time</option>
+                            <option value="subject">By Subject</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Timetable views -->
+                <div id="gridView"></div>
+                <div id="tableView" style="display:none;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden"></div>
+
+                <!-- AI Panel -->
+                <div class="ai-panel" id="aiPanel">
+                    <div class="ai-panel-header">
+                        <div class="ai-avatar">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        </div>
+                        <div class="ai-header-text">
+                            <div class="ai-header-title">ChronoFlex AI</div>
+                            <div class="ai-header-sub" id="aiSubtitle">Ask anything about this faculty's schedule</div>
+                        </div>
+                        <div class="ai-status-dot"></div>
+                    </div>
+                    <div class="ai-messages" id="aiMessages">
+                        <div class="ai-msg ai">
+                            <div class="ai-bubble">Hello! I'm your scheduling assistant. Select a faculty and I'll help you analyze their timetable, find free slots, or answer any schedule-related questions. 📅</div>
+                            <div class="ai-msg-time">Just now</div>
+                        </div>
+                    </div>
+                    <div class="ai-suggestions" id="aiSuggestions">
+                        <div class="ai-suggestion" onclick="sendSuggestion(this)">What are the free slots?</div>
+                        <div class="ai-suggestion" onclick="sendSuggestion(this)">Busiest day?</div>
+                        <div class="ai-suggestion" onclick="sendSuggestion(this)">List all subjects</div>
+                        <div class="ai-suggestion" onclick="sendSuggestion(this)">Morning schedule</div>
+                    </div>
+                    <div class="ai-input-row">
+                        <textarea class="ai-input" id="aiInput" placeholder="Ask about this faculty's timetable…" rows="1" onkeydown="handleAIKey(event)" oninput="autoResize(this)"></textarea>
+                        <button class="ai-send-btn" id="aiSendBtn" onclick="sendAIMessage()">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                        </button>
+                    </div>
+                </div>
+
+            </div><!-- /facultyDetail -->
+        </main>
+    </div>
+</div>
+
+<div class="topbar-right">
+    <button class="btn-primary" onclick="emailAllFaculty()" id="emailAllBtn" title="Email all faculty timetables">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        Email All
+    </button>
+</div>
+
+<div id="emailOverlay" class="email-overlay">
+    <div class="email-modal">
+        <div id="lottieContainer" style="display: flex; justify-content: center; align-items: center; width: 100%;">
+            <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.10/dist/dotlottie-wc.js" type="module"></script>
+
+            <dotlottie-wc
+                    id="lottieAnim"
+                    src="https://lottie.host/94694533-4818-48f1-8eee-f3c5705861cb/bnmYjJQ1xD.lottie"
+                    style="width: 450px; height: 450px;" /* Increased from 300px */
+            autoplay
+            loop
+            data-preserve-aspect-ratio="xMidYMid meet"
+            ></dotlottie-wc>
+        </div>
+
+        <div id="emailFallback" class="email-fallback" style="display: none;">
+            <div class="envelope">
+                <div class="paper"></div>
+            </div>
+            <div class="loading-dots">Sending Emails<span>.</span><span>.</span><span>.</span></div>
+        </div>
+
+        <p class="email-status-text">Dispatching Timetables...</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted);">This may take a moment depending on faculty count.</p>
+    </div>
+</div>
+
+<div id="toast"></div>
+
+<script >
+    // ══════════════════════════════════════════════
+    // CONFIG & STATE
+    // ══════════════════════════════════════════════
+    const API_BASE_TIMETABLE = 'http://localhost:8080/api/faculty/timetable';
+    const API_AI = 'http://localhost:8080/api/ai/chat';
+    // Fix 1: Update DAY_ORDER to use short codes (matching your API)
+    const DAY_ORDER = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+    const DAY_SHORT = { MON:'MON', TUE:'TUE', WED:'WED', THU:'THU', FRI:'FRI', SAT:'SAT', SUN:'SUN' };
+    const DAY_FULL = { MON:'Monday', TUE:'Tuesday', WED:'Wednesday', THU:'Thursday', FRI:'Friday', SAT:'Saturday', SUN:'Sunday' };
+    const COLORS = ['#C9A96E','#8B6F47','#4A3728','#E8C98A','#A0785A','#D4A96A'];
+
+    let allFaculty = [];
+    let filteredFaculty = [];
+    let selectedFaculty = null;
+    let currentView = 'grid';
+    let currentFilter = 'all';
+    let currentDayFilter = 'ALL';
+    let currentSort = 'day';
+    let aiTyping = false;
+    let sidebarOpen = false;
+
+    // ══════════════════════════════════════════════
+    // INIT
+    // ══════════════════════════════════════════════
+    document.addEventListener('DOMContentLoaded', () => {
+      loadThemePrefs();
+      loadAdminInfo();
+      fetchAllTimetables();
+    });
+
+    function loadAdminInfo() {
+      const session = JSON.parse(localStorage.getItem('cfAdminSession') || '{}');
+      const name = session.adminName || 'Admin';
+      const role = session.role || 'Super Admin';
+      document.getElementById('adminName').textContent = name;
+      document.getElementById('adminRoleEl').textContent = role;
+      document.getElementById('adminAvatar').textContent = (name[0] || 'A').toUpperCase();
+    }
+
+    // ══════════════════════════════════════════════
+    // FETCH DATA
+    // ══════════════════════════════════════════════
+    async function fetchAllTimetables() {
+      const session = JSON.parse(localStorage.getItem('cfAdminSession') || '{}');
+      const email = session.adminEmail || '';
+      const password = session.adminPassword || '';
+
+      showLoading(true);
+
+      try {
+        const res = await fetch(`${API_BASE_TIMETABLE}/all`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ adminEmail: email, adminPassword: password })
+        });
+
+        if (res.ok) {
+          allFaculty = await res.json();
+          renderFacultyList(allFaculty);
+          showLoading(false);
+          showToast(`Loaded ${allFaculty.length} faculty timetables`, 'success');
+        } else {
+          const err = await res.text();
+          throw new Error(err);
+        }
+      } catch(e) {
+        // Demo mode
+        allFaculty = generateDemoData();
+        renderFacultyList(allFaculty);
+        showLoading(false);
+        showToast('Demo mode — sample timetable data loaded', 'info');
+      }
+    }
+
+    function generateDemoData() {
+      const subjects = ['Data Structures','Algorithms','DBMS','Operating Systems','Computer Networks','Software Engineering','Machine Learning','Compiler Design','Web Development','Computer Architecture'];
+      const names = ['Dr. Priya Sharma','Prof. Ramesh Kumar','Dr. Anita Patel','Prof. Suresh Nair','Dr. Kavitha Menon','Prof. Arjun Singh','Dr. Meera Iyer','Prof. Vijay Reddy','Dr. Sunita Joshi','Prof. Kiran Mehta'];
+      const days = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY'];
+      const times = [ ['08:00','09:00'], ['09:00','10:00'], ['10:00','11:00'], ['11:00','12:00'], ['13:00','14:00'], ['14:00','15:00'], ['15:00','16:00'] ];
+      const sections = ['A','B','C','D'];
+
+      return names.map((name, i) => {
+        const slots = [];
+        const numSlots = 4 + Math.floor(Math.random()*6);
+        const usedSlots = new Set();
+
+        for(let s=0; s<numSlots; s++) {
+          let key;
+          let day, time;
+          do {
+            day = days[Math.floor(Math.random()*days.length)];
+            time = times[Math.floor(Math.random()*times.length)];
+            key = day+time[0];
+          } while(usedSlots.has(key));
+          usedSlots.add(key);
+
+          slots.push({
+            day, startTime: time[0], endTime: time[1],
+            section: sections[Math.floor(Math.random()*sections.length)],
+            semester: (Math.floor(Math.random()*8)+1).toString(),
+            subjectName: subjects[Math.floor(Math.random()*subjects.length)],
+            facultyName: name
+          });
+        }
+
+        slots.sort((a,b)=> DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day) || a.startTime.localeCompare(b.startTime));
+
+        return {
+          facultyId: i+1,
+          facultyName: name,
+          timetable: slots
+        };
+      });
+    }
+
+    function refreshData() {
+      const icon = document.getElementById('refreshIcon');
+      icon.style.animation = 'spin 0.6s linear infinite';
+      fetchAllTimetables().finally(()=> {
+        setTimeout(()=> icon.style.animation = '', 800);
+      });
+    }
+
+    // ══════════════════════════════════════════════
+    // RENDER FACULTY LIST
+    // ══════════════════════════════════════════════
+    function renderFacultyList(list) {
+      filteredFaculty = list;
+      const container = document.getElementById('facultyList');
+      document.getElementById('facultyCountEl').textContent = `${list.length} faculty`;
+
+      if(!list.length) {
+        container.innerHTML = `<div class="no-results"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>No faculty found</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map(f => {
+        const initials = f.facultyName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const slots = f.timetable?.length || 0;
+        const days = [...new Set((f.timetable||[]).map(s=>s.day))].length;
+        const colorIdx = f.facultyId % COLORS.length;
+        const isActive = selectedFaculty?.facultyId === f.facultyId;
+        return `
+          <div class="faculty-item ${isActive?'active':''}" data-id="${f.facultyId}" onclick="selectFaculty(${f.facultyId})">
+            <div class="fi-avatar" style="background:linear-gradient(135deg,${COLORS[colorIdx]},${COLORS[(colorIdx+2)%COLORS.length]})">${initials}</div>
+            <div class="fi-info">
+              <div class="fi-name">${f.facultyName}</div>
+              <div class="fi-meta">${days} days · ${slots} classes</div>
+            </div>
+            <div class="fi-slots">${slots}</div>
+            ${isActive ? '<div class="fi-active-dot"></div>' : ''}
+          </div>`;
+      }).join('');
+
+      if(selectedFaculty) {
+        const found = list.find(f=>f.facultyId===selectedFaculty.facultyId);
+        if(!found) { selectedFaculty = null; showEmptyState(); }
+      } else {
+        showEmptyState();
+      }
+    }
+
+    function filterFaculty() {
+      const q = document.getElementById('facultySearch').value.toLowerCase().trim();
+      const dayF = currentFilter === 'all' ? null : currentFilter.toUpperCase();
+      let list = allFaculty;
+
+      if(q) list = list.filter(f =>
+        f.facultyName.toLowerCase().includes(q) ||
+        (f.timetable||[]).some(s =>
+          s.subjectName?.toLowerCase().includes(q) ||
+          s.section?.toLowerCase().includes(q)
+        )
+      );
+
+      // Fix 2: Day filter — was doing .toUpperCase().startsWith(dayF.substring(0,3))
+    // Now just match directly since API already uses 3-letter codes
+    if(dayF) {
+      list = list.filter(f =>
+        (f.timetable||[]).some(s => s.day.toUpperCase() === dayF)
+      );
+    }
+
+      renderFacultyList(list);
+    }
+
+    function setFilter(val) {
+      currentFilter = val;
+      document.querySelectorAll('#filterBar .filter-chip').forEach(c => {
+        c.classList.toggle('active', c.dataset.filter === val);
+      });
+      filterFaculty();
+    }
+    // No change needed here — filter values like 'mon' get .toUpperCase() → 'MON' which now matches
+
+    // ══════════════════════════════════════════════
+    // SELECT FACULTY & RENDER DETAIL
+    // ══════════════════════════════════════════════
+    function selectFaculty(id) {
+      selectedFaculty = allFaculty.find(f=>f.facultyId===id);
+      if(!selectedFaculty) return;
+
+      // Update sidebar
+      document.querySelectorAll('.faculty-item').forEach(el => {
+        el.classList.toggle('active', +el.dataset.id === id);
+      });
+
+      // Close mobile sidebar
+      if(window.innerWidth <= 768) {
+        document.getElementById('sidebar').classList.remove('mobile-open');
+        document.getElementById('themeOverlay').classList.remove('open');
+      }
+
+      renderDetail(selectedFaculty);
+    }
+
+    function renderDetail(faculty) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'none';
+      const det = document.getElementById('facultyDetail');
+      det.style.display = 'flex';
+
+      const colorIdx = faculty.facultyId % COLORS.length;
+      const initials = faculty.facultyName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const slots = faculty.timetable || [];
+
+      // Header
+      document.getElementById('detailAvatar').textContent = initials;
+      document.getElementById('detailAvatar').style.background = `linear-gradient(135deg,${COLORS[colorIdx]},${COLORS[(colorIdx+2)%COLORS.length]})`;
+      document.getElementById('detailName').textContent = faculty.facultyName;
+
+      const days = [...new Set(slots.map(s=>s.day))];
+      const subjects = [...new Set(slots.map(s=>s.subjectName))];
+      const semesters = [...new Set(slots.map(s=>s.semester))];
+      const tagsHtml = [
+        ...days.slice(0,3).map(d=>`<span class="fh-tag">${DAY_FULL[d]||d}</span>`),
+        subjects.length>3?`<span class="fh-tag">+${subjects.length-3} subjects</span>`:''
+      ].join('');
+      document.getElementById('detailTags').innerHTML = tagsHtml;
+
+      // Stats
+      const totalHours = slots.reduce((acc,s)=>{
+        const [sh,sm]=s.startTime.split(':').map(Number);
+        const [eh,em]=s.endTime.split(':').map(Number);
+        return acc + (eh*60+em-sh*60-sm)/60;
+      },0);
+      document.getElementById('statsRow').innerHTML = `
+        <div class="stat-card"><div class="stat-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><div><div class="stat-num">${slots.length}</div><div class="stat-label">Total Classes</div></div></div>
+        <div class="stat-card"><div class="stat-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div class="stat-num">${totalHours.toFixed(1)}h</div><div class="stat-label">Weekly Hours</div></div></div>
+        <div class="stat-card"><div class="stat-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div><div><div class="stat-num">${subjects.length}</div><div class="stat-label">Subjects</div></div></div>
+        <div class="stat-card"><div class="stat-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><div class="stat-num">${[...new Set(slots.map(s=>s.section))].length}</div><div class="stat-label">Sections</div></div></div>
+      `;
+
+      // Day filter pills
+      const uniqueDays = [...new Set(slots.map(s=>s.day))].sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
+      document.getElementById('dayFilter').innerHTML =
+        `<div class="day-chip active" data-day="ALL" onclick="setDayFilter('ALL')">All Days</div>` +
+        uniqueDays.map(d=>`<div class="day-chip" data-day="${d}" onclick="setDayFilter('${d}')">${DAY_FULL[d]||d}</div>`).join('');
+
+      currentDayFilter = 'ALL';
+
+      renderTimetable(slots);
+      updateAIContext(faculty);
+    }
+
+    function renderTimetable(slots) {
+      let filtered = slots;
+      if(currentDayFilter !== 'ALL') {
+        filtered = slots.filter(s=>s.day===currentDayFilter);
+      }
+      if(currentSort === 'time') {
+        filtered = [...filtered].sort((a,b)=>a.startTime.localeCompare(b.startTime));
+      } else if(currentSort === 'subject') {
+        filtered = [...filtered].sort((a,b)=>a.subjectName.localeCompare(b.subjectName));
+      } else {
+        filtered = [...filtered].sort((a,b)=>DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day)||a.startTime.localeCompare(b.startTime));
+      }
+
+      renderGridView(filtered);
+      renderTableView(filtered);
+    }
+
+    function renderGridView(slots) {
+      const grouped = {};
+      slots.forEach(s=>{
+        const d = s.day||'UNKNOWN';
+        if(!grouped[d]) grouped[d]=[];
+        grouped[d].push(s);
+      });
+
+      const days = Object.keys(grouped).sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
+
+      if(!slots.length) {
+        document.getElementById('gridView').innerHTML = `<div class="no-slots"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>No classes for this selection</div>`;
+        return;
+      }
+
+      document.getElementById('gridView').innerHTML = days.map(day => `
+        <div class="day-section">
+          <div class="day-header">
+            <div class="day-header-dot"></div>
+            ${DAY_FULL[day]||day}
+            <span style="font-size:0.65rem;color:var(--text-muted);font-weight:400;margin-left:auto">${grouped[day].length} class${grouped[day].length!==1?'es':''}</span>
+          </div>
+          <div class="tt-grid-view">
+            ${grouped[day].map(s=>`
+              <div class="slot-card">
+                <div class="slot-time">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                  ${s.startTime} – ${s.endTime}
+                </div>
+                <div class="slot-subject">${s.subjectName||'—'}</div>
+                <div class="slot-meta">
+                  ${s.section?`<span class="slot-tag">Sec ${s.section}</span>`:''}
+                  ${s.semester?`<span class="slot-tag">Sem ${s.semester}</span>`:''}
+                </div>
+              </div>`).join('')}
+          </div>
+        </div>`).join('');
+    }
+
+    function renderTableView(slots) {
+  const container = document.getElementById('tableView');
+  if (!slots.length) {
+    container.innerHTML = `<div class="no-slots">No classes for this selection</div>`;
+    return;
+  }
+
+  // Collect unique time slots and days, sorted
+  const times = [...new Set(slots.map(s => s.startTime + '–' + s.endTime))]
+    .sort((a, b) => a.localeCompare(b));
+  const days = [...new Set(slots.map(s => s.day))]
+    .sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b));
+
+  // Build lookup: day → timeKey → slot
+  const lookup = {};
+  slots.forEach(s => {
+    const key = s.startTime + '–' + s.endTime;
+    if (!lookup[s.day]) lookup[s.day] = {};
+    lookup[s.day][key] = s;
+  });
+
+  // Header row — time slots as columns
+  const headerCells = times.map(t =>
+    `<th style="white-space:nowrap;font-size:0.72rem">${t}</th>`
+  ).join('');
+   // Data rows — one per day
+  const bodyRows = days.map(day => {
+    const cells = times.map(t => {
+      const s = lookup[day]?.[t];
+      if (!s) return `<td style="background:var(--cream-2);opacity:0.4"></td>`;
+      return `<td>
+        <div style="font-size:0.8rem;font-weight:600;color:var(--text)">${s.subjectName || '—'}</div>
+        <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+          ${s.section ? `<span class="slot-tag">Sec ${s.section}</span>` : ''}
+          ${s.semester ? `<span class="slot-tag">Sem ${s.semester}</span>` : ''}
+        </div>
+      </td>`;
+    }).join('');
+    return `<tr>
+      <td><span class="day-badge d-${DAY_SHORT[day] || day.slice(0,3)}">
+        ${DAY_SHORT[day] || day.slice(0,3)}
+      </span></td>
+      ${cells}
+    </tr>`;
+  }).join('');
+
+  container.innerHTML = `
+    <div class="tt-table-wrap">
+      <table class="tt-table">
+        <thead><tr>
+          <th style="min-width:70px">Day</th>
+          ${headerCells}
+        </tr></thead>
+        <tbody>${bodyRows}</tbody>
+      </table>
+    </div>`;
+}
+
+    function setView(v) {
+      currentView = v;
+      document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase()===v));
+      document.getElementById('gridView').style.display = v==='grid'?'block':'none';
+      document.getElementById('tableView').style.display = v==='table'?'block':'none';
+    }
+
+    function setDayFilter(day) {
+      currentDayFilter = day;
+      document.querySelectorAll('#dayFilter .day-chip').forEach(c=>c.classList.toggle('active',c.dataset.day===day));
+      if(selectedFaculty) renderTimetable(selectedFaculty.timetable||[]);
+    }
+
+    function sortSlots(val) {
+      currentSort = val;
+      if(selectedFaculty) renderTimetable(selectedFaculty.timetable||[]);
+    }
+
+    // ══════════════════════════════════════════════
+    // AI CHAT
+    // ══════════════════════════════════════════════
+    function updateAIContext(faculty) {
+      document.getElementById('aiSubtitle').textContent = `Analyzing ${faculty.facultyName}'s schedule`;
+      const msgs = document.getElementById('aiMessages');
+      msgs.innerHTML = `<div class="ai-msg ai"><div class="ai-bubble">I've loaded <strong>${faculty.facultyName}</strong>'s timetable — ${faculty.timetable?.length||0} classes across ${[...new Set((faculty.timetable||[]).map(s=>s.day))].length} days. What would you like to know? 📅</div><div class="ai-msg-time">Just now</div></div>`;
+    }
+
+    function buildTimetableContext() {
+      if(!selectedFaculty) return '';
+      const slots = selectedFaculty.timetable || [];
+      const lines = slots.map(s=>`${s.day} ${s.startTime}-${s.endTime}: ${s.subjectName} (Sec ${s.section}, Sem ${s.semester})`);
+      return `Faculty: ${selectedFaculty.facultyName}\nTimetable:\n${lines.join('\n')}`;
+    }
+
+    async function sendAIMessage(text) {
+  const inp = document.getElementById('aiInput');
+  const msg = text || inp.value.trim();
+  if (!msg || aiTyping) return;
+  if (!selectedFaculty) { showToast('Please select a faculty first', 'error'); return; }
+  if (!text) inp.value = '';
+  inp.style.height = '';
+  aiTyping = true;
+  document.getElementById('aiSendBtn').disabled = true;
+
+  appendAIMessage(msg, 'user');
+  showTypingIndicator();
+
+  const context = buildTimetableContext();
+
+  try {
+    const res = await fetch('http://localhost:8080/api/ai/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        message: msg,
+        context: context
+      })
+    });
+
+    hideTypingIndicator();
+    if (res.ok) {
+      const data = await res.json();
+      const reply = data.response || data.message || data.text
+        || data.reply || data.answer
+        || (typeof data === 'string' ? data : JSON.stringify(data));
+      appendAIMessage(reply, 'ai');
+    } else {
+      throw new Error('AI unavailable');
+    }
+  } catch {
+    hideTypingIndicator();
+    const fallback = generateFallbackAIResponse(msg, selectedFaculty);
+    appendAIMessage(fallback, 'ai');
+  } finally {
+    aiTyping = false;
+    document.getElementById('aiSendBtn').disabled = false;
+  }
+}
+
+    function generateFallbackAIResponse(msg, faculty) {
+      const slots = faculty.timetable || [];
+      const q = msg.toLowerCase();
+
+      if(q.includes('free') || q.includes('available') || q.includes('gap')) {
+        const allDays = ['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY'];
+        const busyDays = new Set(slots.map(s=>s.day));
+        const freeDays = allDays.filter(d=>!busyDays.has(d));
+        return freeDays.length ? `${faculty.facultyName} is free on: ${freeDays.map(d=>DAY_FULL[d]).join(', ')}.` : `${faculty.facultyName} has classes every weekday. Check individual days for free time slots.`;
+      }
+      if(q.includes('busiest') || q.includes('most class')) {
+        const dayCounts = {};
+        slots.forEach(s=>dayCounts[s.day]=(dayCounts[s.day]||0)+1);
+        const busiest = Object.entries(dayCounts).sort((a,b)=>b[1]-a[1])[0];
+        return busiest ? `The busiest day is **${DAY_FULL[busiest[0]]}** with ${busiest[1]} classes.` : 'No data available.';
+      }
+      if(q.includes('subject') || q.includes('teach')) {
+        const subjects = [...new Set(slots.map(s=>s.subjectName))];
+        return `${faculty.facultyName} teaches: ${subjects.join(', ')}.`;
+      }
+      if(q.includes('morning') || q.includes('early')) {
+        const morning = slots.filter(s=>parseInt(s.startTime)<12);
+        return morning.length ? `Morning classes (before 12pm): ${morning.map(s=>`${DAY_FULL[s.day]} ${s.startTime} – ${s.subjectName}`).join('; ')}.` : 'No morning classes found.';
+      }
+      if(q.includes('afternoon') || q.includes('evening')) {
+        const aft = slots.filter(s=>parseInt(s.startTime)>=12);
+        return aft.length ? `Afternoon/evening classes: ${aft.map(s=>`${DAY_FULL[s.day]} ${s.startTime} – ${s.subjectName}`).join('; ')}.` : 'No afternoon classes found.';
+      }
+      if(q.includes('hour') || q.includes('total')) {
+        const totalHours = slots.reduce((acc,s)=>{
+          const [sh,sm]=s.startTime.split(':').map(Number);
+          const [eh,em]=s.endTime.split(':').map(Number);
+          return acc+(eh*60+em-sh*60-sm)/60;
+        },0);
+        return `${faculty.facultyName} teaches a total of ${totalHours.toFixed(1)} hours per week.`;
+      }
+      return `${faculty.facultyName} has ${slots.length} scheduled classes across ${[...new Set(slots.map(s=>s.day))].length} days, covering ${[...new Set(slots.map(s=>s.subjectName))].length} subjects. Is there something specific you'd like to know?`;
+    }
+
+    function appendAIMessage(text, role) {
+      const msgs = document.getElementById('aiMessages');
+      const time = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+      const div = document.createElement('div');
+      div.className = `ai-msg ${role}`;
+      div.innerHTML = `<div class="ai-bubble">${text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div><div class="ai-msg-time">${time}</div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+      const msgs = document.getElementById('aiMessages');
+      const div = document.createElement('div');
+      div.className = 'ai-msg ai'; div.id = 'typingIndicator';
+      div.innerHTML = `<div class="ai-typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+      msgs.appendChild(div);
+      msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+      document.getElementById('typingIndicator')?.remove();
+    }
+
+    function handleAIKey(e) {
+      if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendAIMessage(); }
+    }
+
+    function sendSuggestion(el) {
+      sendAIMessage(el.textContent);
+    }
+
+    function autoResize(el) {
+      el.style.height = '';
+      el.style.height = Math.min(el.scrollHeight, 120) + 'px';
+    }
+
+    function scrollToAI() {
+      document.getElementById('aiPanel')?.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    // ══════════════════════════════════════════════
+    // EXPORT
+    // ══════════════════════════════════════════════
+    function exportCSV() {
+  if (!selectedFaculty) return;
+  const slots = selectedFaculty.timetable || [];
+  if (!slots.length) { showToast('No timetable data to export', 'error'); return; }
+
+  // Build matrix: days as rows, time slots as columns
+  const times = [...new Set(slots.map(s => s.startTime + ' – ' + s.endTime))]
+    .sort((a, b) => a.localeCompare(b));
+  const days = [...new Set(slots.map(s => s.day))]
+    .sort((a, b) => DAY_ORDER.indexOf(a) - DAY_ORDER.indexOf(b));
+
+  // lookup[day][timeKey] = slot
+  const lookup = {};
+  slots.forEach(s => {
+    const key = s.startTime + ' – ' + s.endTime;
+    if (!lookup[s.day]) lookup[s.day] = {};
+    lookup[s.day][key] = s;
+  });
+
+  // Header row
+  const header = ['Day', ...times];
+
+  // Data rows
+  const rows = days.map(day => {
+    const row = { 'Day': DAY_FULL[day] || day };
+    times.forEach(t => {
+      const s = lookup[day]?.[t];
+      row[t] = s
+        ? `${s.subjectName || '—'} | Sec ${s.section || '—'} | Sem ${s.semester || '—'}`
+        : '';
+    });
+    return row;
+  });
+
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(rows, { header });
+
+  // Column widths
+  ws['!cols'] = [{ wch: 14 }, ...times.map(() => ({ wch: 30 }))];
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Timetable');
+  XLSX.writeFile(wb, `${selectedFaculty.facultyName.replace(/\s+/g, '_')}_timetable.xlsx`);
+  showToast('Excel exported!', 'success');
+}
+
+    // ══════════════════════════════════════════════
+    // UI HELPERS
+    // ══════════════════════════════════════════════
+    function showLoading(show) {
+      document.getElementById('loadingState').style.display = show ? 'flex' : 'none';
+      if(show) {
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('facultyDetail').style.display = 'none';
+      }
+    }
+
+    function showEmptyState() {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('emptyState').style.display = 'flex';
+      document.getElementById('facultyDetail').style.display = 'none';
+    }
+
+    function showToast(msg, type='success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.className = `show ${type}`;
+      setTimeout(()=>t.className='', 3500);
+    }
+
+    function toggleSidebar() {
+      const s = document.getElementById('sidebar');
+      const o = document.getElementById('themeOverlay');
+      sidebarOpen = !sidebarOpen;
+      s.classList.toggle('mobile-open', sidebarOpen);
+      if(sidebarOpen && !document.getElementById('themePanel').classList.contains('open')) {
+        o.classList.toggle('open', sidebarOpen);
+      }
+    }
+
+    // ══════════════════════════════════════════════
+    // THEME
+    // ══════════════════════════════════════════════
+    function loadThemePrefs() {
+      const prefs = JSON.parse(localStorage.getItem('cfThemePrefs') || '{}');
+      const savedMode = localStorage.getItem('cfTheme');
+
+      if(savedMode==='dark' || (!savedMode && matchMedia('(prefers-color-scheme:dark)').matches)) {
+        document.documentElement.classList.add('dark');
+        document.getElementById('darkToggle').checked = true;
+        updateThemeIcon(true);
+      }
+
+      if(prefs.radius) {
+        document.documentElement.style.setProperty('--radius', prefs.radius+'px');
+        document.getElementById('radiusSlider').value = prefs.radius;
+        document.getElementById('radiusVal').textContent = prefs.radius+'px';
+      }
+      if(prefs.sidebarW) {
+        document.documentElement.style.setProperty('--sidebar-w', prefs.sidebarW+'px');
+        document.getElementById('sidebarSlider').value = prefs.sidebarW;
+        document.getElementById('sidebarVal').textContent = prefs.sidebarW+'px';
+      }
+      if(prefs.font) {
+        document.body.style.fontFamily = prefs.font;
+        document.getElementById('fontSelect').value = prefs.font;
+      }
+      if(prefs.compact) document.body.classList.add('compact');
+      if(prefs.orbs===false) document.querySelector('.ambient').style.display = 'none';
+      if(prefs.grid===false) document.body.style.setProperty('--grid-opacity','0');
+
+      if(prefs.accent) {
+        setAccent(prefs.accent.key, prefs.accent.gold, prefs.accent.warm, true);
+      }
+      if(prefs.preset && prefs.preset!=='default') {
+        applyPreset(prefs.preset, true);
+      }
+    }
+
+    function saveThemePref(key, val) {
+      const prefs = JSON.parse(localStorage.getItem('cfThemePrefs') || '{}');
+      prefs[key] = val;
+      localStorage.setItem('cfThemePrefs', JSON.stringify(prefs));
+    }
+
+    function toggleDark(input) {
+      document.documentElement.classList.toggle('dark', input.checked);
+      localStorage.setItem('cfTheme', input.checked ? 'dark' : 'light');
+      updateThemeIcon(input.checked);
+    }
+
+    function toggleThemeMode() {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('cfTheme', isDark ? 'dark' : 'light');
+      document.getElementById('darkToggle').checked = isDark;
+      updateThemeIcon(isDark);
+    }
+
+    function updateThemeIcon(isDark) {
+      document.getElementById('themeIcon').innerHTML = isDark
+        ? '<path stroke-linecap="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+        : '<circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    }
+
+    function openThemePanel() {
+      document.getElementById('themePanel').classList.add('open');
+      document.getElementById('themeOverlay').classList.add('open');
+    }
+
+    function closeThemePanel() {
+      document.getElementById('themePanel').classList.remove('open');
+      if(!sidebarOpen) document.getElementById('themeOverlay').classList.remove('open');
+    }
+
+    function applyPreset(name, silent=false) {
+      document.querySelectorAll('.preset-card').forEach(c=>c.classList.toggle('active',c.id===`preset-${name}`));
+      const root = document.documentElement;
+
+      const presets = {
+        default: { '--gold':'#C9A96E','--gold-light':'#E8C98A','--accent':'#4A3728','--accent-warm':'#8B6F47' },
+        ivory:   { '--gold':'#D4A96A','--gold-light':'#EDD090','--accent':'#5A3E28','--accent-warm':'#9A7A50' },
+        slate:   { '--gold':'#4a9eff','--gold-light':'#7dbfff','--accent':'#1a4a8a','--accent-warm':'#2563EB' },
+        forest:  { '--gold':'#4ade80','--gold-light':'#86efac','--accent':'#14532d','--accent-warm':'#16a34a' }
+      };
+
+      const p = presets[name] || presets.default;
+      Object.entries(p).forEach(([k,v])=>root.style.setProperty(k,v));
+      document.documentElement.style.setProperty('--accent-glow', `rgba(${hexToRgb(p['--gold'])},0.15)`);
+      document.documentElement.style.setProperty('--tag-bg', `rgba(${hexToRgb(p['--gold'])},0.12)`);
+      document.documentElement.style.setProperty('--border', `rgba(${hexToRgb(p['--gold'])},0.18)`);
+      document.documentElement.style.setProperty('--border-strong', `rgba(${hexToRgb(p['--gold'])},0.35)`);
+
+      if(!silent) {
+        saveThemePref('preset', name);
+        showToast(`Applied "${name}" preset`, 'info');
+      }
+    }
+
+    function setAccent(key, gold, warm, silent=false) {
+      document.querySelectorAll('.color-swatch').forEach(s=>s.classList.toggle('active',s.dataset.accent===key));
+      document.documentElement.style.setProperty('--gold', gold);
+      document.documentElement.style.setProperty('--gold-light', gold);
+      document.documentElement.style.setProperty('--accent-warm', warm);
+      document.documentElement.style.setProperty('--accent-glow', `rgba(${hexToRgb(gold)},0.15)`);
+      document.documentElement.style.setProperty('--tag-bg', `rgba(${hexToRgb(gold)},0.12)`);
+      document.documentElement.style.setProperty('--border', `rgba(${hexToRgb(gold)},0.18)`);
+      document.documentElement.style.setProperty('--border-strong', `rgba(${hexToRgb(gold)},0.35)`);
+      if(!silent) saveThemePref('accent', {key,gold,warm});
+    }
+
+    function hexToRgb(hex) {
+      const r=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return r ? `${parseInt(r[1],16)},${parseInt(r[2],16)},${parseInt(r[3],16)}` : '201,169,110';
+    }
+
+    function applyFont(val) {
+      document.body.style.fontFamily = val;
+      saveThemePref('font', val);
+    }
+
+    function setRadius(val) {
+      document.documentElement.style.setProperty('--radius', val+'px');
+      document.getElementById('radiusVal').textContent = val+'px';
+      saveThemePref('radius', +val);
+    }
+
+    function setSidebarWidth(val) {
+      document.documentElement.style.setProperty('--sidebar-w', val+'px');
+      document.getElementById('sidebarVal').textContent = val+'px';
+      saveThemePref('sidebarW', +val);
+    }
+
+    function toggleOrbs(input) {
+      document.querySelector('.ambient').style.display = input.checked ? '' : 'none';
+      saveThemePref('orbs', input.checked);
+    }
+
+    function toggleGrid(input) {
+      document.body.style.setProperty('--grid-opacity', input.checked ? '0.5' : '0');
+      saveThemePref('grid', input.checked);
+    }
+
+    function toggleCompact(input) {
+      document.body.classList.toggle('compact', input.checked);
+      saveThemePref('compact', input.checked);
+      if(input.checked) {
+        const s = document.createElement('style');
+        s.id = 'compactStyle';
+        s.textContent = `.slot-card{padding:10px 12px!important}.faculty-item{padding:8px 10px!important}.content{padding:1rem!important}.stats-row{gap:8px!important}`;
+        document.head.appendChild(s);
+      } else {
+        document.getElementById('compactStyle')?.remove();
+      }
+    }
+
+    function resetTheme() {
+      localStorage.removeItem('cfThemePrefs');
+      localStorage.removeItem('cfTheme');
+      location.reload();
+    }
+
+    async function emailAllFaculty() {
+    const session = JSON.parse(localStorage.getItem('cfAdminSession') || '{}');
+    const email = session.adminEmail;
+    const password = session.adminPassword;
+
+    if (!email || !password) {
+        showToast("Session expired. Please login again.", "error");
+        return;
+    }
+
+    // Show overlay and check Lottie
+    const overlay = document.getElementById('emailOverlay');
+    const lottie = document.querySelector('dotlottie-wc');
+    const fallback = document.getElementById('emailFallback');
+
+    overlay.classList.add('show');
+
+    // Lottie failure detection (if CDN fails or element doesn't load)
+    setTimeout(() => {
+        // If lottie doesn't have a shadowRoot or height is 0, show fallback
+        if (!lottie || !lottie.shadowRoot || lottie.offsetHeight === 0) {
+            document.getElementById('lottieContainer').style.display = 'none';
+            fallback.style.display = 'block';
+        }
+    }, 1500);
+
+    try {
+        const response = await fetch(`${API_BASE_TIMETABLE}/email-all`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ adminEmail: email, adminPassword: password })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            showToast(data.message || "All emails sent successfully!", "success");
+        } else {
+            showToast(data.message || "Failed to send emails.", "error");
+        }
+    } catch (error) {
+        console.error("Email Error:", error);
+        showToast("Server error occurred while sending emails.", "error");
+    } finally {
+        // Hide overlay
+        overlay.classList.remove('show');
+    }
+}
+    // Inside emailAllFaculty function
+overlay.classList.add('show');
+
+const lottieElement = document.getElementById('lottieAnim');
+if (lottieElement) {
+    // This forces the internal canvas to respect the 300x300 bounds
+    // without stretching the actual animation paths
+    lottieElement.resize();
+}
+</script>
+</body>
+</html>

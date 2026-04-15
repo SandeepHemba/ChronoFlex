@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChronoFlex | My Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+          --cream: #FAF7F2; --cream-2: #F2EDE4; --cream-3: #E8DDD0;
+          --warm-white: #FFFEFB; --text: #1C1C1E; --text-2: #2C2C2E;
+          --text-muted: #6B6B70; --text-faint: #AEAEB2;
+          --accent: #4A3728; --accent-warm: #8B6F47; --gold: #C9A96E; --gold-light: #E8C98A;
+          --accent-glow: rgba(139,111,71,0.15); --border: rgba(139,111,71,0.18);
+          --border-strong: rgba(139,111,71,0.35); --panel: rgba(250,247,242,0.95);
+          --panel-2: rgba(242,237,228,0.8); --input-bg: rgba(255,254,251,0.95);
+          --shadow-sm: 0 2px 8px rgba(74,55,40,0.08); --shadow-md: 0 8px 32px rgba(74,55,40,0.12);
+          --shadow-lg: 0 24px 64px rgba(74,55,40,0.16); --shadow-xl: 0 40px 80px rgba(74,55,40,0.2);
+          --topbar-h: 70px; --radius: 16px; --radius-sm: 10px;
+          --tag-bg: rgba(201,169,110,0.12); --tag-text: var(--accent);
+          --success: #2d7a4f; --success-bg: rgba(45,122,79,0.1);
+          --day-colors-mon: rgba(139,111,71,0.12); --day-colors-tue: rgba(201,169,110,0.1);
+          --day-colors-wed: rgba(74,55,40,0.09); --day-colors-thu: rgba(232,201,138,0.12);
+          --day-colors-fri: rgba(139,111,71,0.08); --day-colors-sat: rgba(201,169,110,0.15);
+        }
+        html.dark {
+          --cream: #0F0F11; --cream-2: #18181B; --cream-3: #1E1E22;
+          --warm-white: #18181B; --text: #F0EEE8; --text-2: #E0DDD5;
+          --text-muted: #8A8A90; --text-faint: #5A5A60;
+          --accent: #C9A96E; --accent-warm: #E8C98A; --gold: #C9A96E; --gold-light: #E8C98A;
+          --accent-glow: rgba(201,169,110,0.1); --border: rgba(201,169,110,0.12);
+          --border-strong: rgba(201,169,110,0.28); --panel: rgba(24,24,27,0.96);
+          --panel-2: rgba(30,30,34,0.85); --input-bg: rgba(24,24,27,0.95);
+          --shadow-sm: 0 2px 8px rgba(0,0,0,0.4); --shadow-md: 0 8px 32px rgba(0,0,0,0.5);
+          --shadow-lg: 0 24px 64px rgba(0,0,0,0.6); --shadow-xl: 0 40px 80px rgba(0,0,0,0.7);
+          --tag-bg: rgba(201,169,110,0.1); --tag-text: var(--gold);
+          --success: #4ade80; --success-bg: rgba(74,222,128,0.08);
+        }
+        *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body {
+          font-family: 'DM Sans', sans-serif; background: var(--cream);
+          color: var(--text); min-height: 100vh; overflow-x: hidden;
+          transition: background 0.4s ease, color 0.4s ease;
+        }
+
+        /* AMBIENT */
+        .ambient { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
+        .ambient-orb { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.25; }
+        .orb-1 { width:600px;height:600px;background:radial-gradient(circle,var(--gold) 0%,transparent 70%);top:-200px;left:-150px;animation:drift1 20s ease-in-out infinite alternate; }
+        .orb-2 { width:450px;height:450px;background:radial-gradient(circle,var(--accent-warm) 0%,transparent 70%);bottom:-100px;right:-100px;animation:drift2 25s ease-in-out infinite alternate; }
+        @keyframes drift1 { to { transform: translate(60px,40px) scale(1.1); } }
+        @keyframes drift2 { to { transform: translate(-40px,-60px) scale(0.9); } }
+        body::before { content:'';position:fixed;inset:0;background-image:radial-gradient(circle,var(--border) 1px,transparent 1px);background-size:28px 28px;pointer-events:none;z-index:0;opacity:0.5; }
+
+        .app { position:relative;z-index:1;display:flex;flex-direction:column;min-height:100vh; }
+
+        /* TOPBAR */
+        .topbar {
+          height:var(--topbar-h);display:flex;align-items:center;justify-content:space-between;
+          padding:0 2rem;background:var(--panel);border-bottom:1px solid var(--border);
+          backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;box-shadow:var(--shadow-sm);
+        }
+        .topbar-left { display:flex;align-items:center;gap:16px; }
+        .logo-mark { display:flex;align-items:center;gap:10px;text-decoration:none; }
+        .logo-icon { width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--gold));border-radius:9px;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px var(--accent-glow); }
+        .logo-icon svg { width:18px;height:18px;color:white; }
+        .logo-text { font-family:'Playfair Display',serif;font-size:1.2rem;font-weight:700;color:var(--text); }
+        .breadcrumb { display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--text-muted); }
+        .breadcrumb span { color:var(--text);font-weight:500; }
+        .topbar-right { display:flex;align-items:center;gap:10px; }
+
+        .icon-btn { width:38px;height:38px;border-radius:50%;background:var(--panel-2);border:1px solid var(--border);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;flex-shrink:0; }
+        .icon-btn:hover { color:var(--accent);border-color:var(--border-strong);box-shadow:var(--shadow-sm);transform:scale(1.05); }
+        .icon-btn svg { width:17px;height:17px; }
+
+        .faculty-badge { display:flex;align-items:center;gap:10px;padding:6px 14px 6px 6px;background:var(--panel-2);border:1px solid var(--border);border-radius:99px;cursor:pointer;transition:all 0.2s ease; }
+        .faculty-badge:hover { border-color:var(--border-strong);box-shadow:var(--shadow-sm); }
+        .faculty-avatar { width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;color:white;flex-shrink:0; }
+        .faculty-info { display:flex;flex-direction:column; }
+        .faculty-name-top { font-size:0.8rem;font-weight:600;color:var(--text);line-height:1.2; }
+        .faculty-dept { font-size:0.68rem;color:var(--text-muted);line-height:1.2; }
+
+        /* CONTENT */
+        .content { flex:1;padding:2rem;display:flex;flex-direction:column;gap:1.5rem;min-width:0;max-width:1400px;margin:0 auto;width:100%; }
+        .content::-webkit-scrollbar { width:5px; }
+
+        /* LOADING / EMPTY */
+        .loading-state { display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:16px;color:var(--text-muted); }
+        .spinner { width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 0.8s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        @keyframes fadeIn { from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);} }
+
+        /* FACULTY HEADER CARD */
+        .faculty-header-card {
+          background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);
+          padding:1.5rem 2rem;display:flex;align-items:center;justify-content:space-between;
+          flex-wrap:wrap;gap:16px;box-shadow:var(--shadow-sm);animation:fadeIn 0.4s ease both;
+        }
+        .fh-left { display:flex;align-items:center;gap:16px; }
+        .fh-avatar { width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:white;box-shadow:var(--shadow-md);flex-shrink:0; }
+        .fh-name { font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:700;color:var(--text);letter-spacing:-0.3px; }
+        .fh-tags { display:flex;flex-wrap:wrap;gap:6px;margin-top:6px; }
+        .fh-tag { padding:3px 10px;border-radius:99px;font-size:0.72rem;font-weight:600;background:var(--tag-bg);color:var(--tag-text);border:1px solid var(--border); }
+        .fh-right { display:flex;gap:10px;align-items:center; }
+
+        .btn-secondary { display:inline-flex;align-items:center;gap:8px;padding:9px 18px;border-radius:10px;border:1px solid var(--border);background:var(--panel-2);color:var(--text-muted);font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:500;cursor:pointer;transition:all 0.2s ease; }
+        .btn-secondary:hover { border-color:var(--border-strong);color:var(--text);box-shadow:var(--shadow-sm); }
+        .btn-secondary svg { width:15px;height:15px; }
+
+        .btn-primary { display:inline-flex;align-items:center;gap:8px;padding:9px 20px;border-radius:10px;border:none;background:linear-gradient(135deg,var(--accent) 0%,var(--gold) 100%);color:white;font-family:'DM Sans',sans-serif;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s ease;box-shadow:0 4px 12px var(--accent-glow);position:relative;overflow:hidden; }
+        .btn-primary:hover { transform:translateY(-1px);box-shadow:0 8px 20px rgba(139,111,71,0.3); }
+        .btn-primary svg { width:15px;height:15px; }
+
+        /* STATS */
+        .stats-row { display:grid;grid-template-columns:repeat(4,1fr);gap:12px;animation:fadeIn 0.4s 0.1s ease both; }
+        @media(max-width:900px){.stats-row{grid-template-columns:repeat(2,1fr);}}
+        .stat-card { background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--shadow-sm); }
+        .stat-icon { width:36px;height:36px;border-radius:9px;background:var(--tag-bg);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+        .stat-icon svg { width:17px;height:17px;color:var(--accent); }
+        .stat-num { font-size:1.3rem;font-weight:700;color:var(--text);line-height:1; }
+        .stat-label { font-size:0.7rem;color:var(--text-muted);margin-top:2px; }
+
+        /* SUBJECTS + CLASSES SECTION */
+        .two-col { display:grid;grid-template-columns:1fr 1fr;gap:1rem;animation:fadeIn 0.4s 0.15s ease both; }
+        @media(max-width:768px){.two-col{grid-template-columns:1fr;}}
+        .info-card { background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow-sm); }
+        .info-card-title { font-size:0.72rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;display:flex;align-items:center;gap:8px; }
+        .info-card-title svg { width:14px;height:14px;color:var(--gold); }
+        .subject-list,.class-list { display:flex;flex-direction:column;gap:8px; }
+        .subject-item,.class-item { display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius-sm); }
+        .subject-name,.class-name { font-size:0.85rem;font-weight:600;color:var(--text); }
+        .subject-sem,.class-meta { font-size:0.72rem;color:var(--text-muted);margin-top:2px; }
+        .subject-badge,.class-badge { padding:3px 9px;border-radius:99px;font-size:0.68rem;font-weight:700;background:var(--tag-bg);color:var(--tag-text);border:1px solid var(--border); }
+        .empty-info { text-align:center;padding:24px;color:var(--text-muted);font-size:0.82rem; }
+
+        /* VIEW CONTROLS */
+        .view-controls { display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;animation:fadeIn 0.4s 0.2s ease both; }
+        .view-tabs { display:flex;background:var(--panel-2);border:1px solid var(--border);border-radius:10px;padding:3px;gap:2px; }
+        .view-tab { padding:7px 16px;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:500;color:var(--text-muted);transition:all 0.2s ease;border:1px solid transparent; }
+        .view-tab.active { background:var(--panel);color:var(--text);border-color:var(--border);box-shadow:var(--shadow-sm); }
+        .day-filter { display:flex;flex-wrap:wrap;gap:5px; }
+        .day-chip { padding:5px 12px;border-radius:99px;font-size:0.75rem;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--panel-2);color:var(--text-muted);transition:all 0.2s ease; }
+        .day-chip:hover { border-color:var(--border-strong);color:var(--text); }
+        .day-chip.active { background:var(--tag-bg);border-color:var(--gold);color:var(--tag-text); }
+
+        .tp-select { padding:6px 10px;border-radius:8px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.8rem;outline:none;cursor:pointer; }
+        .tp-select:focus { border-color:var(--gold); }
+
+        /* GRID VIEW */
+        .tt-grid-view { display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;animation:fadeIn 0.35s ease both; }
+        .day-section { animation:fadeIn 0.35s ease both;margin-bottom:1rem; }
+        .day-header { display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:10px 16px;border-radius:var(--radius-sm);font-size:0.8rem;font-weight:700;letter-spacing:0.05em;text-transform:uppercase;border:1px solid var(--border);color:var(--text); }
+        .day-header-dot { width:8px;height:8px;border-radius:50%;background:var(--gold); }
+        .slot-card { background:var(--panel);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 16px;transition:all 0.25s ease;position:relative;overflow:hidden;box-shadow:var(--shadow-sm); }
+        .slot-card::before { content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,var(--accent),var(--gold)); }
+        .slot-card:hover { border-color:var(--border-strong);box-shadow:var(--shadow-md);transform:translateY(-2px); }
+        .slot-time { font-size:0.75rem;font-weight:600;color:var(--gold);margin-bottom:6px;display:flex;align-items:center;gap:6px; }
+        .slot-time svg { width:12px;height:12px; }
+        .slot-subject { font-size:0.9rem;font-weight:600;color:var(--text);margin-bottom:6px; }
+        .slot-meta { display:flex;flex-wrap:wrap;gap:6px; }
+        .slot-tag { padding:2px 8px;border-radius:99px;font-size:0.68rem;font-weight:600;background:var(--tag-bg);color:var(--tag-text);border:1px solid var(--border); }
+
+        /* TABLE VIEW */
+        .tt-table-wrap { overflow-x:auto;animation:fadeIn 0.35s ease both; }
+        .tt-table { width:100%;border-collapse:collapse;min-width:600px; }
+        .tt-table th { padding:11px 14px;text-align:left;font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-muted);background:var(--panel-2);border-bottom:1px solid var(--border);white-space:nowrap; }
+        .tt-table td { padding:10px 14px;border-bottom:1px solid var(--border);font-size:0.82rem;color:var(--text);vertical-align:middle; }
+        .tt-table tr:hover td { background:var(--panel-2); }
+        .tt-table tr:last-child td { border-bottom:none; }
+        .day-badge { padding:3px 10px;border-radius:99px;font-size:0.72rem;font-weight:600;white-space:nowrap; }
+        .d-MON{background:var(--day-colors-mon);color:var(--accent);}
+        .d-TUE{background:var(--day-colors-tue);color:var(--accent);}
+        .d-WED{background:var(--day-colors-wed);color:var(--accent);}
+        .d-THU{background:var(--day-colors-thu);color:var(--accent);}
+        .d-FRI{background:var(--day-colors-fri);color:var(--accent);}
+        .d-SAT{background:var(--day-colors-sat);color:var(--accent);}
+
+        /* NO SLOTS */
+        .no-slots { text-align:center;padding:60px 20px;color:var(--text-muted); }
+        .no-slots svg { width:40px;height:40px;margin:0 auto 12px;display:block;opacity:0.3; }
+
+        /* AI PANEL */
+        .ai-panel { background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden;animation:fadeIn 0.4s 0.25s ease both; }
+        .ai-panel-header { padding:14px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--panel-2); }
+        .ai-avatar { width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--gold));display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 3px var(--accent-glow); }
+        .ai-avatar svg { width:16px;height:16px;color:white; }
+        .ai-header-text { flex:1; }
+        .ai-header-title { font-size:0.875rem;font-weight:600;color:var(--text); }
+        .ai-header-sub { font-size:0.72rem;color:var(--text-muted); }
+        .ai-status-dot { width:8px;height:8px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px rgba(74,222,128,0.5);animation:pulse-dot 2s ease-in-out infinite; }
+        @keyframes pulse-dot { 0%,100%{opacity:1;}50%{opacity:0.5;} }
+
+        .ai-messages { height:280px;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px; }
+        .ai-messages::-webkit-scrollbar { width:4px; }
+        .ai-messages::-webkit-scrollbar-thumb { background:var(--border-strong);border-radius:99px; }
+        .ai-msg { max-width:85%;display:flex;flex-direction:column;gap:4px; }
+        .ai-msg.ai { align-self:flex-start; }
+        .ai-msg.user { align-self:flex-end; }
+        .ai-bubble { padding:10px 14px;border-radius:14px;font-size:0.85rem;line-height:1.6;word-break:break-word; }
+        .ai-msg.ai .ai-bubble { background:var(--panel-2);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:4px; }
+        .ai-msg.user .ai-bubble { background:linear-gradient(135deg,var(--accent),var(--gold));color:white;border-bottom-right-radius:4px; }
+        .ai-msg-time { font-size:0.65rem;color:var(--text-faint); }
+        .ai-msg.user .ai-msg-time { text-align:right; }
+        .ai-typing { display:flex;align-items:center;gap:4px;padding:10px 14px;background:var(--panel-2);border:1px solid var(--border);border-radius:14px;border-bottom-left-radius:4px;width:fit-content; }
+        .typing-dot { width:6px;height:6px;border-radius:50%;background:var(--text-muted);animation:typing 1.4s ease-in-out infinite; }
+        .typing-dot:nth-child(2){animation-delay:0.2s;} .typing-dot:nth-child(3){animation-delay:0.4s;}
+        @keyframes typing { 0%,60%,100%{transform:translateY(0);opacity:0.4;}30%{transform:translateY(-6px);opacity:1;} }
+        .ai-suggestions { padding:10px 16px;display:flex;flex-wrap:wrap;gap:6px;border-top:1px solid var(--border); }
+        .ai-suggestion { padding:5px 12px;border-radius:99px;font-size:0.75rem;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--panel-2);color:var(--text-muted);transition:all 0.2s ease; }
+        .ai-suggestion:hover { border-color:var(--gold);color:var(--accent);background:var(--tag-bg); }
+        .ai-input-row { padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:10px; }
+        .ai-input { flex:1;padding:10px 14px;border-radius:10px;border:1px solid var(--border);background:var(--input-bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:0.875rem;outline:none;transition:all 0.3s ease;resize:none; }
+        .ai-input:focus { border-color:var(--gold);box-shadow:0 0 0 3px var(--accent-glow); }
+        .ai-send-btn { width:40px;height:40px;border-radius:10px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--gold));border:none;color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s ease;box-shadow:0 4px 10px var(--accent-glow); }
+        .ai-send-btn:hover { transform:scale(1.05); }
+        .ai-send-btn:disabled { opacity:0.5;cursor:not-allowed;transform:none; }
+        .ai-send-btn svg { width:16px;height:16px; }
+
+        /* TOAST */
+        #toast { position:fixed;top:20px;left:50%;transform:translateX(-50%) translateY(-20px);min-width:260px;padding:12px 20px;border-radius:10px;font-size:0.875rem;font-weight:500;text-align:center;z-index:9999;opacity:0;pointer-events:none;transition:all 0.4s cubic-bezier(0.68,-0.55,0.265,1.55);box-shadow:var(--shadow-lg); }
+        #toast.show { opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto; }
+        #toast.success { background:#1a3a2a;color:#4ade80;border:1px solid rgba(74,222,128,0.2); }
+        #toast.error { background:#3a1a1a;color:#f87171;border:1px solid rgba(248,113,113,0.2); }
+        #toast.info { background:var(--panel);color:var(--text);border:1px solid var(--border); }
+
+        /* LOGOUT CONFIRM */
+        .overlay-bg { position:fixed;inset:0;background:rgba(0,0,0,0.5);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center; }
+        .overlay-bg.show { display:flex; }
+        .confirm-modal { background:var(--panel);border:1px solid var(--border-strong);border-radius:var(--radius);padding:2rem;max-width:360px;width:90%;box-shadow:var(--shadow-xl);text-align:center; }
+        .confirm-modal h3 { font-family:'Playfair Display',serif;font-size:1.2rem;margin-bottom:0.5rem;color:var(--text); }
+        .confirm-modal p { font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem;line-height:1.6; }
+        .confirm-btns { display:flex;gap:10px;justify-content:center; }
+
+        /* ERROR STATE */
+        .error-state { display:none;flex-direction:column;align-items:center;justify-content:center;min-height:400px;gap:20px;text-align:center;padding:2rem;animation:fadeIn 0.4s ease both; }
+        .error-icon { width:72px;height:72px;border-radius:50%;background:rgba(248,113,113,0.1);border:1px solid rgba(248,113,113,0.25);display:flex;align-items:center;justify-content:center;flex-shrink:0; }
+        .error-icon svg { width:32px;height:32px;color:#f87171; }
+        .error-title { font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--text); }
+        .error-message { font-size:0.875rem;color:var(--text-muted);max-width:380px;line-height:1.7; }
+        .error-detail { font-size:0.78rem;color:var(--text-faint);font-family:monospace;background:var(--panel-2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 16px;max-width:420px;word-break:break-all;line-height:1.6; }
+        .error-actions { display:flex;gap:10px;flex-wrap:wrap;justify-content:center; }
+
+        @media(max-width:768px) {
+          .content { padding:1.25rem; }
+          .faculty-header-card { padding:1rem; }
+          .fh-name { font-size:1.2rem; }
+          .stats-row { grid-template-columns:repeat(2,1fr); }
+          .topbar { padding:0 1rem; }
+          .faculty-info,.breadcrumb { display:none; }
+          .tt-grid-view { grid-template-columns:1fr; }
+          .view-controls { flex-direction:column;align-items:flex-start; }
+        }
+    </style>
+</head>
+<body>
+<div class="ambient">
+    <div class="ambient-orb orb-1"></div>
+    <div class="ambient-orb orb-2"></div>
+</div>
+
+<!-- Logout confirm -->
+<div class="overlay-bg" id="logoutOverlay">
+    <div class="confirm-modal">
+        <h3>Sign Out</h3>
+        <p>Are you sure you want to sign out of your faculty workspace?</p>
+        <div class="confirm-btns">
+            <button class="btn-secondary" onclick="document.getElementById('logoutOverlay').classList.remove('show')">Cancel</button>
+            <button class="btn-primary" onclick="doLogout()">Sign Out</button>
+        </div>
+    </div>
+</div>
+
+<div class="app">
+    <!-- TOPBAR -->
+    <header class="topbar">
+        <div class="topbar-left">
+            <a href="/facultyportal" class="logo-mark">
+                <div class="logo-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <span class="logo-text">ChronoFlex</span>
+            </a>
+            <div class="breadcrumb">
+                <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+                <span>My Dashboard</span>
+            </div>
+        </div>
+        <div class="topbar-right">
+            <!-- Theme -->
+            <button class="icon-btn" onclick="toggleThemeMode()" title="Toggle dark/light">
+                <svg id="themeIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+            </button>
+            <!-- Export -->
+            <button class="btn-secondary" onclick="exportExcel()" id="exportBtn" style="display:none">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                Export Excel
+            </button>
+            <!-- Faculty badge -->
+            <div class="faculty-badge" onclick="document.getElementById('logoutOverlay').classList.add('show')">
+                <div class="faculty-avatar" id="topAvatar">?</div>
+                <div class="faculty-info">
+                    <div class="faculty-name-top" id="topName">Loadingâ€¦</div>
+                    <div class="faculty-dept" id="topDept">Faculty</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENT -->
+    <main class="content" id="mainContent">
+
+        <!-- Loading -->
+        <div class="loading-state" id="loadingState">
+            <div class="spinner"></div>
+            <div style="font-size:0.875rem;color:var(--text-muted)">Loading your dashboardâ€¦</div>
+        </div>
+
+
+        <!-- Error state -->
+        <div class="error-state" id="errorState">
+            <div class="error-icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg>
+            </div>
+            <div class="error-title" id="errorTitle">Failed to Load Dashboard</div>
+            <div class="error-message" id="errorMessage">We could not retrieve your faculty data. Please check your connection or try signing in again.</div>
+            <div class="error-detail" id="errorDetail" style="display:none"></div>
+            <div class="error-actions">
+                <button class="btn-secondary" onclick="retryLoad()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Try Again
+                </button>
+                <button class="btn-primary" onclick="doLogout()">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                    Sign In Again
+                </button>
+            </div>
+        </div>
+
+        <!-- Dashboard (hidden until loaded) -->
+        <div id="dashboardContent" style="display:none;flex-direction:column;gap:1.5rem;">
+
+            <!-- Faculty header -->
+            <div class="faculty-header-card">
+                <div class="fh-left">
+                    <div class="fh-avatar" id="headerAvatar"></div>
+                    <div>
+                        <div class="fh-name" id="headerName"></div>
+                        <div class="fh-tags" id="headerTags"></div>
+                    </div>
+                </div>
+                <div class="fh-right">
+                    <button class="btn-primary" onclick="scrollToAI()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                        Ask AI
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-row" id="statsRow"></div>
+
+            <!-- Subjects + Classes -->
+            <div class="two-col">
+                <div class="info-card">
+                    <div class="info-card-title">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        My Subjects
+                    </div>
+                    <div class="subject-list" id="subjectList"><div class="empty-info">No subjects found</div></div>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-title">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        My Classes
+                    </div>
+                    <div class="class-list" id="classList"><div class="empty-info">Not a class teacher</div></div>
+                </div>
+            </div>
+
+            <!-- View controls -->
+            <div class="view-controls">
+                <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                    <div class="view-tabs">
+                        <div class="view-tab active" onclick="setView('grid')">Grid</div>
+                        <div class="view-tab" onclick="setView('table')">Table</div>
+                    </div>
+                    <div class="day-filter" id="dayFilter"></div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px">
+                    <span style="font-size:0.8rem;color:var(--text-muted)">Sort:</span>
+                    <select class="tp-select" onchange="sortSlots(this.value)" id="sortSelect">
+                        <option value="day">By Day</option>
+                        <option value="time">By Time</option>
+                        <option value="subject">By Subject</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Timetable views -->
+            <div id="gridView"></div>
+            <div id="tableView" style="display:none;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow-sm);overflow:hidden"></div>
+
+            <!-- AI Panel -->
+            <div class="ai-panel" id="aiPanel">
+                <div class="ai-panel-header">
+                    <div class="ai-avatar">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+                    </div>
+                    <div class="ai-header-text">
+                        <div class="ai-header-title">ChronoFlex AI</div>
+                        <div class="ai-header-sub" id="aiSubtitle">Ask anything about your schedule</div>
+                    </div>
+                    <div class="ai-status-dot"></div>
+                </div>
+                <div class="ai-messages" id="aiMessages">
+                    <div class="ai-msg ai">
+                        <div class="ai-bubble">Hello! I'm your scheduling assistant. I have your full timetable loaded â€” ask me anything about your schedule, free slots, subjects, or workload. ðŸ“…</div>
+                        <div class="ai-msg-time">Just now</div>
+                    </div>
+                </div>
+                <div class="ai-suggestions">
+                    <div class="ai-suggestion" onclick="sendSuggestion(this)">What are my free slots?</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion(this)">My busiest day?</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion(this)">List all my subjects</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion(this)">Morning schedule</div>
+                    <div class="ai-suggestion" onclick="sendSuggestion(this)">Total weekly hours</div>
+                </div>
+                <div class="ai-input-row">
+                    <textarea class="ai-input" id="aiInput" placeholder="Ask about your timetableâ€¦" rows="1" onkeydown="handleAIKey(event)" oninput="autoResize(this)"></textarea>
+                    <button class="ai-send-btn" id="aiSendBtn" onclick="sendAIMessage()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                    </button>
+                </div>
+            </div>
+
+        </div><!-- /dashboardContent -->
+    </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       CONFIG & STATE
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    const API_BASE      = 'http://localhost:8080/api/faculty';
+    const API_TIMETABLE = 'http://localhost:8080/api/faculty/timetable/me';
+    const API_AI        = 'http://localhost:8080/api/ai/chat';
+
+    const DAY_ORDER = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
+    const DAY_FULL  = { MON:'Monday',TUE:'Tuesday',WED:'Wednesday',THU:'Thursday',FRI:'Friday',SAT:'Saturday',SUN:'Sunday' };
+    const DAY_SHORT = { MON:'MON',TUE:'TUE',WED:'WED',THU:'THU',FRI:'FRI',SAT:'SAT',SUN:'SUN' };
+
+    let facultyData   = null;   // /api/faculty/access response
+    let timetableData = [];     // array of slot objects
+    let currentView   = 'grid';
+    let currentDayFilter = 'ALL';
+    let currentSort   = 'day';
+    let aiTyping      = false;
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       INIT
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    document.addEventListener('DOMContentLoaded', () => {
+        loadTheme();
+        const session = getSession();
+        if (!session) { window.location.href = '/facultyportal'; return; }
+        initDashboard(session);
+    });
+
+    function getSession() {
+        try {
+            const s = JSON.parse(localStorage.getItem('cfFacultySession') || '{}');
+            return (s.email && s.password) ? s : null;
+        } catch { return null; }
+    }
+
+    async function initDashboard(session) {
+        showLoading(true);
+        try {
+            // 1. Get faculty access info (subjects, classes)
+            const accessRes = await fetch(`${API_BASE}/access`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: session.email, password: session.password })
+            });
+            if (!accessRes.ok) throw new Error(await accessRes.text());
+            facultyData = await accessRes.json();
+            // 2. Get timetable using stored faculty credentials
+            const ttRes = await fetch(API_TIMETABLE, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: session.email, password: session.password })
+            });
+            if (!ttRes.ok) throw new Error(await ttRes.text());
+
+            const ttJson = await ttRes.json();
+            const raw = Array.isArray(ttJson) ? ttJson
+                : (ttJson.timetable || ttJson.data || ttJson.slots || ttJson.schedule || []);
+            timetableData = normSlots(raw);
+
+            renderDashboard();
+            showLoading(false);
+
+        } catch (e) {
+            console.error('Dashboard init error:', e);
+            showLoading(false);
+            showError(e);
+        }
+    }
+
+    function showError(e) {
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'none';
+        const es = document.getElementById('errorState');
+        es.style.display = 'flex';
+
+        // Parse the error message from various error shapes
+        let msg = '';
+        if (typeof e === 'string') msg = e;
+        else if (e?.message) msg = e.message;
+
+        // Friendly title based on error type
+        if (msg.toLowerCase().includes('invalid') || msg.toLowerCase().includes('credentials') || msg.toLowerCase().includes('password')) {
+            document.getElementById('errorTitle').textContent = 'Authentication Failed';
+            document.getElementById('errorMessage').textContent = 'Your session credentials are invalid or have expired. Please sign in again.';
+        } else if (msg.toLowerCase().includes('network') || msg.toLowerCase().includes('failed to fetch') || msg.toLowerCase().includes('load')) {
+            document.getElementById('errorTitle').textContent = 'Server Unreachable';
+            document.getElementById('errorMessage').textContent = 'Could not connect to the ChronoFlex server. Please check that the server is running and try again.';
+        } else if (msg.toLowerCase().includes('inactive')) {
+            document.getElementById('errorTitle').textContent = 'Account Inactive';
+            document.getElementById('errorMessage').textContent = 'Your faculty account has been deactivated. Please contact your administrator.';
+        } else {
+            document.getElementById('errorTitle').textContent = 'Failed to Load Dashboard';
+            document.getElementById('errorMessage').textContent = 'An unexpected error occurred while loading your data. Please try again.';
+        }
+
+        // Show raw detail if available
+        if (msg) {
+            const det = document.getElementById('errorDetail');
+            det.textContent = msg;
+            det.style.display = 'block';
+        }
+    }
+
+    function retryLoad() {
+        document.getElementById('errorState').style.display = 'none';
+        const session = getSession();
+        if (!session) { window.location.href = '/facultyportal'; return; }
+        initDashboard(session);
+    }
+
+    /* Normalize slot field names â€” backend may use camelCase or snake_case or nested objects */
+<!--    function normSlots(raw) {-->
+<!--        if (!Array.isArray(raw)) return [];-->
+<!--        return raw.map(s => {-->
+<!--            // Support startTime / start_time / starttime / availabilityStartTime etc.-->
+<!--            const start = s.startTime || s.start_time || s.starttime || s.start || '';-->
+<!--            const end   = s.endTime   || s.end_time   || s.endtime   || s.end   || '';-->
+<!--            const day   = (s.day || s.dayOfWeek || s.day_of_week || s.DAY || '').toString().toUpperCase().slice(0,3);-->
+<!--            const subj  = s.subjectName || s.subject_name || s.subject || s.name || s.subjectname || 'â€”';-->
+<!--            return { ...s, startTime: start, endTime: end, day, subjectName: subj };-->
+<!--        }).filter(s => s.day && s.startTime);   // drop incomplete rows-->
+<!--    }-->
+<!--        return slots.sort((a,b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day) || a.startTime.localeCompare(b.startTime));-->
+<!--    }-->
+
+        /* Normalize slot field names */
+        function normSlots(raw) {
+            if (!Array.isArray(raw)) return [];
+            return raw.map(s => {
+                const start = s.startTime || s.start_time || s.starttime || s.start || '';
+                const end   = s.endTime   || s.end_time   || s.endtime   || s.end   || '';
+                const day   = (s.day || s.dayOfWeek || s.day_of_week || s.DAY || '').toString().toUpperCase().slice(0,3);
+                const subj  = s.subjectName || s.subject_name || s.subject || s.name || s.subjectname || 'â€”';
+                return { ...s, startTime: start, endTime: end, day, subjectName: subj };
+            }).filter(s => s.day && s.startTime);
+        }
+
+        // If you need a separate sorting function, define it like this:
+        function sortSlotsByDay(slots) {
+            return slots.sort((a, b) => DAY_ORDER.indexOf(a.day) - DAY_ORDER.indexOf(b.day) || a.startTime.localeCompare(b.startTime));
+        }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       RENDER DASHBOARD
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    function renderDashboard() {
+        const session = getSession();
+        const f = facultyData;
+        const slots = timetableData;
+
+        // FIX: Added a fallback '??' and optional chaining '?.'
+        // to prevent the 'split' error if name is missing.
+        //const facultyName = f?.name ?? "Faculty Member";
+        // Use name from session first, then API, then fallback
+        const facultyName = session?.name || f?.name || "Faculty Member";
+        //const initials = facultyName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+        // Calculate initials safely
+        const initials = facultyName
+            .split(' ')
+            .map(w => w[0])
+            .join('')
+            .slice(0, 2)
+            .toUpperCase();
+
+
+        // Topbar
+<!--    document.getElementById('topAvatar').textContent = initials;-->
+        document.getElementById('topAvatar').textContent = initials;
+        document.getElementById('topName').textContent   = facultyName;
+        //document.getElementById('topDept').textContent   = f.department || 'Faculty';
+        document.getElementById('topDept').textContent   = session?.dept || f?.department || 'Faculty';
+
+        // Header card
+        document.getElementById('headerAvatar').textContent = initials;
+        //document.getElementById('headerName').textContent   = f.name;
+        document.getElementById('headerName').textContent   = facultyName;
+        const days     = [...new Set(slots.map(s=>s.day))];
+        const subjects = [...new Set(slots.map(s=>s.subjectName))];
+        document.getElementById('headerTags').innerHTML =
+            `<span class="fh-tag">${f.department || 'Faculty'}</span>` +
+            days.slice(0,3).map(d=>`<span class="fh-tag">${DAY_FULL[d]||d}</span>`).join('') +
+            (subjects.length>0 ? `<span class="fh-tag">${subjects.length} Subjects</span>` : '');
+
+        // Stats â€” guard against missing/malformed time strings
+        const totalHours = slots.reduce((acc,s)=>{
+            try {
+                const [sh,sm]=(s.startTime+':00').split(':').map(Number);
+                const [eh,em]=(s.endTime+':00').split(':').map(Number);
+                const diff = (eh*60+em-sh*60-sm)/60;
+                return acc + (diff > 0 ? diff : 0);
+            } catch { return acc; }
+        },0);
+        const sections = [...new Set(slots.map(s=>s.section))];
+        document.getElementById('statsRow').innerHTML = `
+            <div class="stat-card"><div class="stat-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div><div><div class="stat-num">${slots.length}</div><div class="stat-label">Total Classes</div></div></div>
+            <div class="stat-card"><div class="stat-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div class="stat-num">${totalHours.toFixed(1)}h</div><div class="stat-label">Weekly Hours</div></div></div>
+            <div class="stat-card"><div class="stat-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg></div><div><div class="stat-num">${subjects.length}</div><div class="stat-label">Subjects</div></div></div>
+            <div class="stat-card"><div class="stat-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg></div><div><div class="stat-num">${sections.length}</div><div class="stat-label">Sections</div></div></div>
+        `;
+
+        // Subjects
+        if (f.subjects && f.subjects.length > 0) {
+            document.getElementById('subjectList').innerHTML = f.subjects.map(s => `
+                <div class="subject-item">
+                    <div><div class="subject-name">${s.subjectName}</div><div class="subject-sem">Semester ${s.semester}</div></div>
+                    <span class="subject-badge">Sem ${s.semester}</span>
+                </div>`).join('');
+        }
+
+        // Classes
+        if (f.classes && f.classes.length > 0) {
+            document.getElementById('classList').innerHTML = f.classes.map(c => `
+                <div class="class-item">
+                    <div><div class="class-name">${c.className}</div><div class="class-meta">Sem ${c.semester} Â· Section ${c.section}</div></div>
+                    <span class="class-badge">Class Teacher</span>
+                </div>`).join('');
+        }
+
+        // Day filter pills
+        const uniqueDays = [...new Set(slots.map(s=>s.day))].sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
+        document.getElementById('dayFilter').innerHTML =
+            `<div class="day-chip active" data-day="ALL" onclick="setDayFilter('ALL')">All Days</div>` +
+            uniqueDays.map(d=>`<div class="day-chip" data-day="${d}" onclick="setDayFilter('${d}')">${DAY_FULL[d]||d}</div>`).join('');
+
+        // AI subtitle
+        document.getElementById('aiSubtitle').textContent = `Analyzing ${f.name}'s schedule`;
+
+        renderTimetable();
+        document.getElementById('exportBtn').style.display = 'flex';
+        document.getElementById('dashboardContent').style.display = 'flex';
+    }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       TIMETABLE RENDERING
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    function renderTimetable() {
+        let slots = [...timetableData];
+        if (currentDayFilter !== 'ALL') slots = slots.filter(s=>s.day===currentDayFilter);
+        if (currentSort === 'time')    slots.sort((a,b)=>a.startTime.localeCompare(b.startTime));
+        else if (currentSort === 'subject') slots.sort((a,b)=>(a.subjectName||'').localeCompare(b.subjectName||''));
+        else slots.sort((a,b)=>DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day)||a.startTime.localeCompare(b.startTime));
+
+        renderGridView(slots);
+        renderTableView(slots);
+    }
+
+    function renderGridView(slots) {
+        const grouped = {};
+        slots.forEach(s => { const d=s.day||'UNK'; if(!grouped[d])grouped[d]=[]; grouped[d].push(s); });
+        const days = Object.keys(grouped).sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
+        if (!slots.length) { document.getElementById('gridView').innerHTML = `<div class="no-slots"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"/></svg>No classes for this selection</div>`; return; }
+        document.getElementById('gridView').innerHTML = days.map(day => `
+            <div class="day-section">
+                <div class="day-header"><div class="day-header-dot"></div>${DAY_FULL[day]||day}<span style="font-size:0.65rem;color:var(--text-muted);font-weight:400;margin-left:auto">${grouped[day].length} class${grouped[day].length!==1?'es':''}</span></div>
+                <div class="tt-grid-view">${grouped[day].map(s=>`
+                    <div class="slot-card">
+                        <div class="slot-time"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>${s.startTime} â€“ ${s.endTime}</div>
+                        <div class="slot-subject">${s.subjectName||'â€”'}</div>
+                        <div class="slot-meta">
+                            ${s.section?`<span class="slot-tag">Sec ${s.section}</span>`:''}
+                            ${s.semester?`<span class="slot-tag">Sem ${s.semester}</span>`:''}
+                        </div>
+                    </div>`).join('')}
+                </div>
+            </div>`).join('');
+    }
+
+    function renderTableView(slots) {
+        const container = document.getElementById('tableView');
+        if (!slots.length) { container.innerHTML = `<div class="no-slots">No classes for this selection</div>`; return; }
+
+        const times = [...new Set(slots.map(s=>s.startTime+'â€“'+s.endTime))].sort((a,b)=>a.localeCompare(b));
+        const days  = [...new Set(slots.map(s=>s.day))].sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
+        const lookup = {};
+        slots.forEach(s => { const k=s.startTime+'â€“'+s.endTime; if(!lookup[s.day])lookup[s.day]={}; lookup[s.day][k]=s; });
+
+        const headerCells = times.map(t=>`<th style="white-space:nowrap;font-size:0.72rem">${t}</th>`).join('');
+        const bodyRows = days.map(day => {
+            const cells = times.map(t => {
+                const s = lookup[day]?.[t];
+                if (!s) return `<td style="background:var(--cream-2);opacity:0.4"></td>`;
+                return `<td><div style="font-size:0.8rem;font-weight:600;color:var(--text)">${s.subjectName||'â€”'}</div><div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">${s.section?`<span class="slot-tag">Sec ${s.section}</span>`:''} ${s.semester?`<span class="slot-tag">Sem ${s.semester}</span>`:''}</div></td>`;
+            }).join('');
+            return `<tr><td><span class="day-badge d-${DAY_SHORT[day]||day.slice(0,3)}">${DAY_SHORT[day]||day.slice(0,3)}</span></td>${cells}</tr>`;
+        }).join('');
+
+        container.innerHTML = `<div class="tt-table-wrap"><table class="tt-table"><thead><tr><th style="min-width:70px">Day</th>${headerCells}</tr></thead><tbody>${bodyRows}</tbody></table></div>`;
+    }
+
+    function setView(v) {
+        currentView = v;
+        document.querySelectorAll('.view-tab').forEach(t=>t.classList.toggle('active',t.textContent.toLowerCase()===v));
+        document.getElementById('gridView').style.display  = v==='grid'?'block':'none';
+        document.getElementById('tableView').style.display = v==='table'?'block':'none';
+    }
+
+    function setDayFilter(day) {
+        currentDayFilter = day;
+        document.querySelectorAll('#dayFilter .day-chip').forEach(c=>c.classList.toggle('active',c.dataset.day===day));
+        renderTimetable();
+    }
+
+    function sortSlots(val) { currentSort = val; renderTimetable(); }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       EXCEL EXPORT â€” matrix layout
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    function exportExcel() {
+        const slots = timetableData;
+        if (!slots.length) { showToast('No timetable data to export', 'error'); return; }
+
+        const times = [...new Set(slots.map(s=>s.startTime+' â€“ '+s.endTime))].sort((a,b)=>a.localeCompare(b));
+        const days  = [...new Set(slots.map(s=>s.day))].sort((a,b)=>DAY_ORDER.indexOf(a)-DAY_ORDER.indexOf(b));
+        const lookup = {};
+        slots.forEach(s => { const k=s.startTime+' â€“ '+s.endTime; if(!lookup[s.day])lookup[s.day]={}; lookup[s.day][k]=s; });
+
+        const header = ['Day', ...times];
+        const rows = days.map(day => {
+            const row = { 'Day': DAY_FULL[day]||day };
+            times.forEach(t => {
+                const s = lookup[day]?.[t];
+                row[t] = s ? `${s.subjectName||'â€”'} | Sec ${s.section||'â€”'} | Sem ${s.semester||'â€”'}` : '';
+            });
+            return row;
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.json_to_sheet(rows, { header });
+        ws['!cols'] = [{ wch: 14 }, ...times.map(()=>({ wch: 30 }))];
+        XLSX.utils.book_append_sheet(wb, ws, 'Timetable');
+        XLSX.writeFile(wb, `${(facultyData?.name||'Faculty').replace(/\s+/g,'_')}_timetable.xlsx`);
+        showToast('Excel exported!', 'success');
+    }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       AI CHAT
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    function buildTimetableContext() {
+        if (!facultyData || !timetableData.length) return '';
+        const lines = timetableData.map(s=>`${s.day} ${s.startTime}-${s.endTime}: ${s.subjectName} (Sec ${s.section}, Sem ${s.semester})`);
+        return `Faculty: ${facultyData.name}\nDepartment: ${facultyData.department||'N/A'}\nTimetable:\n${lines.join('\n')}`;
+    }
+
+    async function sendAIMessage(text) {
+        const inp = document.getElementById('aiInput');
+        const msg = text || inp.value.trim();
+        if (!msg || aiTyping) return;
+        if (!text) inp.value = '';
+        inp.style.height = '';
+        aiTyping = true;
+        document.getElementById('aiSendBtn').disabled = true;
+
+        appendAIMessage(msg, 'user');
+        showTypingIndicator();
+
+        const context = buildTimetableContext();
+
+        try {
+            const res = await fetch(API_AI, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: msg, context })
+            });
+            hideTypingIndicator();
+            if (res.ok) {
+                const data = await res.json();
+                const reply = data.response || data.message || data.text || data.reply || data.answer
+                    || (typeof data === 'string' ? data : JSON.stringify(data));
+                appendAIMessage(reply, 'ai');
+            } else throw new Error();
+        } catch {
+            hideTypingIndicator();
+            appendAIMessage(generateFallbackAI(msg), 'ai');
+        } finally {
+            aiTyping = false;
+            document.getElementById('aiSendBtn').disabled = false;
+        }
+    }
+
+
+    function generateFallbackAI(msg) {
+        const slots = timetableData;
+        const q = msg.toLowerCase();
+        if (q.includes('free') || q.includes('available')) {
+            const allDays = ['MON','TUE','WED','THU','FRI'];
+            const busy = new Set(slots.map(s=>s.day));
+            const free = allDays.filter(d=>!busy.has(d));
+            return free.length ? `You are free on: ${free.map(d=>DAY_FULL[d]).join(', ')}.` : 'You have classes every weekday.';
+        }
+        if (q.includes('busiest')) {
+            const cnt = {}; slots.forEach(s=>cnt[s.day]=(cnt[s.day]||0)+1);
+            const top = Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+            return top ? `Your busiest day is **${DAY_FULL[top[0]]}** with ${top[1]} classes.` : 'No data available.';
+        }
+        if (q.includes('subject') || q.includes('teach')) {
+            const subj = [...new Set(slots.map(s=>s.subjectName))];
+            return `You teach: ${subj.join(', ')}.`;
+        }
+        if (q.includes('morning')) {
+            const m = slots.filter(s=>parseInt(s.startTime)<12);
+            return m.length ? `Morning classes: ${m.map(s=>`${DAY_FULL[s.day]} ${s.startTime} â€“ ${s.subjectName}`).join('; ')}.` : 'No morning classes found.';
+        }
+        if (q.includes('hour') || q.includes('total')) {
+            const h = slots.reduce((acc,s)=>{ try { if(!s.startTime||!s.endTime)return acc; const [sh,sm]=(s.startTime+':00').split(':').map(Number); const [eh,em]=(s.endTime+':00').split(':').map(Number); const d=(eh*60+em-sh*60-sm)/60; return acc+(d>0?d:0); } catch{return acc;} },0);
+            return `Your total weekly teaching load is **${h.toFixed(1)} hours**.`;
+        }
+        return `You have ${slots.length} classes across ${[...new Set(slots.map(s=>s.day))].length} days, covering ${[...new Set(slots.map(s=>s.subjectName))].length} subjects.`;
+    }
+
+    function appendAIMessage(text, role) {
+        const msgs = document.getElementById('aiMessages');
+        const time = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+        const div = document.createElement('div');
+        div.className = `ai-msg ${role}`;
+        div.innerHTML = `<div class="ai-bubble">${text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div><div class="ai-msg-time">${time}</div>`;
+        msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        const msgs = document.getElementById('aiMessages');
+        const div = document.createElement('div');
+        div.className='ai-msg ai'; div.id='typingIndicator';
+        div.innerHTML=`<div class="ai-typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+        msgs.appendChild(div); msgs.scrollTop = msgs.scrollHeight;
+    }
+    function hideTypingIndicator() { document.getElementById('typingIndicator')?.remove(); }
+    function handleAIKey(e) { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendAIMessage();} }
+    function sendSuggestion(el) { sendAIMessage(el.textContent); }
+    function autoResize(el) { el.style.height=''; el.style.height=Math.min(el.scrollHeight,120)+'px'; }
+    function scrollToAI() { document.getElementById('aiPanel')?.scrollIntoView({behavior:'smooth',block:'start'}); }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       UI HELPERS
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    function showLoading(show) {
+        document.getElementById('loadingState').style.display = show ? 'flex' : 'none';
+        if (show) {
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('errorState').style.display = 'none';
+        }
+    }
+
+    function showToast(msg, type='success') {
+        const t = document.getElementById('toast');
+        t.textContent = msg; t.className = `show ${type}`;
+        setTimeout(()=>t.className='', 3500);
+    }
+
+    function doLogout() {
+        localStorage.removeItem('cfFacultySession');
+        window.location.href = '/facultyportal';
+    }
+
+    /* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+       THEME
+    â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
+    function loadTheme() {
+        const saved = localStorage.getItem('cfFacultyTheme');
+        const dark  = saved === 'dark' || (!saved && matchMedia('(prefers-color-scheme:dark)').matches);
+        document.documentElement.classList.toggle('dark', dark);
+        updateThemeIcon(dark);
+    }
+    function toggleThemeMode() {
+        const isDark = document.documentElement.classList.toggle('dark');
+        localStorage.setItem('cfFacultyTheme', isDark ? 'dark' : 'light');
+        updateThemeIcon(isDark);
+    }
+    function updateThemeIcon(isDark) {
+        document.getElementById('themeIcon').innerHTML = isDark
+            ? '<path stroke-linecap="round" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+            : '<circle cx="12" cy="12" r="5"/><path stroke-linecap="round" d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>';
+    }
+</script>
+</body>
+</html>

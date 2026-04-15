@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Just a moment...</title>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        :root {
+            --cf-text: #313131;
+            --cf-subtext: #727272;
+            --cf-orange: #f38020;
+            --cf-blue: #0051c3;
+            --cf-bg: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            background-color: var(--cf-bg);
+            color: var(--cf-text);
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, "Helvetica Neue", Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            line-height: 1.5;
+        }
+
+        .main-wrapper {
+            flex: 1 0 auto;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 640px;
+            text-align: left;
+        }
+
+        .cf-icon {
+            width: 55px;
+            height: auto;
+            fill: var(--cf-orange);
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: clamp(28px, 5vw, 34px);
+            font-weight: 500;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+            color: var(--cf-text);
+        }
+
+        .status-msg {
+            font-size: clamp(16px, 4vw, 18px);
+            margin-bottom: 12px;
+            color: var(--cf-text);
+        }
+
+        .sub-msg {
+            font-size: 15px;
+            color: var(--cf-subtext);
+            margin-bottom: 32px;
+        }
+
+        .widget-container {
+            margin: 24px 0 40px;
+            min-height: 65px;
+        }
+
+        .footer-info {
+            margin-top: 40px;
+            padding-top: 24px;
+            border-top: 1px solid #e0e0e0;
+            font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
+            font-size: 13px;
+            color: var(--cf-subtext);
+        }
+
+        .footer-info div {
+            margin-bottom: 5px;
+        }
+
+        .footer-info b {
+            font-weight: 400;
+            color: var(--cf-text);
+        }
+
+        .global-footer {
+            flex-shrink: 0;
+            padding: 24px 0;
+            text-align: center;
+            font-size: 12px;
+            color: #9a9a9a;
+            border-top: 1px solid #f2f2f2;
+            width: 100%;
+            background: #fff;
+        }
+
+        .global-footer a {
+            color: var(--cf-blue);
+            text-decoration: none;
+        }
+
+        /* Hidden button for fallback/accessibility only */
+        #submit-btn {
+            display: none;
+        }
+
+        @media (max-width: 480px) {
+            .main-wrapper {
+                justify-content: flex-start;
+                padding-top: 15vh;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="container">
+        <svg class="cf-icon" viewBox="0 0 24 24">
+            <path d="M23.53 13.064c-.16-.525-.433-.997-.796-1.39a3.83 3.83 0 0 0-.547-3.486 4.37 4.37 0 0 0-4.088-1.925 5.564 5.564 0 0 0-10.457 2.01c-.13-.004-.26-.007-.39-.007a4.67 4.67 0 0 0-3.327 7.95 3.193 3.193 0 0 0 5.432 2.373h10.9a3.837 3.837 0 0 0 3.274-5.525z"/>
+        </svg>
+
+        <h1>Verify you are human</h1>
+
+        <p class="status-msg">Please stand by, while we are checking your browser...</p>
+
+        <p class="sub-msg">This process is automatic. Your browser will redirect to your requested content shortly.</p>
+
+        <form id="challenge-form" action="/verify" method="POST">
+            <div class="widget-container">
+                <div class="cf-turnstile"
+                     data-sitekey="0x4AAAAAACyaGkfkt3n9p51D"
+                     data-callback="onSuccess">
+                </div>
+            </div>
+            <button type="submit" id="submit-btn"></button>
+        </form>
+
+        <div class="footer-info">
+            <div>Ray ID: <b id="ray-display"></b></div>
+            <div>Your IP: <b id="ip-display"></b></div>
+        </div>
+    </div>
+</div>
+
+<footer class="global-footer">
+    Performance & security by <a href="https://www.cloudflare.com" target="_blank">Cloudflare</a>
+</footer>
+
+<script>
+    /**
+     * onSuccess is triggered by Turnstile upon completion.
+     * We immediately submit the form to redirect the user.
+     */
+    function onSuccess(token) {
+        // Slight delay (500ms) to allow the "Success" animation to finish
+        // visually, just like real Cloudflare.
+        setTimeout(() => {
+            document.getElementById('challenge-form').submit();
+        }, 500);
+    }
+
+    /**
+     * Dynamic UI helpers for Ray ID and IP
+     */
+    function initIdentity() {
+        // Generate a random 16-char hex Ray ID
+        const ray = Array.from({length: 16}, () =>
+            Math.floor(Math.random() * 16).toString(16)).join('');
+        document.getElementById('ray-display').textContent = ray;
+
+        // Generate a mock IP for visual consistency
+        const ip = Array.from({length: 4}, () =>
+            Math.floor(Math.random() * 256)).join('.');
+        document.getElementById('ip-display').textContent = ip;
+    }
+
+    window.onload = initIdentity;
+</script>
+</body>
+</html>

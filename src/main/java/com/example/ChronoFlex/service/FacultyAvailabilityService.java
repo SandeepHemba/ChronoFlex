@@ -26,6 +26,15 @@ public class FacultyAvailabilityService {
         return conflicts.isEmpty();
     }
 
+//    public boolean isFacultyFree(Long facultyId, DayOfWeekEnum dayOfWeek,
+//                                 LocalTime start, LocalTime end) {
+//
+//        List<FacultyAvailability> conflicts =
+//                repo.findFacultyConflicts(facultyId, dayOfWeek, start, end);
+//
+//        return conflicts.isEmpty();
+//    }
+
     /**
      * Checks if a class is free during the given slot
      */
@@ -33,6 +42,15 @@ public class FacultyAvailabilityService {
         List<FacultyAvailability> conflicts = repo.findConflictsByClass(classId, dayOfWeek.name(), start, end);
         return conflicts.isEmpty();
     }
+
+//    public boolean isClassFree(Integer classId, DayOfWeekEnum dayOfWeek,
+//                               LocalTime start, LocalTime end) {
+//
+//        List<FacultyAvailability> conflicts =
+//                repo.findClassConflicts(classId, dayOfWeek, start, end);
+//
+//        return conflicts.isEmpty();
+//    }
 
     /**
      * Checks for conflicts and if none, persists a BUSY slot.

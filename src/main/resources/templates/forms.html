@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Registration | ChronoFlex</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Dark Theme (Premium SaaS) */
+            --bg-canvas: #050505;
+            --bg-card: rgba(18, 18, 20, 0.7);
+            --bg-card-solid: #121214;
+            --bg-input: rgba(255, 255, 255, 0.03);
+            --bg-input-focus: rgba(255, 255, 255, 0.06);
+            --text-primary: #ffffff;
+            --text-secondary: #a1a1aa;
+            --text-muted: #71717a;
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-glow: rgba(99, 102, 241, 0.3);
+            --success: #10b981;
+            --error: #ef4444;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(255, 255, 255, 0.15);
+            --shadow-card: 0 40px 80px rgba(0, 0, 0, 0.5);
+            --shadow-input: inset 0 2px 4px rgba(0,0,0,0.2);
+            --panel-gradient: linear-gradient(145deg, rgba(99,102,241,0.1) 0%, rgba(0,0,0,0) 100%);
+        }
+
+        [data-theme="light"] {
+            /* Clean Light Theme */
+            --bg-canvas: #f4f4f5;
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-card-solid: #ffffff;
+            --bg-input: #f8fafc;
+            --bg-input-focus: #ffffff;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --border-color: rgba(15, 23, 42, 0.1);
+            --border-hover: rgba(15, 23, 42, 0.2);
+            --shadow-card: 0 30px 60px rgba(15, 23, 42, 0.08);
+            --shadow-input: inset 0 2px 4px rgba(15,23,42,0.02);
+            --panel-gradient: linear-gradient(145deg, rgba(99,102,241,0.05) 0%, rgba(255,255,255,0) 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-canvas);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow-x: hidden;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        /* --- Ambient Background --- */
+        .ambient-bg {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .ambient-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.5;
+            animation: drift 20s infinite alternate ease-in-out;
+        }
+        [data-theme="light"] .ambient-blob { opacity: 0.3; }
+
+        .blob-1 {
+            top: -10%; left: -10%; width: 50vw; height: 50vw;
+            background: radial-gradient(circle, var(--accent-primary), transparent 70%);
+        }
+        .blob-2 {
+            bottom: -20%; right: -10%; width: 60vw; height: 60vw;
+            background: radial-gradient(circle, var(--accent-secondary), transparent 70%);
+            animation-delay: -10s;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(10%, 10%) scale(1.1); }
+        }
+
+        /* --- Main App Window --- */
+        .app-window {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 1080px;
+            margin: 40px 20px;
+            display: flex;
+            background: var(--bg-card);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: var(--shadow-card), inset 0 1px 0 rgba(255,255,255,0.1);
+            overflow: hidden;
+            animation: scaleUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95) translateY(20px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* --- Left Side: Brand Panel --- */
+        .brand-panel {
+            flex: 0.8;
+            padding: 50px;
+            background: var(--panel-gradient);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+        .logo svg { width: 28px; height: 28px; color: var(--accent-primary); }
+
+        .brand-hero {
+            margin-top: 60px;
+            margin-bottom: 40px;
+        }
+        .brand-hero h1 {
+            font-size: 2.5rem;
+            line-height: 1.1;
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .brand-hero p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.6;
+        }
+
+        .perks {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .perk-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .perk-icon {
+            width: 40px; height: 40px;
+            border-radius: 10px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--accent-primary);
+            flex-shrink: 0;
+        }
+        .perk-text h4 { font-size: 0.95rem; font-weight: 600; margin-bottom: 4px; }
+        .perk-text p { font-size: 0.85rem; color: var(--text-muted); }
+
+        /* --- Right Side: Form Panel --- */
+        .form-panel {
+            flex: 1.2;
+            padding: 50px 60px;
+            background: var(--bg-card-solid);
+            position: relative;
+        }
+
+        /* Top Nav inside Form */
+        .form-top-nav {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 20px;
+            position: absolute;
+            top: 30px; right: 30px;
+        }
+
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; color: var(--text-secondary);
+            transition: all 0.2s;
+        }
+        .theme-toggle:hover { background: var(--input-bg); color: var(--text-primary); }
+        .theme-toggle svg { width: 18px; height: 18px; fill: currentColor; }
+
+        /* Progress Header */
+        .form-header { margin-bottom: 30px; }
+        .form-header h2 { font-size: 1.8rem; font-weight: 700; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .form-header p { color: var(--text-secondary); font-size: 0.95rem; }
+
+        /* Minimal Stepper */
+        .stepper-container {
+            margin-bottom: 40px;
+        }
+        .stepper-track {
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 4px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+        .stepper-fill {
+            position: absolute;
+            top: 0; left: 0; height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: 4px;
+            transition: width 0.5s ease-in-out;
+        }
+        .stepper-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .step-lbl.active { color: var(--accent-primary); }
+
+        /* Form Layout */
+        .form-section { display: none; animation: slideIn 0.4s ease forwards; }
+        .form-section.active { display: block; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .full-width { grid-column: span 2; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .input-wrapper { position: relative; }
+        .input-icon {
+            position: absolute;
+            left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+            transition: color 0.3s;
+        }
+        .input-icon svg { width: 18px; height: 18px; }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-input);
+        }
+        .form-input:focus {
+            outline: none;
+            background: var(--bg-input-focus);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 4px var(--accent-glow);
+        }
+        .form-input:focus + .input-icon { color: var(--accent-primary); }
+        .form-input::placeholder { color: var(--text-muted); }
+
+        /* Button Styling */
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .btn-primary {
+            background: var(--text-primary);
+            color: var(--bg-canvas);
+            margin-top: 10px;
+        }
+        [data-theme="light"] .btn-primary { background: var(--accent-primary); color: white; }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        [data-theme="light"] .btn-primary:hover:not(:disabled) {
+            box-shadow: 0 10px 20px var(--accent-glow);
+        }
+
+        .btn-primary:active:not(:disabled) { transform: translateY(0); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            margin-top: 12px;
+        }
+        .btn-secondary:hover {
+            background: var(--input-bg);
+            color: var(--text-primary);
+        }
+
+        /* Loading Spinner */
+        .btn-loading .btn-text { opacity: 0; }
+        .btn-loading::after {
+            content: ''; position: absolute;
+            width: 20px; height: 20px;
+            border: 2px solid rgba(150,150,150,0.3);
+            border-top-color: currentColor;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* OTP Styling */
+        .otp-container {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin: 20px 0 30px;
+        }
+        .otp-input {
+            width: 50px; height: 60px;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            transition: all 0.2s;
+            box-shadow: var(--shadow-input);
+        }
+        .otp-input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px var(--accent-glow);
+        }
+        .otp-input.filled {
+            border-color: var(--success);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .info-card {
+            display: flex; gap: 12px;
+            background: rgba(99, 102, 241, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            padding: 16px; border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .info-card svg { color: var(--accent-primary); flex-shrink: 0; width: 20px; height: 20px; margin-top: 2px; }
+        .info-text h4 { font-size: 0.9rem; margin-bottom: 4px; color: var(--text-primary); }
+        .info-text p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; }
+
+        /* Alerts */
+        .alert {
+            padding: 14px; border-radius: 12px; margin-bottom: 20px;
+            font-size: 0.85rem; font-weight: 500;
+            display: flex; align-items: center; gap: 10px;
+            animation: slideDownFade 0.3s ease;
+        }
+        @keyframes slideDownFade { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .alert-success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); color: var(--success); }
+        .alert-error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.2); color: var(--error); }
+
+        /* Success Screen */
+        .success-wrapper { text-align: center; padding: 40px 20px; }
+        .success-icon-container {
+            width: 80px; height: 80px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px; color: var(--success);
+            animation: pop 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .success-icon-container svg { width: 40px; height: 40px; }
+        @keyframes pop { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .success-wrapper h2 { font-size: 1.8rem; margin-bottom: 12px; }
+        .success-wrapper p { color: var(--text-secondary); margin-bottom: 30px; line-height: 1.6; }
+
+        /* Mobile Adjustments */
+        @media (max-width: 900px) {
+            .app-window { flex-direction: column; height: auto; margin: 20px; }
+            .brand-panel { display: none; /* Hide brand panel on small screens to save space */ }
+            .form-panel { padding: 40px 30px; }
+            .form-grid { grid-template-columns: 1fr; gap: 16px; }
+            .full-width { grid-column: span 1; }
+            .otp-input { width: 45px; height: 55px; font-size: 1.2rem; }
+        }
+        @media (max-width: 480px) {
+            .form-panel { padding: 30px 20px; }
+            .form-header h2 { font-size: 1.5rem; }
+            .otp-input { width: 40px; height: 50px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="ambient-bg">
+    <div class="ambient-blob blob-1"></div>
+    <div class="ambient-blob blob-2"></div>
+</div>
+
+<div class="app-window">
+
+    <div class="brand-panel">
+        <div class="logo">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            ChronoFlex
+        </div>
+
+        <div class="brand-hero">
+            <h1>Smarter scheduling.<br>Zero conflicts.</h1>
+            <p>Register your institution to access our enterprise-grade AI timetable generator and optimize your academic resources.</p>
+        </div>
+
+        <div class="perks">
+            <div class="perk-item">
+                <div class="perk-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m13 14 6.1-6.1"/><path d="M15.5 8.5 19 5"/><path d="M21 21H3"/><path d="M9 9a3 3 0 0 1 3 3v9"/><path d="M9 21V9a3 3 0 0 0-3-3H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h5Z"/></svg>
+                </div>
+                <div class="perk-text">
+                    <h4>Lightning Fast</h4>
+                    <p>Generate complex schedules in seconds.</p>
+                </div>
+            </div>
+            <div class="perk-item">
+                <div class="perk-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <div class="perk-text">
+                    <h4>Enterprise Security</h4>
+                    <p>Bank-grade encryption for your data.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-panel">
+
+        <div class="form-top-nav">
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                <svg class="moon-icon" style="display: none;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+            </button>
+        </div>
+
+        <div class="form-header">
+            <h2>Create Account</h2>
+            <p>Enter your institutional details below</p>
+        </div>
+
+        <div class="stepper-container">
+            <div class="stepper-track">
+                <div class="stepper-fill" id="stepperLine" style="width: 33.33%;"></div>
+            </div>
+            <div class="stepper-labels">
+                <span class="step-lbl active" id="step1">Details</span>
+                <span class="step-lbl" id="step2">Verification</span>
+                <span class="step-lbl" id="step3">Done</span>
+            </div>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="form-section active" id="registrationSection">
+            <form id="registrationForm">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label class="form-label" for="collegeName">Institution Name</label>
+                        <div class="input-wrapper">
+                                <span class="input-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                                </span>
+                            <input type="text" id="collegeName" class="form-input" placeholder="e.g. Stanford University" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="collegeCode">Unique Code</label>
+                        <div class="input-wrapper">
+                                <span class="input-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                </span>
+                            <input type="text" id="collegeCode" class="form-input" placeholder="e.g. STFD-01" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="contactPhone">Phone Number</label>
+                        <div class="input-wrapper">
+                                <span class="input-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                                </span>
+                            <input type="tel" id="contactPhone" class="form-input" placeholder="+1 (555) 000-0000" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label" for="contactEmail">Administrator Email</label>
+                        <div class="input-wrapper">
+                                <span class="input-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><path d="M2 4l10 8 10-8"/></svg>
+                                </span>
+                            <input type="email" id="contactEmail" class="form-input" placeholder="admin@university.edu" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label class="form-label" for="address">Location</label>
+                        <div class="input-wrapper">
+                                <span class="input-icon">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                                </span>
+                            <input type="text" id="address" class="form-input" placeholder="City, State, Country" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="registerBtn">
+                    <span class="btn-text">Continue to Verification</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-section" id="otpSection">
+
+            <div class="info-card">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                <div class="info-text">
+                    <h4>Check your inbox</h4>
+                    <p>We've sent a 6-digit security code to your email. Please enter it below to verify your identity.</p>
+                </div>
+            </div>
+
+            <form id="otpForm">
+                <input type="hidden" id="otpCollegeCode">
+
+                <div class="otp-container">
+                    <input type="text" maxlength="1" class="otp-input" data-index="0" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input" data-index="1" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input" data-index="2" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input" data-index="3" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input" data-index="4" autocomplete="off">
+                    <input type="text" maxlength="1" class="otp-input" data-index="5" autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="verifyBtn">
+                    <span class="btn-text">Confirm & Register</span>
+                </button>
+
+                <button type="button" class="btn btn-secondary" id="resendBtn">
+                    <span class="btn-text">Resend Code</span>
+                </button>
+            </form>
+        </div>
+
+        <div class="form-section" id="successSection">
+            <div class="success-wrapper">
+                <div class="success-icon-container">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </div>
+                <h2>Registration Complete</h2>
+                <p>Your institution has been successfully verified. You can now access the ChronoFlex dashboard to begin scheduling.</p>
+                <button class="btn btn-primary" onclick="window.location.href='home.html'">
+                    <span class="btn-text">Go to Dashboard</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Theme Toggle - Sync with localStorage
+    const themeToggle = document.getElementById('themeToggle');
+    const sunIcon = document.querySelector('.sun-icon');
+    const moonIcon = document.querySelector('.moon-icon');
+    const html = document.documentElement;
+
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    html.setAttribute('data-theme', currentTheme);
+    updateThemeIcon(currentTheme);
+
+    function updateThemeIcon(theme) {
+        if (theme === 'light') {
+            sunIcon.style.display = 'none';
+            moonIcon.style.display = 'block';
+        } else {
+            sunIcon.style.display = 'block';
+            moonIcon.style.display = 'none';
+        }
+    }
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        updateThemeIcon(newTheme);
+    });
+
+    // API Configuration
+    const API_BASE_URL = 'http://localhost:8080/api/colleges';
+
+    // Form Elements
+    const registrationForm = document.getElementById('registrationForm');
+    const otpForm = document.getElementById('otpForm');
+    const registerBtn = document.getElementById('registerBtn');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const resendBtn = document.getElementById('resendBtn');
+    const alertContainer = document.getElementById('alertContainer');
+
+    // Sections
+    const registrationSection = document.getElementById('registrationSection');
+    const otpSection = document.getElementById('otpSection');
+    const successSection = document.getElementById('successSection');
+
+    // Steps
+    const step1 = document.getElementById('step1');
+    const step2 = document.getElementById('step2');
+    const step3 = document.getElementById('step3');
+    const stepperLine = document.getElementById('stepperLine');
+
+    // OTP Inputs
+    const otpInputs = document.querySelectorAll('.otp-input');
+    let registeredCollegeCode = '';
+
+    // Alert Helper
+    function showAlert(message, type = 'success') {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type}`;
+
+        const iconSVG = type === 'success'
+            ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+            : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>';
+
+        alertDiv.innerHTML = `${iconSVG}<span>${message}</span>`;
+        alertContainer.innerHTML = '';
+        alertContainer.appendChild(alertDiv);
+
+        setTimeout(() => { alertDiv.remove(); }, 5000);
+    }
+
+    // Progress Update
+    function updateProgress(step) {
+        step1.classList.remove('active');
+        step2.classList.remove('active');
+        step3.classList.remove('active');
+
+        if (step === 2) {
+            step2.classList.add('active');
+            stepperLine.style.width = '66.66%';
+        } else if (step === 3) {
+            step3.classList.add('active');
+            stepperLine.style.width = '100%';
+        }
+    }
+
+    // OTP Input Logic
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            // Ensure numeric only
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+
+            if (e.target.value.length === 1) {
+                e.target.classList.add('filled');
+                if (index < otpInputs.length - 1) otpInputs[index + 1].focus();
+            } else {
+                e.target.classList.remove('filled');
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                otpInputs[index - 1].focus();
+                otpInputs[index - 1].classList.remove('filled');
+            }
+        });
+
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').replace(/[^0-9]/g, '').slice(0, 6);
+            pastedData.split('').forEach((char, i) => {
+                if (otpInputs[i]) {
+                    otpInputs[i].value = char;
+                    otpInputs[i].classList.add('filled');
+                }
+            });
+            if (otpInputs[pastedData.length - 1]) otpInputs[pastedData.length - 1].focus();
+        });
+    });
+
+    // 1. Submit Registration
+    registrationForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const formData = {
+            collegeName: document.getElementById('collegeName').value.trim(),
+            collegeCode: document.getElementById('collegeCode').value.trim(),
+            contactEmail: document.getElementById('contactEmail').value.trim(),
+            contactPhone: document.getElementById('contactPhone').value.trim(),
+            address: document.getElementById('address').value.trim()
+        };
+
+        if (!formData.collegeName || !formData.collegeCode || !formData.contactEmail || !formData.contactPhone || !formData.address) {
+            showAlert('Please fill in all fields', 'error'); return;
+        }
+
+        registeredCollegeCode = formData.collegeCode;
+        registerBtn.classList.add('btn-loading');
+        registerBtn.disabled = true;
+
+        //changed one
+        try {
+            const response = await fetch(`${API_BASE_URL}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const message = await response.text();   // ✅ FIXED
+
+            if (response.ok) {
+                showAlert(message, 'success');
+                setTimeout(() => {
+                    registrationSection.classList.remove('active');
+                    otpSection.classList.add('active');
+                    updateProgress(2);
+                    otpInputs[0].focus();
+                }, 800);
+            } else {
+                showAlert(message || 'Registration failed.', 'error');
+            }
+
+        } catch (error) {
+            console.error(error);
+            showAlert('Network error. Please check your connection.', 'error');
+        }
+    });
+
+    // 2. Submit OTP
+    otpForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Collect OTP
+        const otp = Array.from(otpInputs).map(input => input.value).join('');
+
+        if (otp.length !== 6) {
+            showAlert('Please enter complete 6-digit OTP', 'error');
+            return;
+        }
+
+        const verifyData = {
+            collegeCode: registeredCollegeCode,
+            otp: otp
+        };
+
+        verifyBtn.classList.add('btn-loading');
+        verifyBtn.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/verify-otp`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(verifyData)
+            });
+
+            // IMPORTANT: Backend returns plain text
+            const message = await response.text();
+
+            if (response.ok) {
+                showAlert(message, 'success');
+
+                setTimeout(() => {
+                    otpSection.classList.remove('active');
+                    successSection.classList.add('active');
+                    updateProgress(3);
+                }, 800);
+
+            } else {
+                // Invalid OTP or other backend error
+                showAlert(message || 'Invalid OTP. Please try again.', 'error');
+
+                // Clear OTP fields
+                otpInputs.forEach(input => {
+                    input.value = '';
+                    input.classList.remove('filled');
+                });
+
+                otpInputs[0].focus();
+            }
+
+        } catch (error) {
+            console.error("OTP Verification Error:", error);
+            showAlert('Network error. Please check your connection.', 'error');
+        } finally {
+            verifyBtn.classList.remove('btn-loading');
+            verifyBtn.disabled = false;
+        }
+    });
+
+    // 3. Resend OTP
+    resendBtn.addEventListener('click', async () => {
+
+        resendBtn.classList.add('btn-loading');
+        resendBtn.disabled = true;
+
+        const formData = {
+            collegeName: document.getElementById('collegeName').value.trim(),
+            collegeCode: registeredCollegeCode,
+            contactEmail: document.getElementById('contactEmail').value.trim(),
+            contactPhone: document.getElementById('contactPhone').value.trim(),
+            address: document.getElementById('address').value.trim()
+        };
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/register`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData)
+            });
+
+            const message = await response.text();   // IMPORTANT
+
+            if (response.ok) {
+                showAlert(message, 'success');
+            } else {
+                showAlert(message || 'Failed to resend OTP.', 'error');
+            }
+
+            // Clear OTP boxes
+            otpInputs.forEach(input => {
+                input.value = '';
+                input.classList.remove('filled');
+            });
+            otpInputs[0].focus();
+
+        } catch (error) {
+            console.error('Resend error:', error);
+            showAlert('Network error. Please try again.', 'error');
+        } finally {
+            resendBtn.classList.remove('btn-loading');
+            resendBtn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

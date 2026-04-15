@@ -84,7 +84,8 @@ public class TimeTableGeneratorService {
             Template template = templateRepo.findById(templateId)
                     .orElseThrow(() -> new RuntimeException("Template not found with ID: " + templateId));
 
-            String semester = toRoman(semesterNumber);
+            //String semester = toRoman(semesterNumber);
+            String semester = semesterNumber.matches("\\d+") ? toRoman(semesterNumber) : semesterNumber;
 
             Optional<CollegeClass> optClass = classRepo.findByCollege_CollegeIdAndSemesterAndSection(
                     collegeId, semester, section
@@ -315,7 +316,8 @@ public class TimeTableGeneratorService {
             return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(report);
 
         } catch (Exception e) {
-            message = "❌ Error generating timetable: " + e.getMessage();
+            e.printStackTrace();  // 👈 This prints full error in console
+            //message = "❌ Error generating timetable: " + e.getMessage();
             logAudit(adminId, collegeId, templateId, null, toRoman(semesterNumber), section, "error", message);
             return "{\"status\":\"error\",\"message\":\"" + message + "\"}";
         }

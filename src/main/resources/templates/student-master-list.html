@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="pageTitle">ChronoFlex | Student Master</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/@lottiefiles/dotlottie-wc@0.9.3/dist/dotlottie-wc.js" type="module"></script>
+
+  <!-- SheetJS loaded with fallback -->
+  <script>
+    window.__xlsxReady = false;
+    window.__xlsxQueue = [];
+    function withXLSX(fn) {
+      if (window.__xlsxReady) { fn(); return; }
+      window.__xlsxQueue.push(fn);
+    }
+  </script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"
+          onload="window.__xlsxReady=true; window.__xlsxQueue.forEach(f=>f()); window.__xlsxQueue=[];"
+          onerror="loadXLSXFallback()"></script>
+  <script>
+    function loadXLSXFallback() {
+      var s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload = function() { window.__xlsxReady=true; window.__xlsxQueue.forEach(f=>f()); window.__xlsxQueue=[]; };
+      s.onerror = function() { console.error('SheetJS failed to load from both CDNs.'); };
+      document.head.appendChild(s);
+    }
+  </script>
+
+  <style>
+    :root {
+        --cream: #FAF7F2; --cream-2: #F2EDE4; --cream-3: #E8DDD0; --warm-white: #FFFEFB;
+        --text: #1C1C1E; --text-2: #3A3A3C; --text-muted: #6B6B70; --text-faint: #AEAEB2;
+        --accent: #4A3728; --accent-warm: #8B6F47; --gold: #C9A96E; --gold-light: #E8C98A;
+        --accent-glow: rgba(139,111,71,0.12); --border: rgba(139,111,71,0.15); --border-2: rgba(139,111,71,0.08);
+        --panel: rgba(250,247,242,0.92); --sidebar-bg: rgba(255,254,251,0.96);
+        --shadow-sm: 0 1px 4px rgba(74,55,40,0.07); --shadow-md: 0 4px 20px rgba(74,55,40,0.1); --shadow-lg: 0 12px 48px rgba(74,55,40,0.14);
+        --card-bg: rgba(255,254,251,0.92); --hover-bg: rgba(139,111,71,0.06); --active-bg: rgba(139,111,71,0.1);
+        --sidebar-w: 260px; --header-h: 70px; --radius-sm: 10px; --radius-md: 16px; --radius-lg: 22px; --transition: 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+    html.dark {
+        --cream: #111113; --cream-2: #181819; --cream-3: #222224; --warm-white: #1A1A1C;
+        --text: #F5F4F0; --text-2: #E0DDD8; --text-muted: #8A8A8F; --text-faint: #5A5A5F;
+        --accent: #C9A96E; --accent-warm: #E8C98A; --gold: #C9A96E; --gold-light: #E8C98A;
+        --accent-glow: rgba(201,169,110,0.1); --border: rgba(201,169,110,0.12); --border-2: rgba(255,255,255,0.05);
+        --panel: rgba(24,24,25,0.94); --sidebar-bg: rgba(18,18,20,0.98); --shadow-sm: 0 1px 4px rgba(0,0,0,0.25);
+        --shadow-md: 0 4px 20px rgba(0,0,0,0.35); --shadow-lg: 0 12px 48px rgba(0,0,0,0.5); --card-bg: rgba(24,24,26,0.92);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; transition: background var(--transition); }
+    body::before { content: ''; position: fixed; inset: 0; background-image: radial-gradient(circle, var(--border) 1px, transparent 1px); background-size: 32px 32px; pointer-events: none; z-index: 0; opacity: 0.45; }
+    body.density-compact .content { padding: 15px; }
+    body.density-comfortable .content { padding: 40px; }
+
+    .sidebar { position: fixed; left: 0; top: 0; bottom: 0; width: var(--sidebar-w); background: var(--sidebar-bg); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 100; backdrop-filter: blur(20px); transition: transform var(--transition); }
+    .sidebar-header { display: flex; align-items: center; padding: 0 16px; height: var(--header-h); border-bottom: 1px solid var(--border); gap: 10px; }
+    .logo-icon { flex-shrink: 0; width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent), var(--gold)); border-radius: 9px; display: flex; align-items: center; justify-content: center; color: white !important; box-shadow: 0 3px 12px var(--accent-glow); }
+    .logo-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; white-space: nowrap; }
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 10px; }
+    .section-label { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); padding: 14px 10px 6px; display: block; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: var(--radius-sm); color: var(--text-muted); text-decoration: none; cursor: pointer; transition: all var(--transition); font-size: 0.88rem; font-weight: 500; }
+    .nav-item:hover { background: var(--hover-bg); color: var(--text); }
+    .nav-item.active { background: var(--active-bg); color: var(--accent); font-weight: 600; }
+
+    .main { margin-left: var(--sidebar-w); min-height: 100vh; position: relative; z-index: 1; transition: margin-left var(--transition); }
+    .topbar { position: sticky; top: 0; z-index: 90; height: var(--header-h); background: var(--panel); border-bottom: 1px solid var(--border); backdrop-filter: blur(16px); display: flex; align-items: center; padding: 0 28px; gap: 16px; }
+    .topbar-title { font-family: 'Playfair Display', serif; font-size: 1.35rem; font-weight: 700; }
+    .topbar-spacer { flex: 1; }
+    .user-avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), var(--gold)); display: flex; align-items: center; justify-content: center; color: white !important; font-weight: 700; font-size: 0.8rem; flex-shrink: 0; }
+    .mobile-toggle { display: none; background: none; border: 1px solid var(--border); padding: 8px; border-radius: 10px; color: var(--text-muted); cursor: pointer; }
+
+    .customize-panel { position: fixed; right: 0; top: 0; bottom: 0; width: 320px; background: var(--panel); border-left: 1px solid var(--border); backdrop-filter: blur(20px); z-index: 200; transform: translateX(110%); transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); box-shadow: var(--shadow-lg); padding: 20px; overflow-y: auto; }
+    .customize-panel.open { transform: translateX(0); }
+    .c-section { margin-bottom: 24px; }
+    .c-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 12px; }
+    .swatch-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .swatch { padding: 10px; border-radius: 10px; border: 1px solid var(--border); cursor: pointer; text-align: center; font-size: 0.75rem; font-weight: 600; transition: all var(--transition); color: var(--text); background: none; font-family: 'DM Sans', sans-serif; }
+    .swatch.active { border-color: var(--gold); background: var(--warm-white); color: var(--accent); }
+    .accent-colors { display: flex; gap: 8px; flex-wrap: wrap; }
+    .accent-dot { width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: all var(--transition); }
+    .accent-dot.active { border-color: white; box-shadow: 0 0 0 2px var(--gold); }
+
+    .content { padding: 28px; }
+    .faculty-tabs { display: flex; gap: 4px; background: var(--cream-2); border: 1px solid var(--border); border-radius: 12px; padding: 4px; width: fit-content; margin-bottom: 20px; overflow-x: auto; max-width: 100%; }
+    .ftab { display: flex; align-items: center; gap: 7px; padding: 8px 18px; border-radius: 9px; background: none; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.83rem; font-weight: 600; color: var(--text-muted); transition: all var(--transition); white-space: nowrap; }
+    .ftab.active { background: var(--card-bg); color: var(--accent); box-shadow: var(--shadow-sm); }
+    .view-pane { display: none; animation: fadeIn 0.4s ease both; }
+    .view-pane.active { display: block; }
+
+    .register-layout { display: grid; grid-template-columns: 1fr 280px; gap: 20px; align-items: start; }
+    .reg-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); position: relative; }
+    .reg-section-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 10px; }
+
+    .btn-reg-submit { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 22px; border-radius: 10px; background: linear-gradient(135deg, var(--accent), var(--gold)); color: #FFFFFF !important; border: none; cursor: pointer; font-weight: 600; font-family: 'DM Sans', sans-serif; transition: all var(--transition); box-shadow: 0 4px 12px var(--accent-glow); }
+    .btn-reg-submit:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 20px var(--accent-glow); }
+    .btn-reg-submit:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .btn-outline { background: none !important; border: 1px solid var(--gold) !important; color: var(--gold) !important; box-shadow: none !important; }
+    .btn-outline:hover:not(:disabled) { background: var(--hover-bg) !important; }
+
+    .filter-search-box { display: flex; align-items: center; gap: 8px; background: var(--cream-2); border: 1px solid var(--border); border-radius: 10px; padding: 7px 14px; transition: all var(--transition); flex: 1; min-width: 200px; }
+    .filter-search-box:focus-within { border-color: var(--gold); background: var(--warm-white); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .filter-search-box input { background: none; border: none; outline: none; font-size: 0.85rem; color: var(--text); width: 100%; font-family: 'DM Sans', sans-serif; }
+
+    .format-helper { background: rgba(139,111,71,0.05); border: 1px solid var(--border); border-radius: 10px; padding: 14px; margin-bottom: 20px; overflow-x: auto; }
+    .mini-table { width: 100%; font-size: 0.7rem; border-collapse: collapse; background: var(--card-bg); min-width: 400px; }
+    .mini-table th, .mini-table td { border: 1px solid var(--border); padding: 5px; text-align: center; color: var(--text); }
+    .mini-table th { background: var(--cream-2); font-weight: 700; }
+
+    .animation-container { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; }
+    .animation-container.active { display: flex; }
+    dotlottie-wc { width: 300px; height: 300px; max-width: 100%; }
+
+    .faculty-table-wrap { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); overflow-x: auto; }
+    .faculty-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; min-width: 700px; }
+    .faculty-table th { padding: 11px 14px; text-align: left; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); background: var(--cream-2); border-bottom: 1px solid var(--border); }
+    .faculty-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-2); color: var(--text-2); }
+    .status-badge { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; }
+    .status-active { background: rgba(34,197,94,0.1); color: #16a34a; }
+    .status-pending { background: rgba(245,158,11,0.1); color: #d97706; }
+
+    .spinner { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-banner { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2); border-radius: 10px; padding: 12px 16px; font-size: 0.82rem; color: #dc2626; display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px; }
+
+    /* PREVIEW — now a full-screen drawer instead of modal */
+    #previewDrawer {
+      position: fixed; inset: 0; z-index: 1000;
+      display: none; flex-direction: column;
+      background: var(--cream); overflow: hidden;
+    }
+    #previewDrawer.open { display: flex; animation: slideUp 0.3s cubic-bezier(0.4,0,0.2,1) both; }
+    @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .drawer-header {
+      display: flex; align-items: center; gap: 14px;
+      padding: 0 24px; height: 64px;
+      background: var(--panel); border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(16px); flex-shrink: 0;
+    }
+    .drawer-body { flex: 1; overflow: auto; padding: 20px 24px; }
+    .preview-table-wrap { background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius-md); overflow-x: auto; }
+    .preview-stat { font-size: 0.78rem; color: var(--text-muted); padding: 6px 14px 14px; }
+
+    /* XLSX-not-ready overlay for buttons */
+    .xlsx-pending { opacity: 0.6; pointer-events: none; }
+
+    #sidebarOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); z-index: 99; }
+    #sidebarOverlay.active { display: block; }
+
+    #toast { position: fixed; bottom: 24px; right: 24px; min-width: 260px; padding: 14px 18px; border-radius: 12px; font-size: 0.875rem; font-weight: 500; z-index: 9999; opacity: 0; transform: translateY(12px); transition: all 0.35s cubic-bezier(0.68,-0.55,0.265,1.55); box-shadow: var(--shadow-lg); }
+    #toast.show { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 1024px) {
+        .register-layout { grid-template-columns: 1fr; }
+        .sidebar { transform: translateX(-110%); }
+        .sidebar.mobile-open { transform: translateX(0); }
+        .main { margin-left: 0; }
+        .mobile-toggle { display: block; }
+    }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+  </style>
+</head>
+<body class="density-default">
+
+<div id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="logo-icon"><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+    <span class="logo-title">ChronoFlex</span>
+  </div>
+  <nav class="sidebar-nav">
+    <span class="section-label">Overview</span>
+    <a class="nav-item" href="/admin-dashboard">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg> Dashboard
+    </a>
+    <span class="section-label">Management</span>
+    <a class="nav-item active">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5z"/><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg> Students
+    </a>
+  </nav>
+</aside>
+
+<main class="main">
+  <header class="topbar">
+    <button class="mobile-toggle" onclick="toggleSidebar()">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+    </button>
+    <div class="topbar-title" id="dynamicTitle">ChronoFlex | Student Management</div>
+    <div class="topbar-spacer"></div>
+    <button onclick="toggleCustomize()" style="background:none; border:1px solid var(--border); padding:8px; border-radius:10px; cursor:pointer; color:var(--text-muted); display:flex; align-items:center; justify-content:center;">
+      <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    </button>
+    <div style="text-align:right">
+      <div id="topName" style="font-size:0.83rem; font-weight:600;">Admin</div>
+      <div style="font-size:0.72rem; color:var(--text-muted);">Super Admin</div>
+    </div>
+    <div class="user-avatar" id="avatarInitials">AD</div>
+  </header>
+
+  <div class="content">
+    <div class="faculty-tabs">
+      <button class="ftab active" onclick="switchTab('stlist', this)">Student List</button>
+      <button class="ftab" onclick="switchTab('stupload', this)">Upload Master List</button>
+    </div>
+
+    <!-- STUDENT LIST -->
+    <div id="stlist" class="view-pane active">
+      <div style="display:flex; gap:12px; margin-bottom:16px; align-items:center; flex-wrap:wrap;">
+        <div style="max-width:130px;">
+          <input type="text" id="semInp" placeholder="Semester"
+                 style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:10px; background:var(--cream-2); color:var(--text); outline:none; font-family:'DM Sans',sans-serif;">
+        </div>
+        <div style="max-width:130px;">
+          <input type="text" id="secInp" placeholder="Section"
+                 style="width:100%; padding:9px 12px; border:1px solid var(--border); border-radius:10px; background:var(--cream-2); color:var(--text); outline:none; font-family:'DM Sans',sans-serif;">
+        </div>
+        <button class="btn-reg-submit" id="fetchBtn" onclick="fetchStudents()">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          Fetch
+        </button>
+        <div class="filter-search-box">
+          <svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="color:var(--text-faint);flex-shrink:0;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input type="text" id="multiFilter" placeholder="Search by name, ID or email..." oninput="applyLocalFilter()">
+        </div>
+        <span id="resultCount" style="font-size:0.75rem; color:var(--text-muted); white-space:nowrap;"></span>
+      </div>
+
+      <div id="fetchError" class="error-banner" style="display:none;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="fetchErrorMsg"></span>
+      </div>
+
+      <div class="faculty-table-wrap">
+        <table class="faculty-table">
+          <thead>
+          <tr><th>Reg ID</th><th>Full Name</th><th>Semester</th><th>Section</th><th>Official Email</th><th>Status</th></tr>
+          </thead>
+          <tbody id="studentBody">
+          <tr><td colspan="6" style="text-align:center; padding:40px; color:var(--text-faint);">Enter semester &amp; section, then click Fetch.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- UPLOAD TAB -->
+    <div id="stupload" class="view-pane">
+      <div class="register-layout">
+        <div class="reg-card" id="uploadFormCard">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <div class="reg-section-label" style="margin:0;">Excel Upload</div>
+            <!-- Download Template: uses withXLSX to safely wait for lib -->
+            <button class="btn-reg-submit btn-outline" id="dlTemplateBtn" onclick="downloadTemplate()" style="padding:6px 12px; font-size:0.7rem;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+              Download Template
+            </button>
+          </div>
+
+          <div class="format-helper">
+            <table class="mini-table">
+              <thead><tr><th>reg_id</th><th>fullName</th><th>semester</th><th>section</th><th>email</th></tr></thead>
+              <tbody><tr><td>U23CS101</td><td>John Doe</td><td>V</td><td>A</td><td>j@edu.com</td></tr></tbody>
+            </table>
+          </div>
+
+          <div style="border:2px dashed var(--border); padding:30px; text-align:center; border-radius:15px; background:var(--cream-2); margin-bottom:20px;"
+               id="dropZone"
+               ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+            <input type="file" id="stFile" accept=".xlsx,.xls" hidden onchange="updateFileName()">
+            <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5" style="color:var(--text-faint); margin-bottom:10px;"><path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            <p style="font-size:0.8rem; color:var(--text-muted); margin-bottom:12px;">Drag & drop your Excel file here, or</p>
+            <button class="btn-reg-submit" style="margin:0 auto;" onclick="document.getElementById('stFile').click()">Browse File</button>
+            <p id="fileName" style="font-size:0.75rem; margin-top:10px; color:var(--text-muted);">Accepted: .xlsx, .xls</p>
+          </div>
+
+          <div id="fileActionBtns" style="display:none; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+            <button class="btn-reg-submit btn-outline" id="previewBtn" onclick="previewSelectedFile()" style="flex:1; min-width:100px;">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              Preview
+            </button>
+            <button class="btn-reg-submit" id="uploadBtn" style="flex:2; min-width:140px;" onclick="processUpload()">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+              Process Upload
+            </button>
+          </div>
+
+          <div id="uploadError" class="error-banner" style="display:none;">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" style="flex-shrink:0;margin-top:1px;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <span id="uploadErrorMsg"></span>
+          </div>
+        </div>
+
+        <div class="animation-container" id="lottiePane">
+          <dotlottie-wc src="https://lottie.host/235169b4-a8de-45fd-9bc0-bd1e8a74a1c1/rqkkRP8ypn.lottie" autoplay loop></dotlottie-wc>
+          <h4 style="font-family:'Playfair Display'; margin-top:15px;">Syncing Master List...</h4>
+          <p style="font-size:0.78rem; color:var(--text-muted); margin-top:6px;">Please don't close this tab.</p>
+        </div>
+
+        <div class="reg-card" style="padding:18px;">
+          <div class="reg-section-label">Upload Info</div>
+          <p style="font-size:0.75rem; color:var(--text-muted); line-height:1.6;">
+            ✔ Existing records with same Reg ID will be skipped.<br>
+            ✔ Maximum recommended: 1000 rows per file.<br>
+            ✔ All 5 columns must be present.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PREVIEW DRAWER  (replaces the old modal — no overflow issues)
+     ═══════════════════════════════════════════════════════════════ -->
+<div id="previewDrawer">
+  <div class="drawer-header">
+    <button onclick="closePreview()"
+            style="background:none;border:1px solid var(--border);padding:7px 10px;border-radius:9px;cursor:pointer;color:var(--text-muted);display:flex;align-items:center;gap:6px;font-family:'DM Sans',sans-serif;font-size:0.8rem;">
+      <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+      Back
+    </button>
+    <h3 style="font-family:'Playfair Display'; font-size:1.1rem; flex:1;">Excel Preview</h3>
+    <button class="btn-reg-submit" id="proceedFromPreview" onclick="closePreviewAndUpload()" style="padding:8px 18px; font-size:0.8rem;">
+      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+      Proceed &amp; Upload
+    </button>
+  </div>
+  <div class="drawer-body">
+    <p class="preview-stat" id="previewMeta"></p>
+    <div class="preview-table-wrap">
+      <table class="faculty-table" style="min-width:500px;">
+        <thead id="previewHead"></thead>
+        <tbody id="previewBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CUSTOMIZE PANEL -->
+<div class="customize-panel" id="customizePanel">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+    <h3 style="font-family:'Playfair Display'; font-size:1.1rem;">Customize</h3>
+    <button onclick="toggleCustomize()" style="background:none; border:none; cursor:pointer; color:var(--text-muted); font-size:1.4rem;">&times;</button>
+  </div>
+  <div class="c-section">
+    <div class="c-title">Theme Mode</div>
+    <div class="swatch-group">
+      <button class="swatch active" id="sw-light" onclick="setTheme('light')">Light</button>
+      <button class="swatch" id="sw-dark" onclick="setTheme('dark')">Dark</button>
+      <button class="swatch" id="sw-system" onclick="setTheme('system')">System</button>
+    </div>
+  </div>
+  <div class="c-section">
+    <div class="c-title">Accent Color</div>
+    <div class="accent-colors">
+      <div class="accent-dot active" style="background:#4A3728" data-main="#4A3728" data-warm="#8B6F47" onclick="setAccent(this)"></div>
+      <div class="accent-dot" style="background:#6366f1" data-main="#3730a3" data-warm="#6366f1" onclick="setAccent(this)"></div>
+      <div class="accent-dot" style="background:#10b981" data-main="#064e3b" data-warm="#10b981" onclick="setAccent(this)"></div>
+      <div class="accent-dot" style="background:#f43f5e" data-main="#9f1239" data-warm="#f43f5e" onclick="setAccent(this)"></div>
+    </div>
+  </div>
+  <div class="c-section">
+    <div class="c-title">Layout Density</div>
+    <div class="swatch-group">
+      <button class="swatch" onclick="setDensity('compact')">Compact</button>
+      <button class="swatch active" onclick="setDensity('default')">Default</button>
+      <button class="swatch" onclick="setDensity('comfortable')">Spacious</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const API = "http://localhost:8080/admin";
+
+  // ─── STREAM-SAFE FETCH ─────────────────────────────────────────────────────
+  async function streamSafeFetch(url, options = {}) {
+      const controller = new AbortController();
+      const timer = setTimeout(() => controller.abort(), 40000);
+      try {
+          const res = await fetch(url, { ...options, signal: controller.signal, cache: 'no-store' });
+          clearTimeout(timer);
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let accumulated = '';
+          while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              accumulated += decoder.decode(value, { stream: true });
+          }
+          accumulated += decoder.decode();
+          return { ok: res.ok, status: res.status, raw: accumulated.trim() };
+      } catch (err) {
+          clearTimeout(timer);
+          if (err.name === 'AbortError') throw new Error('Request timed out. Please try again.');
+          throw new Error('Network error: ' + err.message);
+      }
+  }
+
+  // ─── JSON PARSE WITH TRUNCATION REPAIR ────────────────────────────────────
+  function safeParseJSON(raw) {
+      if (!raw) throw new Error('Server returned an empty response.');
+      const cleaned = raw.trim().replace(/^\uFEFF/, '');
+      try { return JSON.parse(cleaned); } catch {
+          if (cleaned.startsWith('[')) {
+              const lastGood = cleaned.lastIndexOf('},');
+              if (lastGood > 0) {
+                  try {
+                      const partial = JSON.parse(cleaned.substring(0, lastGood + 1) + ']');
+                      console.warn(`[ChronoFlex] Partial recovery: ${partial.length} records.`);
+                      return partial;
+                  } catch { /* fall through */ }
+              }
+          }
+          throw new Error('Could not parse server response. Raw: ' + cleaned.substring(0, 100));
+      }
+  }
+
+  // ─── FETCH STUDENTS ────────────────────────────────────────────────────────
+  async function fetchStudents() {
+      const sem = document.getElementById('semInp').value.trim();
+      const sec = document.getElementById('secInp').value.trim();
+      if (!sem || !sec) return showError('fetchError', 'fetchErrorMsg', 'Please enter both Semester and Section.');
+      hideError('fetchError');
+      const btn = document.getElementById('fetchBtn');
+      btn.disabled = true;
+      btn.innerHTML = '<div class="spinner"></div> Fetching...';
+      const session = JSON.parse(localStorage.getItem('cfAdminSession') || '{}');
+      const params = new URLSearchParams({ email: session.adminEmail || '', password: session.adminPassword || '', semester: sem, section: sec });
+      try {
+          const { ok, status, raw } = await streamSafeFetch(`${API}/students?${params}`);
+          if (!ok) throw new Error(`Server error ${status}: ${raw || 'No details.'}`);
+          const data = safeParseJSON(raw);
+          if (!Array.isArray(data)) throw new Error('Unexpected response format from server.');
+          const tbody = document.getElementById('studentBody');
+          if (data.length === 0) {
+              tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--text-faint);">No students found for Sem <b>${esc(sem)}</b> / Sec <b>${esc(sec)}</b>.</td></tr>`;
+              document.getElementById('resultCount').innerText = '';
+          } else {
+              tbody.innerHTML = data.map(s => `
+                  <tr>
+                      <td style="font-weight:700">${esc(s.regId ?? '')}</td>
+                      <td>${esc(s.fullName ?? '')}</td>
+                      <td>${esc(s.semester ?? '')}</td>
+                      <td>${esc(s.section ?? '')}</td>
+                      <td>${esc(s.officialEmail ?? '—')}</td>
+                      <td><span class="status-badge ${s.registered ? 'status-active' : 'status-pending'}">${s.registered ? 'Registered' : 'Pending'}</span></td>
+                  </tr>`).join('');
+              document.getElementById('resultCount').innerText = `${data.length} record${data.length !== 1 ? 's' : ''}`;
+              showToast(`${data.length} student${data.length !== 1 ? 's' : ''} loaded.`);
+          }
+          applyLocalFilter();
+      } catch (err) {
+          showError('fetchError', 'fetchErrorMsg', err.message);
+          showToast(err.message, 'error');
+      } finally {
+          btn.disabled = false;
+          btn.innerHTML = `<svg width="15" height="15" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> Fetch`;
+      }
+  }
+
+  // ─── PROCESS UPLOAD ────────────────────────────────────────────────────────
+  async function processUpload() {
+      const fileInp = document.getElementById('stFile');
+      if (!fileInp.files[0]) return showError('uploadError', 'uploadErrorMsg', 'Please select a file first.');
+      hideError('uploadError');
+      document.getElementById('uploadFormCard').style.display = 'none';
+      document.getElementById('lottiePane').classList.add('active');
+      const session = JSON.parse(localStorage.getItem('cfAdminSession') || '{}');
+      const formData = new FormData();
+      formData.append('file', fileInp.files[0]);
+      formData.append('email', session.adminEmail || '');
+      formData.append('password', session.adminPassword || '');
+      try {
+          const { ok, status, raw } = await streamSafeFetch(`${API}/upload-students`, { method: 'POST', body: formData });
+          if (!ok) throw new Error(`Upload failed (${status}): ${raw || 'No details.'}`);
+          showToast(raw || 'Upload successful!');
+      } catch (err) {
+          showError('uploadError', 'uploadErrorMsg', err.message);
+          showToast(err.message, 'error');
+      } finally {
+          document.getElementById('uploadFormCard').style.display = 'block';
+          document.getElementById('lottiePane').classList.remove('active');
+          fileInp.value = '';
+          updateFileName();
+      }
+  }
+
+  // ─── PREVIEW (now uses full-screen drawer, no popup) ──────────────────────
+  function previewSelectedFile() {
+      if (!window.__xlsxReady) { showToast('Spreadsheet library still loading, please wait…', 'error'); return; }
+      const file = document.getElementById('stFile').files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+          try {
+              const wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array' });
+              const ws = wb.Sheets[wb.SheetNames[0]];
+              const json = XLSX.utils.sheet_to_json(ws, { header: 1 });
+              if (!json || json.length === 0) return showToast('File is empty.', 'error');
+              const head = json[0];
+              const rows = json.slice(1).filter(r => r.some(c => c !== undefined && c !== ''));
+              document.getElementById('previewMeta').innerText =
+                  `Sheet: ${wb.SheetNames[0]}  •  ${rows.length} data rows  •  ${head.length} columns`;
+              document.getElementById('previewHead').innerHTML =
+                  `<tr>${head.map(h => `<th>${esc(String(h ?? ''))}</th>`).join('')}</tr>`;
+              document.getElementById('previewBody').innerHTML =
+                  rows.map(r => `<tr>${head.map((_, i) => `<td>${esc(String(r[i] ?? ''))}</td>`).join('')}</tr>`).join('');
+              openPreview();
+          } catch (err) { showToast('Could not parse: ' + err.message, 'error'); }
+      };
+      reader.onerror = () => showToast('Could not read file.', 'error');
+      reader.readAsArrayBuffer(file);
+  }
+
+  function openPreview() {
+      document.getElementById('previewDrawer').classList.add('open');
+      document.body.style.overflow = 'hidden';
+  }
+  function closePreview() {
+      document.getElementById('previewDrawer').classList.remove('open');
+      document.body.style.overflow = '';
+  }
+  function closePreviewAndUpload() {
+      closePreview();
+      // Small delay so drawer closes before upload animation shows
+      setTimeout(processUpload, 200);
+  }
+
+  // ─── DOWNLOAD TEMPLATE  (with XLSX-ready guard + CSV fallback) ────────────
+  function downloadTemplate() {
+      if (!window.__xlsxReady) {
+          // Fallback: download a plain CSV the browser can always handle
+          const csv = 'reg_id,fullName,semester,section,email\r\nU23CS101,John Doe,V,A,john@college.edu\r\n';
+          const blob = new Blob([csv], { type: 'text/csv' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = 'ChronoFlex_Student_Template.csv';
+          a.click();
+          URL.revokeObjectURL(a.href);
+          showToast('Template downloaded as CSV (library still loading).');
+          return;
+      }
+      try {
+          const ws = XLSX.utils.aoa_to_sheet([
+              ['reg_id', 'fullName', 'semester', 'section', 'email'],
+              ['U23CS101', 'John Doe', 'V', 'A', 'john@college.edu']
+          ]);
+          // Column widths
+          ws['!cols'] = [{ wch: 14 }, { wch: 22 }, { wch: 10 }, { wch: 10 }, { wch: 28 }];
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, 'Template');
+          XLSX.writeFile(wb, 'ChronoFlex_Student_Template.xlsx');
+          showToast('Template downloaded!');
+      } catch (err) {
+          showToast('Download failed: ' + err.message, 'error');
+      }
+  }
+
+  // ─── DRAG & DROP ───────────────────────────────────────────────────────────
+  function handleDragOver(e) { e.preventDefault(); document.getElementById('dropZone').style.borderColor = 'var(--gold)'; }
+  function handleDragLeave() { document.getElementById('dropZone').style.borderColor = ''; }
+  function handleDrop(e) {
+      e.preventDefault(); handleDragLeave();
+      const file = e.dataTransfer.files[0];
+      if (!file || !file.name.match(/\.(xlsx|xls)$/i)) return showToast('Only .xlsx/.xls accepted.', 'error');
+      const dt = new DataTransfer(); dt.items.add(file);
+      document.getElementById('stFile').files = dt.files;
+      updateFileName();
+  }
+
+  // ─── HELPERS ──────────────────────────────────────────────────────────────
+  const esc = str => String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+  function updateFileName() {
+      const file = document.getElementById('stFile').files[0];
+      document.getElementById('fileName').innerText = file ? `Selected: ${file.name}` : 'Accepted: .xlsx, .xls';
+      document.getElementById('fileActionBtns').style.display = file ? 'flex' : 'none';
+  }
+
+  function applyLocalFilter() {
+      const q = document.getElementById('multiFilter').value.toLowerCase();
+      const rows = document.querySelectorAll('#studentBody tr');
+      let v = 0;
+      rows.forEach(r => { const m = r.innerText.toLowerCase().includes(q); r.style.display = m ? '' : 'none'; if(m) v++; });
+      if (q && rows.length > 1) document.getElementById('resultCount').innerText = `${v} / ${rows.length}`;
+  }
+
+  function switchTab(id, btn) {
+      document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.view-pane').forEach(v => v.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(id).classList.add('active');
+  }
+
+  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('mobile-open'); document.getElementById('sidebarOverlay').classList.toggle('active'); }
+  function toggleCustomize() { document.getElementById('customizePanel').classList.toggle('open'); }
+  function showError(bId, mId, msg) { document.getElementById(bId).style.display = 'flex'; document.getElementById(mId).innerText = msg; }
+  function hideError(bId) { document.getElementById(bId).style.display = 'none'; }
+
+  function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.innerText = msg; t.style.background = type === 'success' ? '#22c55e' : '#ef4444'; t.style.color = '#fff';
+      t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  function setTheme(mode) {
+      ['light','dark','system'].forEach(m => document.getElementById('sw-'+m)?.classList.remove('active'));
+      document.documentElement.classList.toggle('dark', mode === 'dark' || (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches));
+      document.getElementById('sw-'+mode)?.classList.add('active');
+      localStorage.setItem('cfTheme', mode);
+  }
+  function setAccent(el) {
+      document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('active')); el.classList.add('active');
+      document.documentElement.style.setProperty('--accent', el.dataset.main);
+      document.documentElement.style.setProperty('--accent-warm', el.dataset.warm);
+  }
+  function setDensity(d) { document.body.className = 'density-' + d; localStorage.setItem('cfDensity', d); }
+
+  function initSession() {
+      const s = JSON.parse(localStorage.getItem('cfAdminSession') || '{}');
+      const code = s.collegeCode || 'INST', name = s.adminName || 'Super Admin';
+      document.getElementById('pageTitle').innerText = `ChronoFlex | ${code} | Student Master`;
+      document.getElementById('dynamicTitle').innerText = `ChronoFlex | ${code}`;
+      document.getElementById('topName').innerText = name;
+      document.getElementById('avatarInitials').innerText = name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+      setTheme(localStorage.getItem('cfTheme') || 'light');
+      setDensity(localStorage.getItem('cfDensity') || 'default');
+  }
+
+  // Close preview on Escape
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePreview(); });
+  ['semInp','secInp'].forEach(id => document.getElementById(id).addEventListener('keydown', e => { if (e.key === 'Enter') fetchStudents(); }));
+  window.onload = initSession;
+</script>
+</body>
+</html>

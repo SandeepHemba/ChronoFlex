@@ -2,6 +2,7 @@ package com.example.ChronoFlex.repository;
 
 import com.example.ChronoFlex.model.CollegeClass;
 import com.example.ChronoFlex.model.College;
+import com.example.ChronoFlex.model.Faculty;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -27,4 +28,6 @@ public interface CollegeClassRepository extends JpaRepository<CollegeClass, Inte
 
      // Return list instead of Optional to handle multiple classes
     Optional<CollegeClass> findByCollege_CollegeIdAndSemesterAndSection(Long collegeId, String semester, String section);
+
+    List<CollegeClass> findByClassTeacher(Faculty faculty);
 }

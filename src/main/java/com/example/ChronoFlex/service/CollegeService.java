@@ -44,7 +44,7 @@ public class CollegeService {
                 "Name", college.getCollegeName(),
                 "OTP", otp
         );
-        emailService.sendEmailFromTemplate("college_registration_otp.txt",
+        emailService.sendEmailFromTemplate("college_registration_otp.html",
                 college.getContactEmail(), values);
     }
 

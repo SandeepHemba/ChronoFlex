@@ -1,7 +1,10 @@
 package com.example.ChronoFlex.controllers;
 
+import com.example.ChronoFlex.dto.FacultyAuthRequest;
 import com.example.ChronoFlex.dto.FacultyTimetableOverviewDTO;
 import com.example.ChronoFlex.service.AllFacultyTimeTableService;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,12 +30,19 @@ public class AllFacultyTimeTableController {
                     request.getAdminEmail(),
                     request.getAdminPassword()
             );
+
+            // Force serialize to string first — if this throws, you'll see the real error
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            String json = mapper.writeValueAsString(overview); // ← will throw if serialization fails
+
             return ResponseEntity.ok(overview);
         } catch (IllegalAccessException e) {
             return ResponseEntity.status(401).body(
                     new ErrorResponse("Unauthorized", e.getMessage())
             );
         } catch (Exception e) {
+            e.printStackTrace(); // ← now you'll see the real error in console
             return ResponseEntity.internalServerError().body(
                     new ErrorResponse("Error", e.getMessage())
             );
@@ -63,5 +73,30 @@ public class AllFacultyTimeTableController {
 
         public String getStatus() { return status; }
         public String getMessage() { return message; }
+    }
+
+
+    // ✅ Endpoint: /api/faculty/timetable/me
+    @PostMapping("/me")
+    public ResponseEntity<?> getMyTimetable(@RequestBody FacultyAuthRequest request) {
+        try {
+            FacultyTimetableOverviewDTO timetable =
+                    allFacultyTimeTableService.getFacultyTimetable(
+                            request.getEmail(),
+                            request.getPassword()
+                    );
+
+            return ResponseEntity.ok(timetable);
+
+        } catch (IllegalAccessException e) {
+            return ResponseEntity.status(401).body(
+                    new ErrorResponse("Unauthorized", e.getMessage())
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body(
+                    new ErrorResponse("Error", e.getMessage())
+            );
+        }
     }
 }

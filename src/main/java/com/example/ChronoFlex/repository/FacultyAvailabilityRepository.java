@@ -31,6 +31,8 @@ public interface FacultyAvailabilityRepository extends JpaRepository<FacultyAvai
             "  AND fa.status = 'BUSY' " +
             "  AND NOT ( :newEnd <= fa.start_time OR :newStart >= fa.end_time )",
             nativeQuery = true)
+
+    //28th feb 2026
     List<FacultyAvailability> findConflicts(
             @Param("facultyId") Long facultyId,
             @Param("dayOfWeek") String dayOfWeek,
@@ -51,6 +53,8 @@ public interface FacultyAvailabilityRepository extends JpaRepository<FacultyAvai
             "  AND fa.status = 'BUSY' " +
             "  AND NOT ( :newEnd <= fa.start_time OR :newStart >= fa.end_time )",
             nativeQuery = true)
+
+    //28th feb 2026
     List<FacultyAvailability> findConflictsByClass(
             @Param("classId") Integer classId,
             @Param("dayOfWeek") String dayOfWeek,
