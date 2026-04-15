@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class AllFacultyTimeTableService {
 
     private final FacultyRepository facultyRepo;
-    private final com.example.chronoflex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo;
+    private final com.example.ChronoFlex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo;
     private final SubjectRepository subjectRepo;
     private final AdminRepository adminRepo;
     private final CollegeRepository collegeRepo;
@@ -22,7 +22,7 @@ public class AllFacultyTimeTableService {
 
     public AllFacultyTimeTableService(
             FacultyRepository facultyRepo,
-            com.example.chronoflex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo,
+            com.example.ChronoFlex.repository.FacultyAvailabilityRepository facultyAvailabilityRepo,
             SubjectRepository subjectRepo,
             AdminRepository adminRepo,
             CollegeRepository collegeRepo
