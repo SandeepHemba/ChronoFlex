@@ -1009,8 +1009,8 @@
     // ══════════════════════════════════════════════
     // CONFIG & STATE
     // ══════════════════════════════════════════════
-    const API_BASE_TIMETABLE = 'http://localhost:8080/api/faculty/timetable';
-    const API_AI = 'http://localhost:8080/api/ai/chat';
+    const API_BASE_TIMETABLE = 'https://chronoflex.onrender.com/api/faculty/timetable';
+    const API_AI = 'https://chronoflex.onrender.com/api/ai/chat';
     // Fix 1: Update DAY_ORDER to use short codes (matching your API)
     const DAY_ORDER = ['MON','TUE','WED','THU','FRI','SAT','SUN'];
     const DAY_SHORT = { MON:'MON', TUE:'TUE', WED:'WED', THU:'THU', FRI:'FRI', SAT:'SAT', SUN:'SUN' };
@@ -1435,7 +1435,7 @@
   const context = buildTimetableContext();
 
   try {
-    const res = await fetch('http://localhost:8080/api/ai/chat', {
+    const res = await fetch('https://chronoflex.onrender.com/api/ai/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
