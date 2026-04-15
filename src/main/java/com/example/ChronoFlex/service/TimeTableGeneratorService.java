@@ -7,7 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.example.chronoflex.repository.FacultyAvailabilityRepository;
+import com.example.ChronoFlex.repository.FacultyAvailabilityRepository;
 
 import java.time.LocalTime;
 import java.util.*;
