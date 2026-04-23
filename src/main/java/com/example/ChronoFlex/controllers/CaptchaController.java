@@ -182,7 +182,7 @@ public class CaptchaController {
         Boolean verified = (Boolean) session.getAttribute("captchaVerified");
 
         if (verified != null && verified) {
-            return "/admin-dashboard";   // home.html inside templates
+            return "admin-dashboard";   // home.html inside templates
         } else {
             return "redirect:/";
         }
@@ -194,7 +194,7 @@ public class CaptchaController {
         Boolean verified = (Boolean) session.getAttribute("captchaVerified");
 
         if (verified != null && verified) {
-            return "/mapping";
+            return "mapping";
         } else {
             return "redirect:/";
         }
@@ -206,7 +206,7 @@ public class CaptchaController {
         Boolean verified = (Boolean) session.getAttribute("captchaVerified");
 
         if (verified != null && verified) {
-            return "/timetableOpts";
+            return "timetableOpts";
         } else {
             return "redirect:/";
         }
@@ -218,7 +218,7 @@ public class CaptchaController {
         Boolean verified = (Boolean) session.getAttribute("captchaVerified");
 
         if (verified != null && verified) {
-            return "/student-master-list";
+            return "student-master-list";
         } else {
             return "redirect:/";
         }
@@ -230,7 +230,7 @@ public class CaptchaController {
         Boolean verified = (Boolean) session.getAttribute("captchaVerified");
 
         if (verified != null && verified) {
-            return "/faculty-timetables";
+            return "faculty-timetables";
         } else {
             return "redirect:/";
         }
@@ -242,7 +242,7 @@ public class CaptchaController {
         Boolean verified = (Boolean) session.getAttribute("captchaVerified");
 
         if (verified != null && verified) {
-            return "/faculty-dashboard";
+            return "faculty-dashboard";
         } else {
             return "redirect:/";
         }
